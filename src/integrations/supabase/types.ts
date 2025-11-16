@@ -20,6 +20,10 @@ export type Database = {
           id: string
           metadata: Json | null
           notes: string | null
+          research_data: Json | null
+          research_last_run_at: string | null
+          research_status: string | null
+          research_summary: string | null
           status: string
           topic: string
           updated_at: string
@@ -29,6 +33,10 @@ export type Database = {
           id?: string
           metadata?: Json | null
           notes?: string | null
+          research_data?: Json | null
+          research_last_run_at?: string | null
+          research_status?: string | null
+          research_summary?: string | null
           status?: string
           topic: string
           updated_at?: string
@@ -38,6 +46,10 @@ export type Database = {
           id?: string
           metadata?: Json | null
           notes?: string | null
+          research_data?: Json | null
+          research_last_run_at?: string | null
+          research_status?: string | null
+          research_summary?: string | null
           status?: string
           topic?: string
           updated_at?: string
