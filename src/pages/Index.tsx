@@ -1,9 +1,61 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Sparkles, Search, FileText, Video, Image, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [topic, setTopic] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    // التحقق من أن الحقل غير فارغ
+    if (!topic.trim()) {
+      setError("رجاءً اكتب الموضوع أولًا.");
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      // إنشاء مشروع جديد في قاعدة البيانات
+      const { data, error: insertError } = await supabase
+        .from("projects")
+        .insert({
+          topic: topic.trim(),
+          status: "new",
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Error creating project:", insertError);
+        toast.error("حدث خطأ غير متوقع، جرّب مرة ثانية.");
+        return;
+      }
+
+      if (data) {
+        toast.success("تم إنشاء المشروع بنجاح!");
+        // إعادة التوجيه إلى صفحة المشروع
+        navigate(`/projects/${data.id}`);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("حدث خطأ غير متوقع، جرّب مرة ثانية.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const features = [
     {
       icon: Search,
@@ -41,16 +93,23 @@ const Index = () => {
             <Sparkles className="w-8 h-8 text-primary" />
             <h1 className="text-2xl font-bold text-foreground">PreShoot AI</h1>
           </div>
-          <Link to="/instructions">
-            <Button variant="outline" size="sm">
-              التعليمات
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link to="/projects">
+              <Button variant="outline" size="sm">
+                مشاريعي
+              </Button>
+            </Link>
+            <Link to="/instructions">
+              <Button variant="outline" size="sm">
+                التعليمات
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section className="container mx-auto px-4 py-12 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
             <Sparkles className="w-10 h-10 text-primary" />
@@ -64,27 +123,61 @@ const Index = () => {
             مساعدك الشخصي قبل التصوير وبعده
           </p>
           
-          <p className="body-text max-w-2xl mx-auto mb-8 leading-relaxed">
-            منصة شاملة تساعد صناع المحتوى العرب على تحويل فكرة واحدة إلى محتوى متكامل جاهز للإنتاج. 
-            من البحث والتجميع، إلى السكريبتات والبرومبتات، وصولاً إلى المقالات الجاهزة.
+          <p className="body-text max-w-2xl mx-auto mb-12 leading-relaxed">
+            حوّل أي فكرة إلى محتوى متكامل جاهز للإنتاج - من البحث إلى السكريبتات والبرومبتات
           </p>
-          
-          <div className="flex gap-4 justify-center mb-12">
-            <Button size="lg" className="gap-2">
-              <Sparkles className="w-5 h-5" />
-              ابدأ الآن
-            </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link to="/instructions">
-                تعرف أكثر
-              </Link>
-            </Button>
-          </div>
 
-          {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/20 border border-secondary/30 rounded-full">
+          {/* Project Creation Form */}
+          <Card className="max-w-2xl mx-auto p-8 bg-card border-2 border-primary/10 shadow-lg">
+            <form onSubmit={handleCreateProject} className="space-y-6">
+              <div className="text-right space-y-3">
+                <Label htmlFor="topic" className="text-lg font-semibold">
+                  اكتب الموضوع اللي حاب تتكلم عنه
+                </Label>
+                <Input
+                  id="topic"
+                  type="text"
+                  placeholder="مثال: أبي أتكلم عن معالجات Apple M5"
+                  value={topic}
+                  onChange={(e) => {
+                    setTopic(e.target.value);
+                    if (error) setError("");
+                  }}
+                  className="text-lg h-12"
+                  disabled={isCreating}
+                />
+                {error && (
+                  <p className="text-sm text-destructive text-right">
+                    {error}
+                  </p>
+                )}
+              </div>
+
+              <Button 
+                type="submit" 
+                size="lg" 
+                className="w-full gap-2 h-12 text-lg"
+                disabled={isCreating}
+              >
+                {isCreating ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                    جاري الإنشاء...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    إنشاء مشروع جديد
+                  </>
+                )}
+              </Button>
+            </form>
+          </Card>
+
+          {/* Info Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/20 border border-secondary/30 rounded-full mt-8">
             <div className="w-2 h-2 rounded-full bg-accent-green animate-pulse"></div>
-            <span className="text-sm font-medium text-foreground">النسخة التأسيسية - قيد التطوير</span>
+            <span className="text-sm font-medium text-foreground">جرّب الآن وابدأ مشروعك الأول</span>
           </div>
         </div>
       </section>
