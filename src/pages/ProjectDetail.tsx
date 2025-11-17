@@ -24,6 +24,11 @@ interface Project {
   notes?: string;
   created_at: string;
   updated_at: string;
+  research_status: string | null;
+  scripts_status: string | null;
+  broll_status: string | null;
+  prompts_status: string | null;
+  article_status: string | null;
 }
 
 const ProjectDetail = () => {
