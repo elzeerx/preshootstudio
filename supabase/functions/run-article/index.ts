@@ -20,10 +20,10 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
 
-    if (!openaiApiKey) {
-      throw new Error("OpenAI API key not configured");
+    if (!lovableApiKey) {
+      throw new Error("Lovable AI API key not configured");
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -87,30 +87,61 @@ Deno.serve(async (req) => {
 - خاتمة تلخص الفكرة الأساسية
 - معلومات SEO محسّنة`;
 
-    console.log("Calling OpenAI API for article generation...");
+    console.log("Calling Lovable AI Gateway for article generation...");
 
-    // Call OpenAI API
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // Call Lovable AI Gateway
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openaiApiKey}`,
+        "Authorization": `Bearer ${lovableApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: ARTICLE_SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
         response_format: { type: "json_object" },
-        temperature: 0.7,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error("Lovable AI Gateway error:", response.status, errorText);
+      
+      // Handle rate limiting and payment errors
+      if (response.status === 429) {
+        await supabase
+          .from("projects")
+          .update({
+            article_status: "error",
+            article_last_run_at: new Date().toISOString(),
+          })
+          .eq("id", projectId);
+        
+        return new Response(
+          JSON.stringify({ error: "معدل الطلبات مرتفع جداً، يرجى المحاولة لاحقاً" }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      if (response.status === 402) {
+        await supabase
+          .from("projects")
+          .update({
+            article_status: "error",
+            article_last_run_at: new Date().toISOString(),
+          })
+          .eq("id", projectId);
+        
+        return new Response(
+          JSON.stringify({ error: "الرصيد غير كافٍ، يرجى إضافة رصيد في إعدادات Workspace" }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      throw new Error(`Lovable AI Gateway error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -158,12 +189,14 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in run-article function:", error);
 
     // Try to update status to error
     try {
-      const { projectId } = await req.json();
+      const requestBody = await req.clone().json();
+      const projectId = requestBody?.projectId;
+      
       if (projectId) {
         const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
         const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -183,7 +216,7 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error: error?.message || "حدث خطأ أثناء توليد المقال",
       }),
       {
         status: 500,
