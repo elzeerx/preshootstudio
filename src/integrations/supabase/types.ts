@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       projects: {
         Row: {
+          broll_data: Json | null
+          broll_last_run_at: string | null
+          broll_status: string | null
           created_at: string
           id: string
           metadata: Json | null
@@ -32,6 +35,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          broll_data?: Json | null
+          broll_last_run_at?: string | null
+          broll_status?: string | null
           created_at?: string
           id?: string
           metadata?: Json | null
@@ -48,6 +54,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          broll_data?: Json | null
+          broll_last_run_at?: string | null
+          broll_status?: string | null
           created_at?: string
           id?: string
           metadata?: Json | null
