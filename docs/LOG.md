@@ -6,6 +6,40 @@
 
 ## 2025-01-17
 
+### Mission 10: إضافة نظام المصادقة وربط المشاريع بالمستخدمين (User Authentication & Project Ownership)
+- إنشاء جدول `profiles` في قاعدة البيانات لبيانات المستخدمين الإضافية
+- إضافة حقل `user_id` لجدول `projects` مع علاقة Foreign Key
+- تطبيق RLS policies على جداول `profiles` و `projects` لحماية البيانات
+- إنشاء trigger `on_auth_user_created` لإنشاء profile تلقائياً عند التسجيل
+- إنشاء `AuthContext.tsx` لإدارة حالة المصادقة عبر التطبيق
+- إنشاء صفحة `/auth` لتسجيل الدخول والتسجيل
+- إنشاء صفحة `/profile` لعرض وتعديل معلومات المستخدم
+- إنشاء مكون `ProtectedRoute` لحماية الصفحات
+- تحديث `App.tsx` لإضافة AuthProvider والمسارات المحمية
+- تحديث `Index.tsx` لعرض حالة المستخدم في الهيدر وربط المشاريع بالمستخدم
+- تحديث `Projects.tsx` لعرض مشاريع المستخدم الحالي فقط
+- تحديث `ProjectDetail.tsx` لفحص ملكية المشروع قبل عرضه
+- تفعيل auto-confirm email في Supabase Auth للتطوير السريع
+
+### Mission 9: تفعيل تبويب التصدير (Export Tab - PreShoot Pack)
+- إنشاء أنواع البيانات في `src/lib/types/export.ts`
+- إنشاء Edge Function `run-export` لتجميع مخرجات المشروع
+- بناء حزمة التصدير من البيانات المخزنة (بدون استدعاء AI جديد)
+- توليد ملف Markdown شامل يحتوي:
+  - ملخص حالة جميع الأجزاء
+  - البحث (Research)
+  - السكريبتات (Scripts)
+  - B-Roll
+  - البرومبتات (Prompts)
+  - المقال (Article)
+- تحديث `ExportTab.tsx` لعرض:
+  - حالة جاهزية كل جزء
+  - زر تجهيز حزمة التصدير
+  - معاينة Markdown
+  - أزرار نسخ وتحميل (Markdown + JSON)
+
+## 2025-01-17
+
 ### Mission 8: تفعيل تبويب المقال (Article Tab)
 - إضافة حقول `article_status`, `article_last_run_at`, `article_data` في جدول `projects`
 - إنشاء System Prompt خاص بالمقال في `systemPrompts.ts`
