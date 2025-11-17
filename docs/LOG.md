@@ -609,4 +609,20 @@ g) **الأسئلة والأجوبة**:
 
 ---
 
-*آخر تحديث: مرحلة التأسيس الكاملة*
+### 2025-01-17 – Mission 6: تفعيل تبويب B-Roll
+
+- ✅ إضافة حقول `broll_status`, `broll_last_run_at`, `broll_data` في جدول `projects`
+- ✅ إنشاء `BROLL_SYSTEM_PROMPT` في `systemPrompts.ts`
+- ✅ إنشاء Edge Function: `supabase/functions/run-broll/index.ts`
+- ✅ تحديث `BRollTab.tsx` بواجهة كاملة
+
+### 2025-01-17 – Mission 7: تفعيل تبويب البرومبتات
+
+- ✅ إضافة حقول `prompts_status`, `prompts_last_run_at`, `prompts_data` في جدول `projects`
+- ✅ إنشاء `PROMPTS_SYSTEM_PROMPT` في `systemPrompts.ts`
+- ✅ إنشاء Types في `src/lib/types/prompts.ts`
+- ✅ إنشاء Edge Function: `supabase/functions/run-prompts/index.ts`
+- ✅ تحديث `PromptsTab.tsx` بواجهة كاملة بتبويبات فرعية
+- ✅ دعم إعادة توليد حزمة البرومبتات
+
+*آخر تحديث: Mission 7 - تفعيل تبويب البرومبتات*

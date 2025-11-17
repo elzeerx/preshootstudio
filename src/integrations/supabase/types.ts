@@ -23,6 +23,9 @@ export type Database = {
           id: string
           metadata: Json | null
           notes: string | null
+          prompts_data: Json | null
+          prompts_last_run_at: string | null
+          prompts_status: string | null
           research_data: Json | null
           research_last_run_at: string | null
           research_status: string | null
@@ -42,6 +45,9 @@ export type Database = {
           id?: string
           metadata?: Json | null
           notes?: string | null
+          prompts_data?: Json | null
+          prompts_last_run_at?: string | null
+          prompts_status?: string | null
           research_data?: Json | null
           research_last_run_at?: string | null
           research_status?: string | null
@@ -61,6 +67,9 @@ export type Database = {
           id?: string
           metadata?: Json | null
           notes?: string | null
+          prompts_data?: Json | null
+          prompts_last_run_at?: string | null
+          prompts_status?: string | null
           research_data?: Json | null
           research_last_run_at?: string | null
           research_status?: string | null
