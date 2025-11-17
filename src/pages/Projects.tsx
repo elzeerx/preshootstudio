@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, FolderOpen, ArrowLeft } from "lucide-react";
+import { Sparkles, FolderOpen, ArrowLeft, Plus, Inbox } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -58,7 +58,7 @@ const Projects = () => {
   const getStatusLabel = (status: string) => {
     const statusMap: Record<string, string> = {
       new: "جديد",
-      processing: "قيد المعالجة",
+      processing: "قيد التجهيز",
       ready: "جاهز",
     };
     return statusMap[status] || status;
@@ -84,11 +84,16 @@ const Projects = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6">
+      <header className="container mx-auto px-4 py-6 sticky top-0 bg-background/80 backdrop-blur-sm z-50 border-b border-border/50">
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-8 h-8 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">PreShoot AI</h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">PreShoot AI</h1>
+              <p className="text-xs text-muted-foreground">مساعدك الشخصي قبل التصوير وبعده</p>
+            </div>
           </div>
           <Link to="/">
             <Button variant="outline" size="sm" className="gap-2">
@@ -104,90 +109,88 @@ const Projects = () => {
         <div className="max-w-6xl mx-auto">
           {/* Page Title */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 mb-4">
               <FolderOpen className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="heading-1 mb-4">مشاريعي</h1>
-            <p className="body-text-secondary">
-              جميع مشاريعك في مكان واحد
+            <h1 className="heading-2 mb-3">مشاريعي</h1>
+            <p className="body-text-secondary max-w-2xl mx-auto">
+              هنا تقدر تشوف وتدير كل المواضيع اللي جهزتها باستخدام PreShoot AI
             </p>
           </div>
 
           {/* Loading State */}
           {isLoading && (
-            <div className="text-center py-12">
-              <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="text-center py-16">
+              <div className="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
               <p className="body-text-secondary">جاري التحميل...</p>
             </div>
           )}
 
           {/* Empty State */}
           {!isLoading && projects.length === 0 && (
-            <Card className="max-w-2xl mx-auto p-12 text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-6">
-                <FolderOpen className="w-10 h-10 text-muted-foreground" />
-              </div>
-              <h2 className="heading-2 mb-4">ما عندك مشاريع حتى الآن</h2>
-              <p className="body-text mb-8">
-                ابدأ من الصفحة الرئيسية بإدخال موضوع جديد
-              </p>
-              <Link to="/">
-                <Button size="lg" className="gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  ابدأ مشروع جديد
-                </Button>
-              </Link>
+            <Card className="max-w-md mx-auto border-2 shadow-lg">
+              <CardContent className="pt-12 pb-12 text-center">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-muted/50 mb-6">
+                  <Inbox className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-bold mb-3">ما عندك أي مشروع لحد الآن</h3>
+                <p className="body-text-secondary mb-6 max-w-sm mx-auto">
+                  ابدأ من الصفحة الرئيسية بإدخال موضوع جديد، وخلي PreShoot AI يجهز لك كل شيء
+                </p>
+                <Link to="/">
+                  <Button size="lg" className="gap-2">
+                    <Plus className="w-5 h-5" />
+                    إنشاء مشروع جديد
+                  </Button>
+                </Link>
+              </CardContent>
             </Card>
           )}
 
           {/* Projects Grid */}
           {!isLoading && projects.length > 0 && (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <Card
-                  key={project.id}
-                  className="p-6 hover:shadow-lg transition-all hover:scale-105 border-2 hover:border-primary/20"
-                >
-                  <div className="flex flex-col h-full">
-                    {/* Project Topic */}
-                    <h3 className="heading-3 text-xl mb-3 line-clamp-2 min-h-[3.5rem]">
-                      {project.topic}
-                    </h3>
-
-                    {/* Status Badge */}
-                    <div className="mb-4">
-                      <Badge variant={getStatusVariant(project.status)}>
-                        {getStatusLabel(project.status)}
-                      </Badge>
-                    </div>
-
-                    {/* Date */}
-                    <p className="body-text-secondary text-sm mb-6 flex-grow">
-                      تاريخ الإنشاء: {formatDate(project.created_at)}
-                    </p>
-
-                    {/* View Button */}
-                    <Link to={`/projects/${project.id}`} className="mt-auto">
-                      <Button variant="outline" className="w-full">
-                        عرض المشروع
-                      </Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {/* Create New Project CTA */}
-          {!isLoading && projects.length > 0 && (
-            <div className="text-center mt-12">
-              <Link to="/">
-                <Button size="lg" className="gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  إنشاء مشروع جديد
-                </Button>
-              </Link>
-            </div>
+            <>
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-muted-foreground">
+                  {projects.length} {projects.length === 1 ? 'مشروع' : 'مشاريع'}
+                </p>
+                <Link to="/">
+                  <Button size="sm" className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    مشروع جديد
+                  </Button>
+                </Link>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects.map((project) => (
+                  <Link key={project.id} to={`/projects/${project.id}`}>
+                    <Card className="h-full border-2 hover:border-primary/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+                      <CardHeader>
+                        <div className="flex justify-between items-start mb-3">
+                          <Badge variant={getStatusVariant(project.status)}>
+                            {getStatusLabel(project.status)}
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-lg line-clamp-2 leading-tight">
+                          {project.topic}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-2 mt-3">
+                          <span className="text-xs">
+                            {formatDate(project.created_at)}
+                          </span>
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button variant="ghost" size="sm" className="w-full">
+                          فتح المشروع ←
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </main>
