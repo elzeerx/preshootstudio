@@ -4,6 +4,43 @@
 
 ---
 
+## 2025-01-17
+
+### Mission 8: تفعيل تبويب المقال (Article Tab)
+- إضافة حقول `article_status`, `article_last_run_at`, `article_data` في جدول `projects`
+- إنشاء System Prompt خاص بالمقال في `systemPrompts.ts`
+- إنشاء أنواع البيانات في `src/lib/types/article.ts`
+- إنشاء Edge Function `run-article` للتواصل مع OpenAI API
+- تحديث `ArticleTab.tsx` لعرض المقال الجاهز للنشر:
+  - العنوان والعنوان الفرعي
+  - مقدمة وأقسام منظمة
+  - خاتمة
+  - معلومات SEO (Title, Description, Keywords)
+  - مدة القراءة التقريبية
+- أزرار نسخ (نص عادي + Markdown)
+- إعادة توليد المقال
+
+### Mission 7: تفعيل تبويب البرومبتات (Prompts Tab)
+- إضافة حقول `prompts_status`, `prompts_last_run_at`, `prompts_data` في جدول `projects`
+- إنشاء System Prompt خاص بالبرومبتات في `systemPrompts.ts`
+- إنشاء أنواع البيانات في `src/lib/types/prompts.ts`
+- إنشاء Edge Function `run-prompts` للتواصل مع OpenAI API
+- تحديث `PromptsTab.tsx` لعرض البرومبتات في تبويبات فرعية:
+  - برومبتات الصور (Image Prompts)
+  - برومبتات الفيديو (Video Prompts)
+  - برومبتات الـ Thumbnails
+- أزرار نسخ لكل برومبت
+- إعادة توليد البرومبتات
+
+### Mission 6: تفعيل تبويب B-Roll (B-Roll Tab)
+- إضافة حقول `broll_status`, `broll_last_run_at`, `broll_data` في جدول `projects`
+- إنشاء System Prompt خاص بـ B-Roll في `systemPrompts.ts`
+- إنشاء أنواع البيانات في `src/lib/types/broll.ts`
+- إنشاء Edge Function `run-broll` للتواصل مع OpenAI API
+- تحديث `BRollTab.tsx` لعرض لقطات B-Roll المقترحة
+- أزرار نسخ لكل لقطة
+- إعادة توليد لقطات B-Roll
+
 ## المرحلة 1: التأسيس الكامل للمشروع
 **التاريخ**: [تاريخ إنشاء المشروع]
 

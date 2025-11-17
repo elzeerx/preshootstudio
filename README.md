@@ -279,14 +279,29 @@
 
 ## Mission 7 – Prompts Tab (AI-powered)
 
-تم تفعيل تبويب "البرومبتات" باستخدام Lovable AI Gateway (Gemini 2.5 Flash):
-- إضافة حقول `prompts_status`, `prompts_last_run_at`, `prompts_data` في جدول `projects`
-- إنشاء Edge Function: `supabase/functions/run-prompts/index.ts`
-- إنشاء واجهة كاملة في `PromptsTab.tsx` بتبويبات فرعية:
-  - برومبتات الصور (Midjourney/Gemini/Generic)
-  - برومبتات الفيديو (Sora/Veo)
-  - برومبتات Thumbnails
-- أزرار نسخ وملاحظات عامة لكل نوع
+تم تفعيل تبويب "البرومبتات" باستخدام الذكاء الاصطناعي:
+- إضافة حقول `prompts_status`, `prompts_last_run_at`, `prompts_data` في جدول المشاريع
+- إنشاء خدمة `runPromptsForProject` للتواصل مع نموذج AI
+- واجهة عرض البرومبتات مقسّمة إلى:
+  - برومبتات الصور (Midjourney / Gemini)
+  - برومبتات الفيديو (Sora / Veo)
+  - برومبتات الـ Thumbnails
+- أزرار نسخ لكل برومبت
+- إعادة توليد البرومبتات
+
+## Mission 8 – Article Tab (AI-powered)
+
+تم تفعيل تبويب "المقال" باستخدام الذكاء الاصطناعي:
+- إضافة حقول `article_status`, `article_last_run_at`, `article_data` في جدول المشاريع
+- إنشاء خدمة `runArticleForProject` للتواصل مع نموذج AI
+- واجهة عرض المقال بشكل احترافي:
+  - العنوان والعنوان الفرعي
+  - مقدمة وأقسام منظمة
+  - خاتمة
+  - معلومات SEO (Title, Description, Keywords)
+  - مدة القراءة التقريبية
+- أزرار نسخ (نص عادي + Markdown)
+- إعادة توليد المقال
 
 - ⏳ التبويبات الأخرى ما زالت Placeholder
 
