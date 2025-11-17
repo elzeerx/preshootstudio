@@ -26,9 +26,20 @@ const Projects = () => {
 
   const loadProjects = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setProjects([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Load only user's projects
       const { data, error } = await supabase
         .from("projects")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -116,7 +127,7 @@ const Projects = () => {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-6">
                 <FolderOpen className="w-10 h-10 text-muted-foreground" />
               </div>
-              <h2 className="heading-2 mb-4">ما عندك ولا مشروع لحد الآن</h2>
+              <h2 className="heading-2 mb-4">ما عندك مشاريع حتى الآن</h2>
               <p className="body-text mb-8">
                 ابدأ من الصفحة الرئيسية بإدخال موضوع جديد
               </p>

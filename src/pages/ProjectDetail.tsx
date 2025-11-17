@@ -46,10 +46,20 @@ const ProjectDetail = () => {
 
   const loadProject = async (projectId: string) => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("projects")
         .select("*")
         .eq("id", projectId)
+        .eq("user_id", user.id)
         .maybeSingle();
 
       if (error) {
@@ -125,8 +135,8 @@ const ProjectDetail = () => {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-destructive/10 mb-6">
               <AlertCircle className="w-10 h-10 text-destructive" />
             </div>
-            <h2 className="heading-2 mb-4">لم يتم العثور على هذا المشروع</h2>
-            <p className="body-text mb-8">المشروع الذي تبحث عنه غير موجود أو تم حذفه</p>
+            <h2 className="heading-2 mb-4">غير مصرح لك بعرض هذا المشروع</h2>
+            <p className="body-text mb-8">المشروع الذي تبحث عنه غير موجود أو لا تملك صلاحية الوصول إليه</p>
             <div className="flex gap-4 justify-center">
               <Button onClick={() => navigate("/projects")} variant="outline" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />

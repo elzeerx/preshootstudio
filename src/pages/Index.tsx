@@ -2,14 +2,22 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Search, FileText, Video, Image, BookOpen } from "lucide-react";
+import { Sparkles, Search, FileText, Video, Image, BookOpen, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [topic, setTopic] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
@@ -27,12 +35,22 @@ const Index = () => {
     setIsCreating(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("يجب تسجيل الدخول أولاً");
+        navigate("/auth");
+        return;
+      }
+
       // إنشاء مشروع جديد في قاعدة البيانات
       const { data, error: insertError } = await supabase
         .from("projects")
         .insert({
           topic: topic.trim(),
           status: "new",
+          user_id: user.id,
         })
         .select()
         .single();
@@ -94,11 +112,39 @@ const Index = () => {
             <h1 className="text-2xl font-bold text-foreground">PreShoot AI</h1>
           </div>
           <div className="flex gap-2">
-            <Link to="/projects">
-              <Button variant="outline" size="sm">
-                مشاريعي
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/projects">
+                  <Button variant="outline" size="sm">
+                    مشاريعي
+                  </Button>
+                </Link>
+                <DropdownMenu dir="rtl">
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <User className="w-4 h-4 ml-2" />
+                      حسابي
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <User className="w-4 h-4 ml-2" />
+                      الملف الشخصي
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="w-4 h-4 ml-2" />
+                      تسجيل الخروج
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button size="sm">
+                  تسجيل الدخول
+                </Button>
+              </Link>
+            )}
             <Link to="/instructions">
               <Button variant="outline" size="sm">
                 التعليمات
