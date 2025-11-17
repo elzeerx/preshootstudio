@@ -24,6 +24,9 @@ export type Database = {
           research_last_run_at: string | null
           research_status: string | null
           research_summary: string | null
+          scripts_data: Json | null
+          scripts_last_run_at: string | null
+          scripts_status: string | null
           status: string
           topic: string
           updated_at: string
@@ -37,6 +40,9 @@ export type Database = {
           research_last_run_at?: string | null
           research_status?: string | null
           research_summary?: string | null
+          scripts_data?: Json | null
+          scripts_last_run_at?: string | null
+          scripts_status?: string | null
           status?: string
           topic: string
           updated_at?: string
@@ -50,6 +56,9 @@ export type Database = {
           research_last_run_at?: string | null
           research_status?: string | null
           research_summary?: string | null
+          scripts_data?: Json | null
+          scripts_last_run_at?: string | null
+          scripts_status?: string | null
           status?: string
           topic?: string
           updated_at?: string
