@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -113,6 +113,11 @@ export default function Auth() {
                       'تسجيل الدخول'
                     )}
                   </Button>
+                  <div className="text-center mt-4">
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                      نسيت كلمة المرور؟
+                    </Link>
+                  </div>
                 </form>
               </TabsContent>
 
