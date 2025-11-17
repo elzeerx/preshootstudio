@@ -185,7 +185,7 @@ const ProjectDetail = () => {
             <TabsContent value="overview"><OverviewTab project={project} /></TabsContent>
             <TabsContent value="research"><ResearchTab project={project} /></TabsContent>
             <TabsContent value="simplify"><SimplifyTab project={project} /></TabsContent>
-            <TabsContent value="scripts"><ScriptsTab project={project} /></TabsContent>
+            <TabsContent value="scripts"><ScriptsTab project={project} onRefresh={() => loadProject(id!)} /></TabsContent>
             <TabsContent value="broll"><BRollTab project={project} /></TabsContent>
             <TabsContent value="prompts"><PromptsTab project={project} /></TabsContent>
             <TabsContent value="article"><ArticleTab project={project} /></TabsContent>
