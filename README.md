@@ -268,6 +268,26 @@
 - ✅ استخدام Lovable AI (بدون حاجة لـ API keys)
 - ✅ حفظ البيانات في قاعدة البيانات
 - ✅ واجهة عربية كاملة مع RTL
+
+## Mission 6 – B-Roll Tab (AI-powered)
+
+تم تفعيل تبويب "B-Roll" باستخدام Lovable AI Gateway (Gemini 2.5 Flash):
+- إضافة حقول `broll_status`, `broll_last_run_at`, `broll_data` في جدول `projects`
+- إنشاء Edge Function: `supabase/functions/run-broll/index.ts`
+- إنشاء واجهة كاملة في `BRollTab.tsx` تعرض لقطات B-Roll المقترحة مع برومبتات AI
+- أزرار نسخ سريعة ونصائح عامة للتصوير
+
+## Mission 7 – Prompts Tab (AI-powered)
+
+تم تفعيل تبويب "البرومبتات" باستخدام Lovable AI Gateway (Gemini 2.5 Flash):
+- إضافة حقول `prompts_status`, `prompts_last_run_at`, `prompts_data` في جدول `projects`
+- إنشاء Edge Function: `supabase/functions/run-prompts/index.ts`
+- إنشاء واجهة كاملة في `PromptsTab.tsx` بتبويبات فرعية:
+  - برومبتات الصور (Midjourney/Gemini/Generic)
+  - برومبتات الفيديو (Sora/Veo)
+  - برومبتات Thumbnails
+- أزرار نسخ وملاحظات عامة لكل نوع
+
 - ⏳ التبويبات الأخرى ما زالت Placeholder
 
 ---
