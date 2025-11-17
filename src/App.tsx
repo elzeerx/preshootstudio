@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Instructions from "./pages/Instructions";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/instructions" element={<Instructions />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
