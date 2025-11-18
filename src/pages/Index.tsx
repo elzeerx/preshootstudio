@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Search, FileText, Video, Image, BookOpen, User, LogOut, Zap, Target, Lightbulb } from "lucide-react";
+import { Sparkles, Search, FileText, Video, Image, BookOpen, User, LogOut, Zap, Target, Lightbulb, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -142,11 +142,11 @@ const Index = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => navigate("/profile")}>
-                      <User className="ml-2 w-4 h-4" />
+                      <User className="ms-2 w-4 h-4" />
                       الملف الشخصي
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={signOut}>
-                      <LogOut className="ml-2 w-4 h-4" />
+                      <LogOut className="ms-2 w-4 h-4" />
                       تسجيل الخروج
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -229,12 +229,12 @@ const Index = () => {
                 >
                   {isCreating ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2" />
+                      <Loader2 className="ms-2 h-5 w-5 animate-spin" />
                       جاري الإنشاء...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-5 h-5 ml-2" />
+                      <Sparkles className="ms-2 w-5 h-5" />
                       إنشاء مشروع جديد
                     </>
                   )}

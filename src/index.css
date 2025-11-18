@@ -114,21 +114,44 @@ All colors MUST be HSL.
   /* Typography helpers */
   .heading-1 {
     @apply text-4xl md:text-5xl lg:text-6xl font-bold text-foreground;
+    line-height: 1.3;
   }
 
   .heading-2 {
     @apply text-3xl md:text-4xl font-bold text-foreground;
+    line-height: 1.35;
   }
 
   .heading-3 {
     @apply text-2xl md:text-3xl font-semibold text-foreground;
+    line-height: 1.4;
   }
 
   .body-text {
     @apply text-base md:text-lg text-foreground;
+    line-height: 1.8;
   }
 
   .body-text-secondary {
     @apply text-sm md:text-base text-muted-foreground;
+    line-height: 1.7;
+  }
+
+  /* RTL-specific adjustments */
+  [dir="rtl"] * {
+    letter-spacing: 0;
+  }
+
+  /* RTL scrollbar positioning */
+  [dir="rtl"] ::-webkit-scrollbar {
+    left: 0;
+    right: auto;
+  }
+
+  /* Email and password inputs - always LTR */
+  input[type="email"],
+  input[type="password"] {
+    direction: ltr;
+    text-align: right;
   }
 }

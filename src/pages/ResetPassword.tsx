@@ -81,8 +81,6 @@ export default function ResetPassword() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  dir="ltr"
-                  className="text-right"
                   minLength={6}
                 />
               </div>
@@ -96,8 +94,6 @@ export default function ResetPassword() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  dir="ltr"
-                  className="text-right"
                   minLength={6}
                 />
               </div>
@@ -110,7 +106,7 @@ export default function ResetPassword() {
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                     جاري التحديث...
                   </>
                 ) : (

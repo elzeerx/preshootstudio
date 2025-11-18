@@ -142,7 +142,7 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
               لم نتمكن من إنشاء المقال. يرجى المحاولة مرة أخرى.
             </p>
             <Button onClick={handleGenerateArticle} variant="outline">
-              <RefreshCw className="w-4 h-4 ml-2" />
+              <RefreshCw className="w-4 h-4 ms-2" />
               إعادة المحاولة
             </Button>
           </div>
@@ -169,7 +169,7 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
             </div>
           </div>
           <Button onClick={handleGenerateArticle} variant="ghost" size="sm">
-            <RefreshCw className="w-4 h-4 ml-2" />
+            <RefreshCw className="w-4 h-4 ms-2" />
             إعادة توليد المقال
           </Button>
         </div>

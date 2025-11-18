@@ -89,7 +89,7 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
             <Button onClick={runScripts} disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                   جاري التجهيز...
                 </>
               ) : (
