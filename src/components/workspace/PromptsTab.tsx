@@ -24,6 +24,56 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
   const [project, setProject] = useState(initialProject);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const copyAllPrompts = async () => {
+    if (!project.prompts_data) return;
+    
+    const promptsData = project.prompts_data as PromptsData;
+    let content = `# حزمة البرومبتات: ${project.topic}\n\n`;
+    
+    // Image Prompts
+    if (promptsData.imagePrompts && promptsData.imagePrompts.length > 0) {
+      content += `## برومبتات الصور\n\n`;
+      promptsData.imagePrompts.forEach((prompt, index) => {
+        content += `### ${index + 1}. ${prompt.label}\n`;
+        content += `**نسبة الأبعاد:** ${prompt.aspectRatio}\n`;
+        content += `**الأسلوب:** ${prompt.style}\n`;
+        content += `**المودل:** ${getModelLabel(prompt.model)}\n`;
+        content += `**البرومبت:**\n${prompt.prompt}\n\n`;
+      });
+    }
+    
+    // Video Prompts
+    if (promptsData.videoPrompts && promptsData.videoPrompts.length > 0) {
+      content += `## برومبتات الفيديو\n\n`;
+      promptsData.videoPrompts.forEach((prompt, index) => {
+        content += `### ${index + 1}. ${prompt.label}\n`;
+        content += `**المدة:** ${prompt.durationSec} ثانية\n`;
+        content += `**الأسلوب:** ${prompt.style}\n`;
+        content += `**البرومبت:**\n${prompt.prompt}\n\n`;
+      });
+    }
+    
+    // Thumbnail Prompts
+    if (promptsData.thumbnailPrompts && promptsData.thumbnailPrompts.length > 0) {
+      content += `## برومبتات الـ Thumbnail\n\n`;
+      promptsData.thumbnailPrompts.forEach((prompt, index) => {
+        content += `### ${index + 1}. ${prompt.label}\n`;
+        content += `**البرومبت:**\n${prompt.prompt}\n\n`;
+      });
+    }
+    
+    if (promptsData.notes) {
+      content += `## ملاحظات\n${promptsData.notes}\n`;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success('تم نسخ جميع البرومبتات بنجاح!');
+    } catch (error) {
+      toast.error('فشل النسخ');
+    }
+  };
+
   const handleGeneratePrompts = async () => {
     setIsGenerating(true);
     
@@ -147,7 +197,7 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
   const promptsData = project.prompts_data as PromptsData;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Header */}
       <Card className="p-6">
         <div className="flex items-center justify-between">
@@ -157,20 +207,31 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
               الموضوع: <strong>{project.topic}</strong>
             </p>
           </div>
-          <Button 
-            variant="ghost" 
-            onClick={handleGeneratePrompts} 
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                جاري التوليد...
-              </>
-            ) : (
-              'إعادة توليد البرومبتات'
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={copyAllPrompts} 
+              className="gap-2"
+            >
+              <Copy className="ml-2 h-4 w-4" />
+              نسخ كل البرومبتات
+            </Button>
+            <Button 
+              variant="ghost" 
+              onClick={handleGeneratePrompts} 
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري التوليد...
+                </>
+              ) : (
+                'إعادة توليد البرومبتات'
+              )}
+            </Button>
+          </div>
         </div>
       </Card>
 

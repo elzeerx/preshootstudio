@@ -24,6 +24,53 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const copyAllScripts = async () => {
+    if (!scriptsData) return;
+    
+    let content = `# سكريبتات التصوير: ${project.topic}\n\n`;
+    
+    // Teleprompter Script
+    content += `## سكريبت التلقين\n`;
+    content += `**العنوان:** ${scriptsData.teleprompter.title}\n`;
+    content += `**النبرة:** ${getToneLabel(scriptsData.teleprompter.tone)}\n`;
+    content += `**المدة التقريبية:** ${scriptsData.teleprompter.estimatedDurationSec} ثانية\n\n`;
+    content += scriptsData.teleprompter.lines.join('\n\n');
+    content += '\n\n---\n\n';
+    
+    // Reel Script
+    content += `## سكريبت الريلز\n`;
+    content += `**العنوان:** ${scriptsData.reel.title}\n`;
+    content += `**المدة التقريبية:** ${scriptsData.reel.estimatedDurationSec} ثانية\n\n`;
+    content += `**الخطاف:** ${scriptsData.reel.hook}\n\n`;
+    content += `**المحتوى الرئيسي:**\n`;
+    scriptsData.reel.bodyPoints.forEach((point, index) => {
+      content += `${index + 1}. ${point}\n`;
+    });
+    content += '\n\n---\n\n';
+    
+    // Long Video Script
+    content += `## سكريبت الفيديو الطويل\n`;
+    content += `**العنوان:** ${scriptsData.longVideo.title}\n`;
+    content += `**المدة التقريبية:** ${scriptsData.longVideo.estimatedDurationMin} دقيقة\n\n`;
+    content += `### المقدمة\n${scriptsData.longVideo.intro}\n\n`;
+    content += `### المحتوى الأساسي\n${scriptsData.longVideo.fullScript}\n\n`;
+    content += `### الخاتمة\n${scriptsData.longVideo.outro}\n`;
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      toast({
+        title: "تم النسخ",
+        description: "تم نسخ جميع السكريبتات بنجاح"
+      });
+    } catch (error) {
+      toast({
+        title: "فشل النسخ",
+        description: "حدث خطأ أثناء النسخ",
+        variant: "destructive"
+      });
+    }
+  };
+
   const runScripts = async () => {
     setIsLoading(true);
     try {
@@ -154,10 +201,16 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
             </div>
             <h3 className="heading-3">سكريبتات التصوير</h3>
           </div>
-          <Button onClick={runScripts} variant="ghost" size="sm">
-            <RefreshCw className="ml-2 h-4 w-4" />
-            إعادة توليد السكريبتات
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={copyAllScripts} variant="outline" size="sm" className="gap-2">
+              <Copy className="ml-2 h-4 w-4" />
+              نسخ كل السكريبتات
+            </Button>
+            <Button onClick={runScripts} variant="ghost" size="sm">
+              <RefreshCw className="ml-2 h-4 w-4" />
+              إعادة توليد السكريبتات
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="teleprompter" className="w-full" dir="rtl">
