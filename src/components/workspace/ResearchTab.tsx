@@ -141,14 +141,14 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
   if (researchStatus === 'idle' || !researchData) {
     return (
-      <Card className="p-12 text-center" dir="rtl">
+      <Card className="card-fluid container-responsive p-6 sm:p-8 lg:p-12 text-center" dir="rtl">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
           <Search className="w-10 h-10 text-primary" />
         </div>
-        <h3 className="heading-3 mb-4">ما تم تجهيز بحث لهذا الموضوع بعد</h3>
-        <p className="body-text mb-8 max-w-2xl mx-auto">
+        <h3 className="heading-3 mb-4 break-words-rtl">ما تم تجهيز بحث لهذا الموضوع بعد</h3>
+        <p className="body-text mb-8 max-w-2xl mx-auto break-words-rtl">
           استخدم Tavily Web Search + الذكاء الاصطناعي لجمع وتنظيم أهم المعلومات حول:{" "}
-          <span className="font-semibold text-primary">{project.topic}</span>
+          <span className="font-semibold text-primary break-words-rtl">{project.topic}</span>
         </p>
         <Button 
           size="lg" 
@@ -174,13 +174,13 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
   if (researchStatus === 'loading' || isLoading) {
     return (
-      <Card className="p-12" dir="rtl">
+      <Card className="card-fluid container-responsive p-6 sm:p-8 lg:p-12" dir="rtl">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
             <Search className="w-10 h-10 text-primary animate-pulse" />
           </div>
-          <h3 className="heading-3 mb-4">جاري تجهيز البحث...</h3>
-          <p className="body-text mb-4">
+          <h3 className="heading-3 mb-4 break-words-rtl">جاري تجهيز البحث...</h3>
+          <p className="body-text mb-4 break-words-rtl">
             نستخدم Tavily Web Search لجلب أحدث المعلومات من الإنترنت
           </p>
           <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
@@ -189,7 +189,7 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
             <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
           </div>
         </div>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="h-40 bg-muted/50 rounded-xl animate-pulse"></div>
           <div className="h-40 bg-muted/50 rounded-xl animate-pulse"></div>
         </div>
