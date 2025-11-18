@@ -133,6 +133,10 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
@@ -285,5 +289,27 @@ All colors MUST be HSL.
   .card-fluid > * {
     min-width: 0;
     max-width: 100%;
+  }
+
+  /* Smooth Transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Workspace Consistent Spacing */
+  .workspace-container {
+    @apply space-y-6;
+  }
+
+  .workspace-card {
+    @apply card-fluid container-responsive p-4 sm:p-6 lg:p-8 transition-smooth hover:shadow-md;
+  }
+
+  .workspace-header {
+    @apply flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6;
+  }
+
+  .workspace-section {
+    @apply space-y-4;
   }
 }

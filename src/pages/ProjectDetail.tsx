@@ -109,10 +109,10 @@ const ProjectDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="inline-block w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-6"></div>
-          <p className="body-text-secondary text-lg">جاري تحميل المشروع...</p>
+          <p className="body-text-secondary text-lg break-words-rtl">جاري تحميل المشروع...</p>
         </div>
       </div>
     );
