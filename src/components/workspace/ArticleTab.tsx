@@ -108,7 +108,7 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
   // Loading state
   if (project.article_status === "loading" || isLoading) {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 animate-pulse">
             <BookOpen className="w-6 h-6 text-primary" />

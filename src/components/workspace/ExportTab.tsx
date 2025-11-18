@@ -147,7 +147,7 @@ export const ExportTab = ({ project }: ExportTabProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Header */}
       <Card className="p-6">
         <div className="flex items-start gap-4">

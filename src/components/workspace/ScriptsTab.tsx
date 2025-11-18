@@ -76,14 +76,14 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
   // Idle state
   if (status === 'idle' || !scriptsData) {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
             <FileText className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1">
-            <h3 className="heading-3 mb-3">سكريبتات التصوير</h3>
-            <p className="body-text mb-6">
+            <h3 className="heading-3 mb-3 text-right">سكريبتات التصوير</h3>
+            <p className="body-text mb-6 text-right">
               ما تم تجهيز سكريبتات لهذا الموضوع بعد.
             </p>
             <Button onClick={runScripts} disabled={isLoading}>
@@ -105,7 +105,7 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
   // Loading state
   if (status === 'loading' || isLoading) {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
             <Loader2 className="w-6 h-6 text-primary animate-spin" />
@@ -124,7 +124,7 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
   // Error state
   if (status === 'error') {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
             <FileText className="w-6 h-6 text-destructive" />
@@ -145,7 +145,7 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
 
   // Ready state with scripts
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">

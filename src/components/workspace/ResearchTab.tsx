@@ -76,7 +76,7 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
   if (researchStatus === 'idle' || !researchData) {
     return (
-      <Card className="p-12 text-center">
+      <Card className="p-12 text-center" dir="rtl">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
           <Search className="w-10 h-10 text-primary" />
         </div>
@@ -109,7 +109,7 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
   if (researchStatus === 'loading' || isLoading) {
     return (
-      <Card className="p-12">
+      <Card className="p-12" dir="rtl">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
             <Search className="w-10 h-10 text-primary animate-pulse" />
@@ -151,10 +151,10 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Research Summary */}
       <Card className="p-6">
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-4 text-right">
           <h3 className="heading-3">ملخص البحث</h3>
           <Button
             variant="outline"

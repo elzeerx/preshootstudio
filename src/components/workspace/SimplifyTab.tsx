@@ -100,14 +100,14 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
   // Idle state
   if (simplifyStatus === 'idle' || !simplifyData) {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
             <Lightbulb className="w-6 h-6 text-secondary-foreground" />
           </div>
           <div className="flex-1">
-            <h3 className="heading-3 mb-3">تبسيط الفكرة</h3>
-            <div className="space-y-4 body-text leading-relaxed" dir="rtl">
+            <h3 className="heading-3 mb-3 text-right">تبسيط الفكرة</h3>
+            <div className="space-y-4 body-text leading-relaxed text-right">
               <p>
                 استخدم الذكاء الاصطناعي لتبسيط الموضوع بأسلوب يناسب الجمهور العام، 
                 مع أمثلة وتشبيهات تسهّل الفهم.
@@ -152,7 +152,7 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
   // Loading state
   if (simplifyStatus === 'processing' || isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" dir="rtl">
         <Card className="p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="animate-spin">
@@ -173,7 +173,7 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
   // Error state
   if (simplifyStatus === 'error') {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
             <AlertCircle className="w-6 h-6 text-destructive" />
@@ -195,7 +195,7 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
 
   // Success state - Display results
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Main Explanation */}
       <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">
