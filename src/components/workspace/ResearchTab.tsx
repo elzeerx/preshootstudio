@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, AlertCircle, RefreshCw, ExternalLink, Lightbulb, TrendingUp, HelpCircle } from "lucide-react";
+import { Search, Sparkles, AlertCircle, RefreshCw, ExternalLink, Lightbulb, TrendingUp, HelpCircle, Copy } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -22,6 +22,71 @@ interface ResearchTabProps {
 export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
   const [project, setProject] = useState(initialProject);
   const [isLoading, setIsLoading] = useState(false);
+
+  const copyAllResearch = async () => {
+    if (!researchData) return;
+    
+    let content = `# البحث الشامل: ${project.topic}\n\n`;
+    content += `## ملخص البحث\n${researchData.summary}\n\n`;
+    
+    if (researchData.keyPoints && researchData.keyPoints.length > 0) {
+      content += `## النقاط الأساسية\n`;
+      researchData.keyPoints.forEach((point, index) => {
+        content += `${index + 1}. ${point}\n`;
+      });
+      content += '\n';
+    }
+    
+    if (researchData.facts && researchData.facts.length > 0) {
+      content += `## حقائق وإحصائيات\n`;
+      researchData.facts.forEach((fact) => {
+        content += `**${fact.label}:** ${fact.value}\n`;
+        if (fact.source) content += `المصدر: ${fact.source}\n`;
+        content += '\n';
+      });
+    }
+    
+    if (researchData.sources && researchData.sources.length > 0) {
+      content += `## المصادر والمراجع\n`;
+      researchData.sources.forEach((source) => {
+        content += `- **${source.title}**\n`;
+        if (source.url) content += `  الرابط: ${source.url}\n`;
+        if (source.type) content += `  النوع: ${source.type}\n`;
+        content += '\n';
+      });
+    }
+    
+    if (researchData.mythsVsReality && researchData.mythsVsReality.length > 0) {
+      content += `## خرافات vs. حقيقة\n`;
+      researchData.mythsVsReality.forEach((item) => {
+        content += `**خرافة:** ${item.myth}\n`;
+        content += `**الحقيقة:** ${item.reality}\n\n`;
+      });
+    }
+    
+    if (researchData.trends && researchData.trends.length > 0) {
+      content += `## الاتجاهات الحديثة\n`;
+      researchData.trends.forEach((trend) => {
+        content += `• ${trend}\n`;
+      });
+      content += '\n';
+    }
+    
+    if (researchData.faqs && researchData.faqs.length > 0) {
+      content += `## الأسئلة الشائعة\n`;
+      researchData.faqs.forEach((faq) => {
+        content += `**س: ${faq.question}**\n`;
+        content += `ج: ${faq.answer}\n\n`;
+      });
+    }
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success('تم نسخ البحث الكامل بنجاح!');
+    } catch (error) {
+      toast.error('فشل النسخ');
+    }
+  };
 
   const runResearch = async () => {
     setIsLoading(true);
@@ -152,10 +217,19 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {/* Research Summary */}
-      <Card className="p-6">
-        <div className="flex items-start justify-between mb-4 text-right">
-          <h3 className="heading-3">ملخص البحث</h3>
+      {/* Header with Copy All button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="heading-3">نتائج البحث الشامل</h2>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyAllResearch}
+            className="gap-2"
+          >
+            <Copy className="w-4 h-4" />
+            نسخ البحث كامل
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -166,6 +240,13 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
             <RefreshCw className="w-4 h-4" />
             إعادة التوليد
           </Button>
+        </div>
+      </div>
+
+      {/* Research Summary */}
+      <Card className="p-6">
+        <div className="flex items-start justify-between mb-4 text-right">
+          <h3 className="heading-3">ملخص البحث</h3>
         </div>
         <p className="body-text leading-relaxed">{researchData.summary}</p>
       </Card>

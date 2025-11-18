@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Lightbulb, Sparkles, BookOpen, Layers, CheckCircle2, AlertCircle } from "lucide-react";
+import { Lightbulb, Sparkles, BookOpen, Layers, CheckCircle2, AlertCircle, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { SimplifyData } from "@/lib/types/simplify";
@@ -22,6 +22,53 @@ interface SimplifyTabProps {
 export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
   const [project, setProject] = useState<Project>(initialProject);
   const [isLoading, setIsLoading] = useState(false);
+
+  const copyAllSimplified = async () => {
+    if (!simplifyData) return;
+    
+    let content = `# الشرح المبسط: ${project.topic}\n\n`;
+    
+    if (simplifyData.difficulty_level) {
+      content += `**المستوى:** ${getDifficultyLabel(simplifyData.difficulty_level)}\n\n`;
+    }
+    
+    content += `## الشرح المبسط\n${simplifyData.simplified_explanation}\n\n`;
+    
+    if (simplifyData.everyday_examples && simplifyData.everyday_examples.length > 0) {
+      content += `## أمثلة من الحياة اليومية\n`;
+      simplifyData.everyday_examples.forEach((example) => {
+        content += `**${example.title}**\n${example.description}\n\n`;
+      });
+    }
+    
+    if (simplifyData.analogies && simplifyData.analogies.length > 0) {
+      content += `## تشبيهات توضيحية\n`;
+      simplifyData.analogies.forEach((analogy) => {
+        content += `**${analogy.concept}**\n${analogy.analogy}\n\n`;
+      });
+    }
+    
+    if (simplifyData.key_takeaways && simplifyData.key_takeaways.length > 0) {
+      content += `## النقاط الأساسية للتذكر\n`;
+      simplifyData.key_takeaways.forEach((takeaway, index) => {
+        content += `${index + 1}. ${takeaway}\n`;
+      });
+    }
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      toast({
+        title: "تم النسخ",
+        description: "تم نسخ الشرح المبسط كامل بنجاح",
+      });
+    } catch (error) {
+      toast({
+        title: "فشل النسخ",
+        description: "حدث خطأ أثناء النسخ",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     setProject(initialProject);
@@ -196,6 +243,32 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
   // Success state - Display results
   return (
     <div className="space-y-6" dir="rtl">
+      {/* Header with Copy All button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="heading-3">الشرح المبسط</h2>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyAllSimplified}
+            className="gap-2"
+          >
+            <Copy className="w-4 h-4" />
+            نسخ الشرح كامل
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={runSimplify}
+            disabled={isLoading}
+            className="gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            إعادة التبسيط
+          </Button>
+        </div>
+      </div>
+
       {/* Main Explanation */}
       <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">

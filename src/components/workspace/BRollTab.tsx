@@ -45,6 +45,52 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
+  const copyAllBRoll = async () => {
+    if (!project.broll_data) return;
+    
+    const brollData = project.broll_data as BRollData;
+    let content = `# خطة لقطات الـ B-Roll: ${project.topic}\n\n`;
+    
+    if (brollData.generalTips && brollData.generalTips.length > 0) {
+      content += `## نصائح عامة للتصوير\n`;
+      brollData.generalTips.forEach((tip) => {
+        content += `• ${tip}\n`;
+      });
+      content += '\n';
+    }
+    
+    content += `## اللقطات المقترحة (${brollData.shots.length} لقطة)\n\n`;
+    
+    brollData.shots.forEach((shot, index) => {
+      content += `### ${index + 1}. ${shot.title}\n`;
+      content += `**الوصف:** ${shot.description}\n`;
+      content += `**نوع اللقطة:** ${SHOT_TYPE_LABELS[shot.shotType] || shot.shotType}\n`;
+      content += `**حركة الكاميرا:** ${CAMERA_MOVEMENT_LABELS[shot.cameraMovement] || shot.cameraMovement}\n`;
+      if (shot.durationSec > 0) {
+        content += `**المدة:** ${shot.durationSec} ثانية\n`;
+      }
+      content += `**المكان/السياق:** ${shot.locationOrContext}\n`;
+      if (shot.notes) {
+        content += `**ملاحظات:** ${shot.notes}\n`;
+      }
+      content += '\n';
+    });
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      toast({
+        title: "تم النسخ",
+        description: "تم نسخ خطة B-Roll كاملة بنجاح"
+      });
+    } catch (error) {
+      toast({
+        title: "فشل النسخ",
+        description: "حدث خطأ أثناء النسخ",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleGenerateBRoll = async () => {
     setIsGenerating(true);
     
@@ -191,7 +237,7 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {/* Header with regenerate button */}
+      {/* Header with regenerate and copy all buttons */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center">
@@ -199,25 +245,36 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
           </div>
           <h3 className="heading-3">خطة لقطات الـ B-Roll</h3>
         </div>
-        <Button
-          onClick={handleGenerateBRoll}
-          disabled={isGenerating}
-          variant="ghost"
-          size="sm"
-          className="gap-2"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              جاري التجديد...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="w-4 h-4" />
-              إعادة توليد خطة B-Roll
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={copyAllBRoll}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Copy className="w-4 h-4" />
+            نسخ الخطة كاملة
+          </Button>
+          <Button
+            onClick={handleGenerateBRoll}
+            disabled={isGenerating}
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                جاري التجديد...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4" />
+                إعادة توليد خطة B-Roll
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* General Tips Section */}
