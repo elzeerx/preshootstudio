@@ -224,3 +224,66 @@ All colors MUST be HSL.
     text-align: right;
   }
 }
+
+@layer utilities {
+  /* RTL Text Breaking & Overflow Utilities */
+  .break-words-rtl {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .break-all {
+    word-break: break-all;
+  }
+
+  .truncate-rtl {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  /* URL Breaking */
+  .url-break {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+    display: inline-block;
+  }
+
+  /* Responsive Container Utilities */
+  .container-responsive {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  /* Fluid Card Utilities */
+  .card-fluid {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .card-fluid > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
