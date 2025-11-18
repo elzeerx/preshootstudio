@@ -6,55 +6,109 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// System prompt for research
-const RESEARCH_SYSTEM_PROMPT = `أنت باحث ومحلل تقني محترف تكتب باللغة العربية الفصحى المبسّطة.
+// Enhanced system prompt for research with Tavily integration
+const RESEARCH_SYSTEM_PROMPT_V2 = `أنت باحث وصحفي تقني محترف، وتكتب باللغة العربية الفصحى المبسّطة.
 
-مهمتك جمع وتنظيم معلومات دقيقة وحديثة حول موضوع معيّن، بحيث تصلح لصنّاع محتوى يريدون شرح الموضوع لجمهور عام غير متخصص.
+يتم تزويدك بنتائج بحث حقيقية من Tavily Web Search تتضمن عناوين وروابط ونصوص مختصرة من مصادر فعلية على الإنترنت.
 
-اكتب النتائج بصيغة JSON فقط، وبدون أي نص زائد، وبالبنية التالية:
+مهمتك:
+1. تحليل جميع النتائج المقدمة بعناية
+2. استخراج أهم المعلومات الدقيقة والحديثة
+3. جمع الحقائق مع ذكر المصدر الحقيقي + الرابط الصحيح الفعلي
+4. تبسيط الفكرة للقارئ غير المتخصص
+5. تنظيم المخرجات بصيغة JSON فقط
+
+البنية المطلوبة (JSON فقط):
 {
-  "summary": "ملخص شامل للموضوع في 3-5 جمل",
-  "keyPoints": ["نقطة أساسية 1", "نقطة أساسية 2", ...],
+  "summary": "ملخص عربي واضح للموضوع في 3-5 جمل، يشرح الفكرة الأساسية بشكل مبسط",
+  "keyPoints": [
+    "النقطة الأساسية الأولى",
+    "النقطة الأساسية الثانية",
+    "النقطة الأساسية الثالثة"
+  ],
   "facts": [
     {
-      "label": "عنوان الحقيقة",
-      "value": "القيمة أو الوصف",
-      "source": "المصدر (اختياري)"
+      "label": "عنوان الحقيقة أو الإحصائية",
+      "value": "القيمة أو الوصف التفصيلي",
+      "source": "عنوان المصدر الحقيقي من نتائج Tavily",
+      "url": "الرابط الفعلي والصحيح من نتائج Tavily فقط"
     }
   ],
   "sources": [
     {
-      "title": "اسم المصدر",
-      "url": "الرابط (اختياري)",
-      "type": "official أو article أو video أو other"
+      "title": "عنوان المصدر",
+      "url": "الرابط الحقيقي من نتائج Tavily",
+      "type": "official" أو "article" أو "blog" أو "video" أو "news"
     }
   ],
   "mythsVsReality": [
     {
-      "myth": "خرافة أو مفهوم خاطئ شائع",
-      "reality": "الحقيقة العلمية أو الواقعية"
+      "myth": "خرافة أو مفهوم خاطئ شائع حول هذا الموضوع",
+      "reality": "الحقيقة العلمية أو الواقعية المدعومة بالمصادر"
     }
   ],
-  "trends": ["توجه حالي 1", "توجه حالي 2", ...],
+  "trends": [
+    "التوجه أو الترند الحالي الأول",
+    "التوجه أو الترند الحالي الثاني"
+  ],
   "faqs": [
     {
-      "question": "سؤال متوقع من الجمهور",
-      "answer": "إجابة واضحة ومبسطة"
+      "question": "سؤال متوقع من الجمهور العام",
+      "answer": "إجابة واضحة ومبسطة ومفيدة"
     }
   ]
 }
 
-التزم بالتالي:
-- اجعل اللغة بسيطة وواضحة وقابلة للقراءة بصوت عالٍ في فيديو
-- إذا لم تكن متأكداً من معلومة، قل إن المعلومة تقريبية أو متغيرة
-- اذكر المصادر الموثوقة في حقل sources مع عناوين وروابط حقيقية قدر الإمكان
-- ركز على المعلومات الحديثة والمحدّثة
-- اجعل المحتوى مناسباً لصناع محتوى عرب (يوتيوبرز، ريلز، بودكاست)
-- استخدم أمثلة عربية عندما يكون ذلك ممكناً
-- في حقل mythsVsReality، اذكر 2-3 مفاهيم خاطئة شائعة إن وُجدت
-- في حقل faqs، اذكر 3-5 أسئلة متوقعة من الجمهور العام
+قواعد صارمة يجب الالتزام بها:
+✅ استخدم فقط المعلومات والروابط الموجودة في نتائج Tavily المقدمة
+✅ لا تختلق أي مصادر أو روابط خارج نتائج Tavily
+✅ إذا كانت المعلومة غير مؤكدة أو تختلف بين المصادر، اذكر ذلك بوضوح في النص
+✅ استخدم لغة سهلة القراءة، مختصرة، مناسبة لشرح فيديو يوتيوب أو ريلز
+✅ ممنوع منعًا باتًا استخدام أي مراجع دون روابط حقيقية من Tavily
+✅ اجعل المحتوى مناسباً لصناع محتوى عرب (يوتيوبرز، صناع ريلز، بودكاست)
+✅ ركز على المعلومات الحديثة والمحدثة والدقيقة
+✅ في حقل mythsVsReality، اذكر 2-3 مفاهيم خاطئة شائعة إن وُجدت
+✅ في حقل faqs، اذكر 3-5 أسئلة متوقعة من الجمهور العام
 
-تذكر: أنت تساعد صانع محتوى عربي في تجهيز معلومات دقيقة وسهلة الفهم لجمهوره.`;
+تذكر: أنت تساعد صانع محتوى عربي في تجهيز معلومات دقيقة وموثقة بمصادر حقيقية، لا مختلقة.`;
+
+// Tavily Web Search function
+async function searchWithTavily(query: string, maxResults = 8) {
+  const tavilyApiKey = Deno.env.get('TAVILY_API_KEY');
+  
+  if (!tavilyApiKey) {
+    throw new Error('TAVILY_API_KEY not configured');
+  }
+
+  console.log('Searching with Tavily:', query);
+
+  const response = await fetch('https://api.tavily.com/search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      api_key: tavilyApiKey,
+      query: query,
+      search_depth: 'advanced',
+      max_results: maxResults,
+      include_answer: false,
+      include_images: false,
+      include_domains: [], // Open search
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Tavily API error:', response.status, errorText);
+    throw new Error(`Tavily API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log(`Tavily returned ${data.results?.length || 0} results`);
+  
+  return data.results || [];
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -102,15 +156,46 @@ Deno.serve(async (req) => {
       .update({ research_status: 'loading' })
       .eq('id', projectId);
 
-    // Get Lovable AI API key
+    // Get Lovable API Key
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    console.log('Calling Lovable AI for research...');
+    // Step 1: Search with Tavily
+    console.log('Searching with Tavily for:', project.topic);
+    let tavilyResults;
+    try {
+      tavilyResults = await searchWithTavily(project.topic, 8);
+    } catch (tavilyError) {
+      console.error('Tavily search failed:', tavilyError);
+      
+      // Update status to error
+      await supabase
+        .from('projects')
+        .update({ research_status: 'error' })
+        .eq('id', projectId);
 
-    // Call Lovable AI Gateway
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch search results from Tavily' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Step 2: Build user prompt with Tavily results
+    const userPrompt = `الموضوع المطلوب البحث عنه: "${project.topic}"
+
+هذه نتائج بحث حقيقية من Tavily Web Search:
+
+${JSON.stringify(tavilyResults, null, 2)}
+
+استخدم هذه النتائج فقط لاستخراج الحقائق والمصادر والروابط.
+لا تختلق أي روابط أو مصادر غير موجودة في النتائج أعلاه.
+قدّم المخرجات بصيغة JSON حسب البنية المحددة في تعليماتك.`;
+
+    console.log('Calling Lovable AI for analysis...');
+
+    // Step 3: Call Lovable AI Gateway with Tavily results
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -122,11 +207,11 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: RESEARCH_SYSTEM_PROMPT
+            content: RESEARCH_SYSTEM_PROMPT_V2
           },
           {
             role: 'user',
-            content: `قم بإجراء بحث شامل حول الموضوع التالي:\n\n"${project.topic}"\n\nتذكر: يجب أن تكون الإجابة بصيغة JSON فقط حسب البنية المحددة في تعليماتك.`
+            content: userPrompt
           }
         ],
         temperature: 0.7,
@@ -204,7 +289,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Research completed successfully');
+    console.log('Research completed successfully with Tavily web search');
 
     return new Response(
       JSON.stringify({ 
