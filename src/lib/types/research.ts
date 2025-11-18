@@ -8,12 +8,13 @@ export interface ResearchFact {
   label: string;
   value: string;
   source?: string;
+  url?: string;
 }
 
 export interface ResearchSource {
   title: string;
   url?: string;
-  type?: "official" | "article" | "video" | "other";
+  type?: "official" | "article" | "blog" | "video" | "news" | "other";
 }
 
 export interface MythVsReality {
