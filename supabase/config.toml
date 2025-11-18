@@ -1,1 +1,22 @@
 project_id = "uoydhwauppxnytzochqx"
+
+[functions.run-article]
+verify_jwt = true
+
+[functions.run-broll]
+verify_jwt = true
+
+[functions.run-export]
+verify_jwt = true
+
+[functions.run-prompts]
+verify_jwt = true
+
+[functions.run-research]
+verify_jwt = true
+
+[functions.run-scripts]
+verify_jwt = true
+
+[functions.run-simplify]
+verify_jwt = true

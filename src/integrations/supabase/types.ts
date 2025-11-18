@@ -60,6 +60,9 @@ export type Database = {
           scripts_data: Json | null
           scripts_last_run_at: string | null
           scripts_status: string | null
+          simplify_data: Json | null
+          simplify_last_run_at: string | null
+          simplify_status: string | null
           status: string
           topic: string
           updated_at: string
@@ -86,6 +89,9 @@ export type Database = {
           scripts_data?: Json | null
           scripts_last_run_at?: string | null
           scripts_status?: string | null
+          simplify_data?: Json | null
+          simplify_last_run_at?: string | null
+          simplify_status?: string | null
           status?: string
           topic: string
           updated_at?: string
@@ -112,6 +118,9 @@ export type Database = {
           scripts_data?: Json | null
           scripts_last_run_at?: string | null
           scripts_status?: string | null
+          simplify_data?: Json | null
+          simplify_last_run_at?: string | null
+          simplify_status?: string | null
           status?: string
           topic?: string
           updated_at?: string
