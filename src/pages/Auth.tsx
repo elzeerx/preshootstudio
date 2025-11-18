@@ -85,8 +85,6 @@ export default function Auth() {
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
                       disabled={isSubmitting}
-                      dir="ltr"
-                      className="text-right"
                     />
                   </div>
                   <div className="space-y-2">
@@ -99,14 +97,12 @@ export default function Auth() {
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
                       disabled={isSubmitting}
-                      dir="ltr"
-                      className="text-right"
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                         جاري تسجيل الدخول...
                       </>
                     ) : (
@@ -144,8 +140,6 @@ export default function Auth() {
                       onChange={(e) => setSignupEmail(e.target.value)}
                       required
                       disabled={isSubmitting}
-                      dir="ltr"
-                      className="text-right"
                     />
                   </div>
                   <div className="space-y-2">
@@ -158,8 +152,6 @@ export default function Auth() {
                       onChange={(e) => setSignupPassword(e.target.value)}
                       required
                       disabled={isSubmitting}
-                      dir="ltr"
-                      className="text-right"
                       minLength={6}
                     />
                     <p className="text-xs text-muted-foreground">
@@ -169,7 +161,7 @@ export default function Auth() {
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                         جاري إنشاء الحساب...
                       </>
                     ) : (

@@ -68,7 +68,7 @@ export default function ForgotPassword() {
                 </div>
                 <Link to="/auth">
                   <Button className="w-full" variant="outline">
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ms-2 h-4 w-4" />
                     العودة إلى تسجيل الدخول
                   </Button>
                 </Link>
@@ -85,14 +85,12 @@ export default function ForgotPassword() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={isSubmitting}
-                    dir="ltr"
-                    className="text-right"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                       جاري الإرسال...
                     </>
                   ) : (

@@ -99,7 +99,7 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
           <Button onClick={handleGeneratePrompts} disabled={isGenerating}>
             {isGenerating ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 جاري المحاولة...
               </>
             ) : (
