@@ -97,14 +97,14 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
   // Idle state
   if (!project.broll_status || project.broll_status === 'idle' || !project.broll_data) {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-accent-green/20 flex items-center justify-center flex-shrink-0">
             <Video className="w-6 h-6 text-accent-green" />
           </div>
           <div className="flex-1">
-            <h3 className="heading-3 mb-3">خطة لقطات الـ B-Roll</h3>
-            <p className="body-text text-muted-foreground mb-6">
+            <h3 className="heading-3 mb-3 text-right">خطة لقطات الـ B-Roll</h3>
+            <p className="body-text text-muted-foreground mb-6 text-right">
               ما تم تجهيز خطة B-Roll لهذا الموضوع بعد.
             </p>
             <Button 
@@ -152,7 +152,7 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
   // Error state
   if (project.broll_status === 'error') {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
             <AlertCircle className="w-6 h-6 text-destructive" />
@@ -190,7 +190,7 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
   const brollData = project.broll_data as BRollData;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       {/* Header with regenerate button */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

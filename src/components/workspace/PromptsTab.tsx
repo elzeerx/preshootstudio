@@ -77,7 +77,7 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
   // Loading state
   if (isGenerating || project.prompts_status === 'loading') {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex flex-col items-center justify-center gap-4 py-12">
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
           <h3 className="heading-3">جاري تجهيز حزمة البرومبتات…</h3>
@@ -92,7 +92,7 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
   // Error state
   if (project.prompts_status === 'error') {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex flex-col items-center justify-center gap-4 py-12">
           <AlertCircle className="w-12 h-12 text-destructive" />
           <h3 className="heading-3">حدث خطأ أثناء تجهيز حزمة البرومبتات</h3>
@@ -114,7 +114,7 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
   // Idle state - no prompts generated yet
   if (!project.prompts_data || project.prompts_status === 'idle') {
     return (
-      <Card className="p-8">
+      <Card className="p-8" dir="rtl">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-accent-orange/20 flex items-center justify-center flex-shrink-0">
             <ImageIcon className="w-6 h-6 text-accent-orange" />
