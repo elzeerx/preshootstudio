@@ -196,7 +196,11 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {researchData.facts.map((fact, index) => (
-              <div key={index} className="p-4 rounded-lg bg-muted/50 border border-border">
+              <div 
+                key={index} 
+                className="p-4 rounded-lg bg-muted/50 border border-border"
+                dir="rtl"
+              >
                 <p className="font-semibold text-primary mb-2">{fact.label}</p>
                 <p className="body-text mb-3">{fact.value}</p>
                 {fact.source && fact.url && (
@@ -205,13 +209,14 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    dir="ltr"
                   >
                     <span className="line-clamp-1">{fact.source}</span>
                     <ExternalLink className="w-3 h-3 shrink-0" />
                   </a>
                 )}
                 {fact.source && !fact.url && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground" dir="rtl">
                     المصدر: {fact.source}
                   </p>
                 )}
@@ -270,7 +275,11 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
           <h3 className="heading-3 mb-4">خرافات شائعة مقابل الحقيقة</h3>
           <div className="space-y-4">
             {researchData.mythsVsReality.map((item, index) => (
-              <div key={index} className="p-4 rounded-lg bg-muted/30 border-r-4 border-destructive">
+              <div 
+                key={index} 
+                className="p-4 rounded-lg bg-muted/30 border-r-4 border-destructive"
+                dir="rtl"
+              >
                 <p className="font-semibold text-destructive mb-2 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   خرافة: {item.myth}
@@ -310,7 +319,11 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
           </div>
           <div className="space-y-4">
             {researchData.faqs.map((faq, index) => (
-              <div key={index} className="p-4 rounded-lg bg-muted/30">
+              <div 
+                key={index} 
+                className="p-4 rounded-lg bg-muted/30"
+                dir="rtl"
+              >
                 <p className="font-semibold text-foreground mb-2">
                   س: {faq.question}
                 </p>
