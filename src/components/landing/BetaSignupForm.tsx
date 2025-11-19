@@ -107,7 +107,7 @@ export const BetaSignupForm = () => {
       <Button
         type="submit"
         size="lg"
-        className="w-full bg-white text-foreground hover:bg-white/90 border-2 border-foreground h-14 text-lg font-bold"
+        className="w-full bg-accent text-accent-foreground hover:bg-accent/90 border-2 border-accent h-14 text-lg font-bold"
         disabled={isSubmitting}
       >
         {isSubmitting ? (

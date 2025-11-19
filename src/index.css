@@ -8,101 +8,101 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Editorial Black & White Design System */
-    --background: 0 0% 96%;  /* #F5F5F5 */
-    --foreground: 0 0% 7%;   /* #111111 */
+    /* Linen Color Palette Design System */
+    --background: 32 55% 95%;        /* #FCF2E7 Linen - الخلفية الرئيسية */
+    --foreground: 0 0% 11%;          /* #1B1B1B Near Black - النص الأساسي */
 
-    --card: 0 0% 100%;       /* #FFFFFF */
-    --card-foreground: 0 0% 7%;
-    --card-border: 0 0% 88%; /* #E0E0E0 */
-    --card-shadow: 0 0% 78%; /* #C7C7C7 */
+    --card: 0 0% 95%;                /* #F1F1F1 Off-White - كروت فاتحة */
+    --card-foreground: 0 0% 11%;     /* #1B1B1B - نص الكروت */
+    --card-border: 12 25% 65%;       /* Dusty Rose مخفف للحدود */
+    --card-shadow: 12 25% 57%;       /* #A97C73 Dusty Rose للظلال */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
+    --popover: 0 0% 95%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 0 0% 7%;      /* #111111 Black */
-    --primary-dark: 0 0% 0%; /* #000000 */
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 11%;             /* #1B1B1B - أسود للأزرار */
+    --primary-dark: 0 0% 7%;         /* أغمق قليلاً عند الـ hover */
+    --primary-foreground: 32 55% 95%; /* Linen للنص على الأزرار */
 
-    --secondary: 0 0% 93%;   /* #ECECEC */
-    --secondary-foreground: 0 0% 7%;
+    --secondary: 12 25% 57%;         /* #A97C73 Dusty Rose */
+    --secondary-foreground: 0 0% 95%; /* Off-white للنص */
 
-    --muted: 0 0% 93%;
-    --muted-foreground: 0 0% 33%; /* #555555 */
+    --muted: 32 40% 88%;             /* Linen أغمق قليلاً */
+    --muted-foreground: 0 0% 30%;    /* رمادي داكن للنصوص الثانوية */
 
-    --accent: 0 0% 7%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 204 26% 46%;           /* #587792 Blue-Grey */
+    --accent-foreground: 0 0% 100%;  /* أبيض للنص */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 87%;      /* #DDDDDD */
-    --input: 0 0% 98%;       /* #FAFAFA */
-    --ring: 0 0% 7%;
+    --border: 12 25% 75%;            /* Dusty Rose فاتح للحدود */
+    --input: 0 0% 98%;               /* أبيض تقريباً للـ inputs */
+    --ring: 204 26% 46%;             /* Blue-Grey للـ focus ring */
 
-    --radius: 0.625rem;      /* 10px */
+    --radius: 0.625rem;              /* 10px */
 
-    /* Editorial Shadows */
-    --shadow-editorial: 6px 6px 0 hsl(0 0% 78%);
-    --shadow-editorial-hover: 8px 8px 0 hsl(0 0% 72%);
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
-    --shadow-md: 0 2px 4px 0 hsl(0 0% 0% / 0.06);
+    /* Editorial Shadows - Dusty Rose */
+    --shadow-editorial: 6px 6px 0 hsl(12 25% 65%);
+    --shadow-editorial-hover: 8px 8px 0 hsl(12 25% 55%);
+    --shadow-sm: 0 1px 2px 0 hsl(12 25% 57% / 0.1);
+    --shadow-md: 0 2px 4px 0 hsl(12 25% 57% / 0.15);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 0 0% 87%;
-    --sidebar-ring: 0 0% 7%;
+    --sidebar-background: 32 55% 95%;
+    --sidebar-foreground: 0 0% 11%;
+    --sidebar-primary: 204 26% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 12 25% 90%;
+    --sidebar-accent-foreground: 0 0% 11%;
+    --sidebar-border: 12 25% 75%;
+    --sidebar-ring: 204 26% 46%;
   }
 
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 11%;          /* #1B1B1B - خلفية داكنة */
+    --foreground: 32 55% 95%;        /* Linen - نص فاتح */
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 98%;
-    --card-border: 0 0% 20%;
-    --card-shadow: 0 0% 15%;
+    --card: 0 0% 15%;                /* رمادي داكن للكروت */
+    --card-foreground: 32 55% 95%;   /* Linen للنص */
+    --card-border: 12 25% 35%;       /* Dusty Rose داكن */
+    --card-shadow: 12 25% 25%;       /* ظل أغمق */
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 32 55% 95%;
 
-    --primary: 0 0% 100%;
-    --primary-dark: 0 0% 90%;
-    --primary-foreground: 0 0% 7%;
+    --primary: 32 55% 95%;           /* Linen للأزرار */
+    --primary-dark: 0 0% 95%;        /* Off-white */
+    --primary-foreground: 0 0% 11%;  /* أسود للنص */
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 12 25% 50%;         /* Dusty Rose معدل */
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 32 40% 75%;  /* Linen للنصوص الثانوية */
 
-    --accent: 0 0% 100%;
-    --accent-foreground: 0 0% 7%;
+    --accent: 204 26% 55%;           /* Blue-Grey أفتح */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 15%;
-    --ring: 0 0% 100%;
+    --border: 0 0% 25%;
+    --input: 0 0% 18%;
+    --ring: 204 26% 55%;
 
-    --shadow-editorial: 6px 6px 0 hsl(0 0% 15%);
-    --shadow-editorial-hover: 8px 8px 0 hsl(0 0% 20%);
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
-    --shadow-md: 0 2px 4px 0 hsl(0 0% 0% / 0.3);
+    --shadow-editorial: 6px 6px 0 hsl(12 25% 20%);
+    --shadow-editorial-hover: 8px 8px 0 hsl(12 25% 25%);
+    --shadow-sm: 0 1px 2px 0 hsl(12 25% 20% / 0.2);
+    --shadow-md: 0 2px 4px 0 hsl(12 25% 20% / 0.3);
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 0 0% 7%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 0 0% 100%;
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 32 55% 95%;
+    --sidebar-primary: 204 26% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 32 55% 95%;
+    --sidebar-border: 0 0% 25%;
+    --sidebar-ring: 204 26% 55%;
   }
 }
 

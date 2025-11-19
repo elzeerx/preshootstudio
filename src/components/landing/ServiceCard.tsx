@@ -15,7 +15,7 @@ export const ServiceCard = ({ icon: Icon, title, description, delay = 0 }: Servi
       className={`p-6 md:p-8 hover:shadow-editorial-hover transition-all duration-300 hover:-translate-y-2 animate-stagger-${delay}`}
     >
       <div className="flex flex-col items-end text-right space-y-4">
-        <div className="p-4 bg-foreground text-background rounded-lg">
+        <div className="p-4 bg-accent text-accent-foreground rounded-lg">
           <Icon className="w-8 h-8 md:w-12 md:h-12" />
         </div>
         <h3 className="text-xl md:text-2xl font-bold text-foreground">{title}</h3>

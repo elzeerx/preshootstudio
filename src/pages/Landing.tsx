@@ -25,11 +25,11 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-16">
+      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center space-y-8 animate-fadeInUp">
-            <div className="flex items-center gap-3 px-6 py-2 border-2 border-foreground rounded-full">
-              <span className="text-sm md:text-base font-bold text-foreground">
+            <div className="flex items-center gap-3 px-6 py-2 border-2 border-accent rounded-full bg-accent/5">
+              <span className="text-sm md:text-base font-bold text-accent">
                 الأداة الاحترافية لصنّاع المحتوى
               </span>
             </div>
@@ -56,7 +56,7 @@ const Landing = () => {
       </section>
 
       {/* What We Offer */}
-      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-muted/30">
+      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-secondary/10">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
@@ -70,7 +70,7 @@ const Landing = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <Card variant="editorial" className="p-8 md:p-10 hover:shadow-editorial-hover transition-all duration-300 hover:-translate-y-2">
               <div className="flex flex-col items-end text-right space-y-6">
-                <div className="p-5 bg-foreground text-background rounded-lg">
+                <div className="p-5 bg-accent text-accent-foreground rounded-lg">
                   <Zap className="w-10 h-10 md:w-12 md:h-12" />
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold text-foreground">
@@ -85,7 +85,7 @@ const Landing = () => {
 
             <Card variant="editorial" className="p-8 md:p-10 hover:shadow-editorial-hover transition-all duration-300 hover:-translate-y-2">
               <div className="flex flex-col items-end text-right space-y-6">
-                <div className="p-5 bg-foreground text-background rounded-lg">
+                <div className="p-5 bg-secondary text-secondary-foreground rounded-lg">
                   <Sparkles className="w-10 h-10 md:w-12 md:h-12" />
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold text-foreground">
@@ -117,7 +117,7 @@ const Landing = () => {
       </section>
 
       {/* Services */}
-      <section id="services" className="py-16 md:py-24 px-4 md:px-8 lg:px-16">
+      <section id="services" className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-background">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
@@ -170,7 +170,7 @@ const Landing = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-muted/30">
+      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-muted/20">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
