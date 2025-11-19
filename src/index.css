@@ -393,6 +393,27 @@ All colors MUST be HSL.
     opacity: 0;
   }
 
+  /* Gradient Backgrounds - Brutalist Style */
+  .bg-gradient-main {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1f1f1f 100%);
+  }
+  
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, #0f0f0f 0%, #2a2a2a 40%, #1a1515 100%);
+  }
+  
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, #2a2a2a 0%, rgba(169, 124, 115, 0.15) 50%, #2a2a2a 100%);
+  }
+  
+  .bg-gradient-footer {
+    background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+  }
+  
+  .bg-gradient-header {
+    background: linear-gradient(180deg, #2a2a2a 0%, #252525 100%);
+  }
+
   /* Glassmorphism Utilities */
   .glass-card {
     background: rgba(169, 124, 115, 0.08);

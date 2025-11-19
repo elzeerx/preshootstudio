@@ -29,7 +29,7 @@ const Landing = () => {
   }, []);
   return <div className="min-h-screen bg-background" dir="rtl">
       {/* Header with Logo */}
-      <header className="py-6 md:py-8 px-4 bg-background border-b-4 border-foreground">
+      <header className="py-6 md:py-8 px-4 bg-gradient-header border-b-4 border-foreground">
         <div className="max-w-7xl mx-auto flex justify-center">
           <div className="p-4 border-4 border-button-primary bg-button-primary/10 brutal-shadow">
             <img src={preshootLogoNew} alt="PreShoot Studio" className="h-12 md:h-16 lg:h-20 w-auto" />
@@ -38,7 +38,7 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-background">
+      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-gradient-hero">
         {/* Brutalist geometric shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" dir="ltr">
           <div className="absolute top-20 left-10 w-32 h-32 border-4 border-button-primary/20 rotate-12" />
@@ -77,7 +77,7 @@ const Landing = () => {
       </section>
 
       {/* What We Offer */}
-      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-secondary/10">
+      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-gradient-main">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
@@ -138,7 +138,7 @@ const Landing = () => {
       </section>
 
       {/* Services */}
-      <section id="services" className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-background">
+      <section id="services" className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-gradient-main">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
@@ -170,7 +170,7 @@ const Landing = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-muted/20">
+      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-gradient-main">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
@@ -186,7 +186,7 @@ const Landing = () => {
       </section>
 
       {/* Early Access / Beta Signup - Glassmorphic + Brutalist */}
-      <section className="relative py-24 px-4 bg-background overflow-hidden">
+      <section className="relative py-24 px-4 bg-gradient-accent overflow-hidden">
         {/* Geometric Background Elements (Brutalist) */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-10 right-20 w-32 h-32 border-4 border-button-primary/30 rotate-12" />
@@ -226,7 +226,7 @@ const Landing = () => {
       </section>
 
       {/* Footer - Brutalist Redesign */}
-      <footer className="bg-[#0A0A0A] text-background py-16 px-4 border-t-4 border-button-primary" dir="rtl">
+      <footer className="bg-gradient-footer text-background py-16 px-4 border-t-4 border-button-primary" dir="rtl">
         <div className="max-w-7xl mx-auto">
           {/* Top Section: Logo Only */}
           <div className="mb-16 pb-16 border-b-4 border-white/10 flex justify-center">
