@@ -60,10 +60,12 @@ export const BetaSignupForm = () => {
 
   if (isSuccess) {
     return (
-      <div className="text-center space-y-4 animate-fadeInUp">
-        <div className="text-6xl">✓</div>
-        <h3 className="text-2xl font-bold text-white">تم التسجيل بنجاح!</h3>
-        <p className="text-white/80">سنتواصل معك عبر البريد الإلكتروني قريباً.</p>
+      <div className="text-center space-y-6 animate-fadeInUp">
+        <div className="inline-flex items-center justify-center w-24 h-24 border-4 border-button-primary bg-button-primary/20">
+          <span className="text-6xl text-button-primary">✓</span>
+        </div>
+        <h3 className="text-2xl font-black text-white">تم التسجيل بنجاح!</h3>
+        <p className="text-white/80 font-bold">سنتواصل معك عبر البريد الإلكتروني قريباً.</p>
       </div>
     );
   }
@@ -71,48 +73,48 @@ export const BetaSignupForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-md mx-auto">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-white text-right block">
+        <Label htmlFor="name" className="text-white text-right block font-black text-lg">
           الاسم الكامل
         </Label>
         <Input
           id="name"
           type="text"
           placeholder="أدخل اسمك الكامل"
-          className="bg-white text-foreground border-2 border-foreground h-12 text-lg"
+          className="glass-card bg-white/5 text-white border-4 border-white/20 h-14 text-lg placeholder:text-white/40 focus:border-button-primary rounded-none"
           {...register("name")}
           disabled={isSubmitting}
         />
         {errors.name && (
-          <p className="text-sm text-red-400 text-right">{errors.name.message}</p>
+          <p className="text-sm text-red-400 text-right font-bold">{errors.name.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-white text-right block">
+        <Label htmlFor="email" className="text-white text-right block font-black text-lg">
           البريد الإلكتروني
         </Label>
         <Input
           id="email"
           type="email"
           placeholder="your@email.com"
-          className="bg-white text-foreground border-2 border-foreground h-12 text-lg"
+          className="glass-card bg-white/5 text-white border-4 border-white/20 h-14 text-lg placeholder:text-white/40 focus:border-button-primary rounded-none"
           {...register("email")}
           disabled={isSubmitting}
         />
         {errors.email && (
-          <p className="text-sm text-red-400 text-right">{errors.email.message}</p>
+          <p className="text-sm text-red-400 text-right font-bold">{errors.email.message}</p>
         )}
       </div>
 
       <Button
         type="submit"
         size="lg"
-        className="w-full bg-accent text-accent-foreground hover:bg-accent/90 border-2 border-accent h-14 text-lg font-bold"
+        className="w-full bg-button-primary text-white hover:bg-button-primary-hover border-4 border-button-primary hover:border-button-primary-hover h-16 text-lg font-black rounded-none transition-all"
         disabled={isSubmitting}
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" strokeWidth={3} />
             جاري التسجيل...
           </>
         ) : (
@@ -120,7 +122,7 @@ export const BetaSignupForm = () => {
         )}
       </Button>
 
-      <p className="text-sm text-white/60 text-center">
+      <p className="text-sm text-white/60 text-center font-bold">
         لن نرسل لك رسائل غير مرغوبة، وعد! 🤝
       </p>
     </form>
