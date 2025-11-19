@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, ArrowLeft, AlertCircle, Calendar, FileText, Film, Search, Lightbulb, Video, Image, BookOpen, Package, Zap } from "lucide-react";
+import { ArrowLeft, AlertCircle, Calendar, FileText, Search, Lightbulb, Video, Image, BookOpen, Package, Film } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { OverviewTab } from "@/components/workspace/OverviewTab";
@@ -16,6 +16,7 @@ import { BRollTab } from "@/components/workspace/BRollTab";
 import { PromptsTab } from "@/components/workspace/PromptsTab";
 import { ArticleTab } from "@/components/workspace/ArticleTab";
 import { ExportTab } from "@/components/workspace/ExportTab";
+import preshootLogo from "@/assets/preshoot-logo.png";
 
 interface Project {
   id: string;
@@ -109,10 +110,10 @@ const ProjectDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="inline-block w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-6"></div>
-          <p className="body-text-secondary text-lg break-words-rtl">جاري تحميل المشروع...</p>
+          <div className="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+          <p className="body-text-secondary">جاري تحميل المشروع...</p>
         </div>
       </div>
     );
