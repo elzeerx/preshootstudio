@@ -177,7 +177,7 @@ const Index = () => {
                     </Button>
                   </Link>
                   <Link to="/auth">
-                    <Button size="sm" variant="premium">
+                    <Button size="sm" variant="default">
                       تسجيل الدخول
                     </Button>
                   </Link>
@@ -212,7 +212,7 @@ const Index = () => {
           </div>
 
           {/* Create Project Form */}
-          <Card variant="glass" className="mb-20 max-w-3xl mx-auto animate-scale-in">
+          <Card variant="editorial" className="mb-20 max-w-3xl mx-auto animate-scale-in">
             <CardHeader className="text-center pb-4">
               <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20">
                 <Lightbulb className="w-8 h-8 text-white" />
@@ -248,7 +248,7 @@ const Index = () => {
                 <Button
                   type="submit"
                   disabled={isCreating}
-                  variant="glow"
+                  variant="default"
                   size="lg"
                   className="w-full text-lg gap-3"
                 >
@@ -281,7 +281,7 @@ const Index = () => {
               {features.map((feature, index) => (
                 <Card
                   key={index}
-                  variant="glass"
+                  variant="editorial"
                   className="group hover:scale-105 cursor-pointer"
                   style={{
                     animationDelay: `${index * 100}ms`,

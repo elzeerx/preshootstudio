@@ -170,7 +170,7 @@ const Projects = () => {
           {/* Stats Cards */}
           {!isLoading && projects.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 animate-scale-in">
-              <Card variant="glass" className="hover:scale-105 transition-transform">
+              <Card variant="subtle" className="hover:scale-105 transition-transform">
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
@@ -184,7 +184,7 @@ const Projects = () => {
                 </CardContent>
               </Card>
 
-              <Card variant="glass" className="hover:scale-105 transition-transform">
+              <Card variant="subtle" className="hover:scale-105 transition-transform">
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
@@ -198,7 +198,7 @@ const Projects = () => {
                 </CardContent>
               </Card>
 
-              <Card variant="glass" className="hover:scale-105 transition-transform">
+              <Card variant="subtle" className="hover:scale-105 transition-transform">
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
@@ -212,7 +212,7 @@ const Projects = () => {
                 </CardContent>
               </Card>
 
-              <Card variant="glass" className="hover:scale-105 transition-transform">
+              <Card variant="subtle" className="hover:scale-105 transition-transform">
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
@@ -276,7 +276,7 @@ const Projects = () => {
               </div>
 
               <Link to="/">
-                <Button variant="premium" size="sm" className="gap-2">
+                <Button variant="default" size="sm" className="gap-2">
                   <Plus className="w-4 h-4" />
                   مشروع جديد
                 </Button>
@@ -294,7 +294,7 @@ const Projects = () => {
 
           {/* Empty State */}
           {!isLoading && projects.length === 0 && (
-            <Card variant="glass" className="max-w-xl mx-auto animate-scale-in">
+            <Card variant="subtle" className="max-w-xl mx-auto animate-scale-in">
               <CardContent className="pt-16 pb-16 text-center">
                 <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-secondary/10 mb-8">
                   <Inbox className="w-12 h-12 text-primary" />
@@ -304,7 +304,7 @@ const Projects = () => {
                   ابدأ من الصفحة الرئيسية بإدخال موضوع جديد، وخلي PreShoot AI يجهز لك كل شيء
                 </p>
                 <Link to="/">
-                  <Button variant="glow" size="lg" className="gap-2">
+                  <Button variant="default" size="lg" className="gap-2">
                     <Plus className="w-5 h-5" />
                     إنشاء مشروع جديد
                   </Button>
@@ -315,7 +315,7 @@ const Projects = () => {
 
           {/* No Results State */}
           {!isLoading && projects.length > 0 && filteredProjects.length === 0 && (
-            <Card variant="glass" className="max-w-xl mx-auto">
+            <Card variant="subtle" className="max-w-xl mx-auto">
               <CardContent className="pt-12 pb-12 text-center">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-muted/50 mb-6">
                   <Search className="w-10 h-10 text-muted-foreground" />
@@ -342,7 +342,7 @@ const Projects = () => {
                   className="animate-fade-in"
                 >
                   <Card 
-                    variant="elevated" 
+                    variant="editorial" 
                     className="h-full group cursor-pointer overflow-hidden"
                   >
                     <CardHeader className="space-y-4">
