@@ -284,7 +284,7 @@ const Landing = () => {
       </section>
 
       {/* Footer - Brutalist Redesign */}
-      <footer className="bg-background text-background py-16 px-4 border-t-4 border-button-primary" dir="rtl">
+      <footer className="bg-[#0A0A0A] text-background py-16 px-4 border-t-4 border-button-primary" dir="rtl">
         <div className="max-w-7xl mx-auto">
           {/* Top Section: Logo + Newsletter Signup */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 pb-16 border-b-4 border-white/10">
