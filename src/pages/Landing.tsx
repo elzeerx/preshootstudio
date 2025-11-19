@@ -286,36 +286,14 @@ const Landing = () => {
       {/* Footer - Brutalist Redesign */}
       <footer className="bg-[#0A0A0A] text-background py-16 px-4 border-t-4 border-button-primary" dir="rtl">
         <div className="max-w-7xl mx-auto">
-          {/* Top Section: Logo + Newsletter Signup */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 pb-16 border-b-4 border-white/10">
-            {/* Brand Section - Bold & Centered */}
-            <div className="space-y-6 text-center lg:text-right">
-              <div className="inline-block p-4 border-4 border-button-primary bg-button-primary/10">
-                <img src={preshootLogoNew} alt="PreShoot Studio" className="h-12 w-auto" />
-              </div>
-              <h3 className="text-2xl font-black text-white">
-                PreShoot Studio
-              </h3>
-              <p className="text-lg text-white/70 max-w-md mx-auto lg:mx-0 font-bold">
+          {/* Top Section: Logo Only */}
+          <div className="mb-16 pb-16 border-b-4 border-white/10 flex justify-center">
+            {/* Brand Section - Centered White Logo */}
+            <div className="text-center">
+              <img src={preshootLogoNew} alt="PreShoot Studio" className="h-16 w-auto brightness-0 invert" />
+              <p className="text-lg text-white/70 max-w-md mx-auto font-bold mt-6">
                 استوديو احترافي لتجهيز محتواك من الفكرة إلى النشر
               </p>
-            </div>
-            
-            {/* Quick Newsletter (Brutalist Form) */}
-            <div className="space-y-4">
-              <h4 className="text-xl font-black text-white border-b-4 border-button-primary inline-block pb-2">
-                اشترك في النشرة
-              </h4>
-              <div className="flex gap-0" dir="ltr">
-                <input 
-                  type="email"
-                  placeholder="your@email.com"
-                  className="flex-1 px-6 py-4 bg-white/5 border-4 border-white/20 text-white placeholder:text-white/40 focus:border-button-primary outline-none glass-card"
-                />
-                <button className="px-8 py-4 bg-button-primary border-4 border-button-primary text-white font-black hover:bg-button-primary-hover transition-colors">
-                  اشترك
-                </button>
-              </div>
             </div>
           </div>
           
