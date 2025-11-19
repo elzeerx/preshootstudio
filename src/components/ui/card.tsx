@@ -3,15 +3,14 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "glass" | "elevated" | "gradient";
+  variant?: "default" | "editorial" | "subtle";
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
-    default: "rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200",
-    glass: "rounded-xl border border-border/50 bg-card/50 backdrop-blur-md text-card-foreground shadow-lg hover:shadow-xl hover:border-border/70 transition-all duration-300",
-    elevated: "rounded-xl border border-border bg-card text-card-foreground shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300",
-    gradient: "rounded-xl border border-border/50 bg-gradient-to-br from-card via-card to-primary/5 text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300",
+    default: "rounded-lg border border-card-border bg-card text-card-foreground shadow-editorial transition-all duration-200 hover:-translate-y-1 hover:shadow-editorial-hover",
+    editorial: "rounded-lg border border-card-border bg-card text-card-foreground shadow-editorial",
+    subtle: "rounded-lg border border-card-border bg-card text-card-foreground shadow-sm",
   };
 
   return (

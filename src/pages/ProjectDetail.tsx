@@ -145,7 +145,7 @@ const ProjectDetail = () => {
         </header>
 
         <main className="container mx-auto px-4 py-20 relative z-10">
-          <Card variant="glass" className="max-w-xl mx-auto">
+          <Card variant="subtle" className="max-w-xl mx-auto">
             <CardContent className="pt-16 pb-16 text-center">
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-destructive/10 to-destructive/5 mb-8">
                 <AlertCircle className="w-12 h-12 text-destructive" />
@@ -162,7 +162,7 @@ const ProjectDetail = () => {
                   </Button>
                 </Link>
                 <Link to="/">
-                  <Button variant="premium" size="lg">
+                  <Button variant="default" size="lg">
                     الصفحة الرئيسية
                   </Button>
                 </Link>
@@ -215,7 +215,7 @@ const ProjectDetail = () => {
       <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Project Header Card */}
-          <Card variant="gradient" className="mb-8 overflow-hidden animate-fade-in">
+          <Card variant="editorial" className="mb-8 overflow-hidden animate-fade-in">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 pointer-events-none" />
             <CardHeader className="relative pb-6">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
