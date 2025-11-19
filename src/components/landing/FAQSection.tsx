@@ -41,18 +41,18 @@ const faqs = [
 
 export const FAQSection = () => {
   return (
-    <Card variant="editorial" className="p-8 md:p-12">
+    <Card variant="glass" className="p-8 md:p-12 border-4 border-white/20">
       <Accordion type="single" collapsible className="w-full space-y-4">
         {faqs.map((faq, index) => (
           <AccordionItem
             key={index}
             value={`item-${index}`}
-            className="border-b border-border pb-4"
+            className="border-b-4 border-border/20 pb-4"
           >
-            <AccordionTrigger className="text-right text-lg md:text-xl font-bold text-foreground hover:text-accent transition-colors">
+            <AccordionTrigger className="text-right text-lg md:text-xl font-black text-foreground hover:text-button-primary transition-colors">
               {faq.question}
             </AccordionTrigger>
-            <AccordionContent className="text-right text-base md:text-lg text-muted-foreground leading-relaxed pt-4">
+            <AccordionContent className="text-right text-base md:text-lg text-muted-foreground leading-relaxed pt-4 font-bold">
               {faq.answer}
             </AccordionContent>
           </AccordionItem>
