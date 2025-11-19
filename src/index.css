@@ -56,6 +56,13 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 0 0% 11%;
     --sidebar-border: 12 25% 75%;
     --sidebar-ring: 204 26% 46%;
+
+    /* Button Color System - Dusty Rose Based */
+    --button-primary: 12 25% 57%;           /* #A97C73 Dusty Rose - اللون الأساسي */
+    --button-primary-hover: 12 25% 50%;     /* أغمق للـ hover */
+    --button-primary-active: 12 25% 45%;    /* أغمق للـ active/clicked */
+    --button-primary-light: 12 25% 65%;     /* أفتح للـ outline */
+    --button-foreground: 0 0% 100%;         /* أبيض للنص */
   }
 
   .dark {
@@ -103,6 +110,13 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 32 55% 95%;
     --sidebar-border: 0 0% 25%;
     --sidebar-ring: 204 26% 55%;
+
+    /* Button Colors - Dark Mode */
+    --button-primary: 12 25% 50%;
+    --button-primary-hover: 12 25% 55%;
+    --button-primary-active: 12 25% 60%;
+    --button-primary-light: 12 25% 45%;
+    --button-foreground: 0 0% 100%;
   }
 }
 

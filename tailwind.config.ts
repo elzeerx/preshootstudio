@@ -60,6 +60,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        button: {
+          primary: "hsl(var(--button-primary))",
+          "primary-hover": "hsl(var(--button-primary-hover))",
+          "primary-active": "hsl(var(--button-primary-active))",
+          "primary-light": "hsl(var(--button-primary-light))",
+          foreground: "hsl(var(--button-foreground))",
+        },
       },
       boxShadow: {
         editorial: "var(--shadow-editorial)",
