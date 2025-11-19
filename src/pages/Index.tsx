@@ -157,14 +157,16 @@ const Index = () => {
                         <User className="w-5 h-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem onClick={() => navigate("/profile")}>
-                        <User className="ms-2 w-4 h-4" />
-                        الملف الشخصي
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile" className="flex items-center gap-2 cursor-pointer flex-row-reverse">
+                          <span>الملف الشخصي</span>
+                          <User className="w-4 h-4" />
+                        </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
-                        <LogOut className="ms-2 w-4 h-4" />
-                        تسجيل الخروج
+                      <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive flex-row-reverse">
+                        <span>تسجيل الخروج</span>
+                        <LogOut className="w-4 h-4" />
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -278,26 +280,27 @@ const Index = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature, index) => (
-                <Card
-                  key={index}
-                  variant="editorial"
-                  className="group hover:scale-105 cursor-pointer"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                  }}
-                >
-                  <CardHeader className="space-y-4">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-all group-hover:scale-110`}>
-                      <feature.icon className="w-7 h-7 text-white" />
-                    </div>
-                    <CardTitle className="text-xl font-bold">{feature.title}</CardTitle>
-                    <CardDescription className="text-base leading-relaxed">
-                      {feature.description}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
+              {features.map((feature, index) => {
+                const FeatureIcon = feature.icon;
+                return (
+                  <Card
+                    key={index}
+                    className="group hover:shadow-xl transition-all duration-300 border-border/50 backdrop-blur-sm bg-card/95 hover:scale-105"
+                  >
+                    <CardHeader className="text-right">
+                      <div className="flex items-center gap-3 mb-3 justify-end flex-row-reverse">
+                        <div className="p-3 rounded-lg bg-button-primary/10 group-hover:bg-button-primary/20 transition-colors">
+                          <FeatureIcon className="w-6 h-6 text-button-primary" strokeWidth={2} />
+                        </div>
+                        <CardTitle className="text-xl">{feature.title}</CardTitle>
+                      </div>
+                      <CardDescription className="text-base text-right">
+                        {feature.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </div>
