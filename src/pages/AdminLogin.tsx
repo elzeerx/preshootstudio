@@ -68,8 +68,8 @@ export default function AdminLogin() {
       <div className="w-full max-w-md">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8 animate-fadeInUp">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-foreground rounded-lg mb-4">
-            <Shield className="w-12 h-12 text-background" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-accent rounded-lg mb-4 shadow-editorial">
+            <Shield className="w-12 h-12 text-accent-foreground" />
           </div>
           <h1 className="text-4xl font-black mb-2">
             لوحة التحكم

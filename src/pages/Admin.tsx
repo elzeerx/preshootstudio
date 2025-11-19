@@ -117,7 +117,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen bg-muted/20" dir="rtl">
       <div className="container max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
