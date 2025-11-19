@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BetaSignupForm } from "@/components/landing/BetaSignupForm";
 import { FAQSection } from "@/components/landing/FAQSection";
+import { FAQSectionSkeleton } from "@/components/landing/FAQSectionSkeleton";
 import { ServiceCard } from "@/components/landing/ServiceCard";
+import { ServiceCardSkeleton } from "@/components/landing/ServiceCardSkeleton";
 import {
   Zap,
   Sparkles,
@@ -23,6 +26,26 @@ import { Link } from "react-router-dom";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 
 const Landing = () => {
+  const [isServicesLoaded, setIsServicesLoaded] = useState(false);
+  const [isFAQLoaded, setIsFAQLoaded] = useState(false);
+
+  useEffect(() => {
+    // Simulate content loading for services section
+    const servicesTimer = setTimeout(() => {
+      setIsServicesLoaded(true);
+    }, 800);
+
+    // Simulate content loading for FAQ section (slightly delayed)
+    const faqTimer = setTimeout(() => {
+      setIsFAQLoaded(true);
+    }, 1200);
+
+    return () => {
+      clearTimeout(servicesTimer);
+      clearTimeout(faqTimer);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header with Logo */}
@@ -151,42 +174,55 @@ const Landing = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <ServiceCard
-              icon={Search}
-              title="بحث ذكي معمّق"
-              description="احصل على بحث شامل ومعمّق حول أي موضوع مع مصادر موثوقة وتحليل دقيق للمعلومات."
-              delay={1}
-            />
-            <ServiceCard
-              icon={Lightbulb}
-              title="تبسيط الأفكار المعقدة"
-              description="حوّل المواضيع المعقدة إلى محتوى سهل الفهم ومناسب لجمهورك المستهدف."
-              delay={2}
-            />
-            <ServiceCard
-              icon={FileText}
-              title="سكريبتات جاهزة للتصوير"
-              description="احصل على سكريبتات احترافية منظمة ومكتوبة بأسلوب جذاب وجاهزة للتصوير مباشرة."
-              delay={3}
-            />
-            <ServiceCard
-              icon={Video}
-              title="خطط B-Roll احترافية"
-              description="خطط تصوير تفصيلية مع اقتراحات للقطات B-Roll التي تثري محتواك البصري."
-              delay={4}
-            />
-            <ServiceCard
-              icon={Image}
-              title="برومبتات AI للصور"
-              description="احصل على برومبتات جاهزة لإنشاء صور مذهلة باستخدام أدوات الذكاء الاصطناعي."
-              delay={5}
-            />
-            <ServiceCard
-              icon={BookOpen}
-              title="مقالات SEO محسّنة"
-              description="مقالات احترافية محسّنة لمحركات البحث مع كلمات مفتاحية وبنية مثالية."
-              delay={6}
-            />
+            {!isServicesLoaded ? (
+              <>
+                <ServiceCardSkeleton />
+                <ServiceCardSkeleton />
+                <ServiceCardSkeleton />
+                <ServiceCardSkeleton />
+                <ServiceCardSkeleton />
+                <ServiceCardSkeleton />
+              </>
+            ) : (
+              <>
+                <ServiceCard
+                  icon={Search}
+                  title="بحث ذكي معمّق"
+                  description="احصل على بحث شامل ومعمّق حول أي موضوع مع مصادر موثوقة وتحليل دقيق للمعلومات."
+                  delay={1}
+                />
+                <ServiceCard
+                  icon={Lightbulb}
+                  title="تبسيط الأفكار المعقدة"
+                  description="حوّل المواضيع المعقدة إلى محتوى سهل الفهم ومناسب لجمهورك المستهدف."
+                  delay={2}
+                />
+                <ServiceCard
+                  icon={FileText}
+                  title="سكريبتات جاهزة للتصوير"
+                  description="احصل على سكريبتات احترافية منظمة ومكتوبة بأسلوب جذاب وجاهزة للتصوير مباشرة."
+                  delay={3}
+                />
+                <ServiceCard
+                  icon={Video}
+                  title="خطط B-Roll احترافية"
+                  description="خطط تصوير تفصيلية مع اقتراحات للقطات B-Roll التي تثري محتواك البصري."
+                  delay={4}
+                />
+                <ServiceCard
+                  icon={Image}
+                  title="برومبتات AI للصور"
+                  description="احصل على برومبتات جاهزة لإنشاء صور مذهلة باستخدام أدوات الذكاء الاصطناعي."
+                  delay={5}
+                />
+                <ServiceCard
+                  icon={BookOpen}
+                  title="مقالات SEO محسّنة"
+                  description="مقالات احترافية محسّنة لمحركات البحث مع كلمات مفتاحية وبنية مثالية."
+                  delay={6}
+                />
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -203,7 +239,7 @@ const Landing = () => {
             </p>
           </div>
 
-          <FAQSection />
+          {!isFAQLoaded ? <FAQSectionSkeleton /> : <FAQSection />}
         </div>
       </section>
 
