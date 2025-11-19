@@ -170,7 +170,7 @@ const ProjectDetail = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-20 flex-row-reverse">
             <Link to="/" className="flex-shrink-0">
               <img 
                 src={preshootLogo} 
@@ -179,9 +179,9 @@ const ProjectDetail = () => {
               />
             </Link>
             <Link to="/projects">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="ml-2 h-4 w-4" />
-                مشاريعي
+              <Button variant="ghost" size="sm" className="gap-2 flex-row-reverse">
+                <span>مشاريعي</span>
+                <ArrowLeft className="h-4 w-4 rotate-180" />
               </Button>
             </Link>
           </div>
@@ -194,22 +194,22 @@ const ProjectDetail = () => {
         <Card variant="editorial" className="mb-8">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-              <div className="flex-1 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
-                    <Film className="w-6 h-6 text-primary-foreground" />
-                  </div>
+              <div className="flex-1 space-y-4 text-right">
+                <div className="flex items-center gap-3 flex-row-reverse justify-end">
                   <Badge variant={getStatusVariant(project.status)}>
                     {getStatusLabel(project.status)}
                   </Badge>
+                  <div className="w-12 h-12 rounded-lg bg-button-primary/10 flex items-center justify-center">
+                    <Film className="w-6 h-6 text-button-primary" strokeWidth={2} />
+                  </div>
                 </div>
                 <CardTitle className="heading-2 break-words-rtl">
                   {project.topic}
                 </CardTitle>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-4 text-sm text-muted-foreground flex-row-reverse">
+                  <div className="flex items-center gap-2 flex-row-reverse">
                     <span>{formatDate(project.created_at)}</span>
+                    <Calendar className="w-4 h-4" />
                   </div>
                 </div>
               </div>
