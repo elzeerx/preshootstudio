@@ -64,8 +64,8 @@ export const BetaSignupForm = () => {
         <div className="inline-flex items-center justify-center w-24 h-24 border-4 border-button-primary bg-button-primary/20">
           <span className="text-6xl text-button-primary">✓</span>
         </div>
-        <h3 className="text-2xl font-black text-white">تم التسجيل بنجاح!</h3>
-        <p className="text-white/80 font-bold">سنتواصل معك عبر البريد الإلكتروني قريباً.</p>
+        <h3 className="text-2xl font-black text-foreground">تم التسجيل بنجاح!</h3>
+        <p className="text-foreground/80 font-bold">سنتواصل معك عبر البريد الإلكتروني قريباً.</p>
       </div>
     );
   }
@@ -73,14 +73,14 @@ export const BetaSignupForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-md mx-auto">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-white text-right block font-black text-lg">
+        <Label htmlFor="name" className="text-foreground text-right block font-black text-lg">
           الاسم الكامل
         </Label>
         <Input
           id="name"
           type="text"
           placeholder="أدخل اسمك الكامل"
-          className="glass-card bg-white/5 text-white border-4 border-white/20 h-14 text-lg placeholder:text-white/40 focus:border-button-primary rounded-none"
+          className="glass-card bg-white/5 text-foreground border-4 border-white/20 h-14 text-lg placeholder:text-foreground/40 focus:border-button-primary rounded-none"
           {...register("name")}
           disabled={isSubmitting}
         />
@@ -90,14 +90,14 @@ export const BetaSignupForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-white text-right block font-black text-lg">
+        <Label htmlFor="email" className="text-foreground text-right block font-black text-lg">
           البريد الإلكتروني
         </Label>
         <Input
           id="email"
           type="email"
           placeholder="your@email.com"
-          className="glass-card bg-white/5 text-white border-4 border-white/20 h-14 text-lg placeholder:text-white/40 focus:border-button-primary rounded-none"
+          className="glass-card bg-white/5 text-foreground border-4 border-white/20 h-14 text-lg placeholder:text-foreground/40 focus:border-button-primary rounded-none"
           {...register("email")}
           disabled={isSubmitting}
         />
@@ -109,7 +109,7 @@ export const BetaSignupForm = () => {
       <Button
         type="submit"
         size="lg"
-        className="w-full bg-button-primary text-white hover:bg-button-primary-hover border-4 border-button-primary hover:border-button-primary-hover h-16 text-lg font-black rounded-none transition-all"
+        className="w-full bg-button-primary text-foreground hover:bg-button-primary-hover border-4 border-button-primary hover:border-button-primary-hover h-16 text-lg font-black rounded-none transition-all"
         disabled={isSubmitting}
       >
         {isSubmitting ? (
@@ -122,7 +122,7 @@ export const BetaSignupForm = () => {
         )}
       </Button>
 
-      <p className="text-sm text-white/60 text-center font-bold">
+      <p className="text-sm text-foreground/60 text-center font-bold">
         لن نرسل لك رسائل غير مرغوبة، وعد! 🤝
       </p>
     </form>

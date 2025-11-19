@@ -244,7 +244,7 @@ const Landing = () => {
       </section>
 
       {/* Early Access / Beta Signup - Glassmorphic + Brutalist */}
-      <section className="relative py-24 px-4 bg-background overflow-hidden">
+      <section className="relative py-24 px-4 bg-[#0F0F0F] overflow-hidden">
         {/* Geometric Background Elements (Brutalist) */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-10 right-20 w-32 h-32 border-4 border-button-primary/30 rotate-12" />
@@ -254,24 +254,24 @@ const Landing = () => {
         
         <div className="max-w-5xl mx-auto relative z-10">
           {/* Glassmorphic Container */}
-          <div className="glass-card p-12 border-4 border-white/20 text-center space-y-8">
+          <div className="glass-card p-12 border-4 border-white/20 text-center space-y-8 bg-[#1A1A1A]/80">
             {/* Title Section */}
             <div className="space-y-6">
               <div className="inline-block p-6 border-4 border-button-primary bg-button-primary/20 backdrop-blur-md">
                 <Film className="w-16 h-16 text-button-primary" strokeWidth={3} />
               </div>
               
-              <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
+              <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
                 انضم إلى الوصول المبكر
               </h2>
               
-              <p className="text-xl text-white/80 max-w-2xl mx-auto font-bold">
+              <p className="text-xl text-foreground/80 max-w-2xl mx-auto font-bold">
                 كن من أوائل المستخدمين واحصل على ميزات حصرية وأسعار خاصة
               </p>
               
               {/* Brutalist Badge */}
               <div className="inline-block px-6 py-3 bg-button-primary border-4 border-button-primary-hover">
-                <span className="text-white font-black text-sm">
+                <span className="text-foreground font-black text-sm">
                   🎁 خصم 50% للمشتركين الأوائل
                 </span>
               </div>
