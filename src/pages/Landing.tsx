@@ -225,7 +225,7 @@ const Landing = () => {
             {/* Column 1: Brand */}
             <div className="space-y-4 text-right" dir="rtl">
               <div className="flex items-center gap-3 justify-end">
-                <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto" />
+                <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto brightness-0 invert" />
               </div>
               <p className="text-sm md:text-base text-muted-foreground">
                 استوديو احترافي لتجهيز محتواك من الفكرة إلى النشر
