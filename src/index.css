@@ -30,15 +30,15 @@ All colors MUST be HSL.
     --muted: 32 40% 88%;             /* Linen أغمق قليلاً */
     --muted-foreground: 0 0% 30%;    /* رمادي داكن للنصوص الثانوية */
 
-    --accent: 40 100% 67%;           /* #FFC857 Golden Yellow */
-    --accent-foreground: 0 0% 11%;   /* Dark text for contrast */
+    --accent: 204 26% 46%;           /* #587792 Blue-Grey */
+    --accent-foreground: 0 0% 100%;  /* أبيض للنص */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 12 25% 75%;            /* Dusty Rose فاتح للحدود */
     --input: 0 0% 98%;               /* أبيض تقريباً للـ inputs */
-    --ring: 40 100% 67%;             /* Golden Yellow للـ focus ring */
+    --ring: 204 26% 46%;             /* Blue-Grey للـ focus ring */
 
     --radius: 0.625rem;              /* 10px */
 
@@ -50,12 +50,12 @@ All colors MUST be HSL.
 
     --sidebar-background: 32 55% 95%;
     --sidebar-foreground: 0 0% 11%;
-    --sidebar-primary: 40 100% 67%;
-    --sidebar-primary-foreground: 0 0% 11%;
+    --sidebar-primary: 204 26% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 12 25% 90%;
     --sidebar-accent-foreground: 0 0% 11%;
     --sidebar-border: 12 25% 75%;
-    --sidebar-ring: 40 100% 67%;
+    --sidebar-ring: 204 26% 46%;
   }
 
   .dark {
@@ -80,15 +80,15 @@ All colors MUST be HSL.
     --muted: 0 0% 20%;
     --muted-foreground: 32 40% 75%;  /* Linen للنصوص الثانوية */
 
-    --accent: 40 100% 67%;           /* #FFC857 Golden Yellow */
-    --accent-foreground: 0 0% 11%;   /* Dark text for contrast */
+    --accent: 204 26% 55%;           /* Blue-Grey أفتح */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 25%;
     --input: 0 0% 18%;
-    --ring: 40 100% 67%;
+    --ring: 204 26% 55%;
 
     --shadow-editorial: 6px 6px 0 hsl(12 25% 20%);
     --shadow-editorial-hover: 8px 8px 0 hsl(12 25% 25%);
@@ -97,12 +97,12 @@ All colors MUST be HSL.
 
     --sidebar-background: 0 0% 11%;
     --sidebar-foreground: 32 55% 95%;
-    --sidebar-primary: 40 100% 67%;
-    --sidebar-primary-foreground: 0 0% 11%;
+    --sidebar-primary: 204 26% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 20%;
     --sidebar-accent-foreground: 32 55% 95%;
     --sidebar-border: 0 0% 25%;
-    --sidebar-ring: 40 100% 67%;
+    --sidebar-ring: 204 26% 55%;
   }
 }
 
