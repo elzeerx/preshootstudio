@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
+import Admin from "./pages/Admin";
 import Instructions from "./pages/Instructions";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -28,6 +29,11 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/landing" element={<Landing />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            } />
             <Route path="/instructions" element={<Instructions />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
