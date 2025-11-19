@@ -40,10 +40,10 @@ const Landing = () => {
       <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-background">
         {/* Abstract geometric shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" dir="ltr">
-          <div className="absolute top-20 right-10 w-32 h-32 border-4 border-foreground/10 rotate-12" />
-          <div className="absolute bottom-20 left-20 w-48 h-48 rounded-full border-4 border-secondary/20" />
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-accent/5 -rotate-45" />
-          <div className="absolute top-40 left-1/4 w-16 h-16 border-4 border-accent/10 rotate-45" />
+          <div className="absolute top-20 left-10 w-32 h-32 border-4 border-foreground/10 rotate-12" />
+          <div className="absolute bottom-20 right-20 w-48 h-48 rounded-full border-4 border-secondary/20" />
+          <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-accent/5 -rotate-45" />
+          <div className="absolute top-40 right-1/4 w-16 h-16 border-4 border-accent/10 rotate-45" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -63,7 +63,7 @@ const Landing = () => {
               من البحث إلى السكريبت، من B-Roll إلى المقال. كل ما تحتاجه في مكان واحد.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row-reverse gap-4 w-full sm:w-auto">
               <Button asChild size="lg" className="text-lg h-14 px-8">
                 <Link to="/auth">ابدأ الآن مجانًا</Link>
               </Button>
@@ -230,7 +230,7 @@ const Landing = () => {
               <p className="text-sm md:text-base text-muted-foreground">
                 استوديو احترافي لتجهيز محتواك من الفكرة إلى النشر
               </p>
-              <div className="flex gap-4 justify-end">
+              <div className="flex flex-row-reverse gap-4 justify-end">
                 <a href="mailto:info@preshoot.studio" className="p-2 hover:text-accent transition-colors">
                   <Mail className="w-5 h-5" strokeWidth={1.5} />
                 </a>
@@ -313,10 +313,10 @@ const Landing = () => {
                 <h4 className="text-sm font-bold text-muted-foreground mb-2">للمسؤولين</h4>
                 <Link 
                   to="/admin/login" 
-                  className="inline-flex items-center gap-2 text-sm text-accent hover:text-background transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-accent hover:text-background transition-colors flex-row-reverse"
                 >
-                  <Shield className="w-4 h-4" strokeWidth={1.5} />
                   <span>تسجيل دخول الإدارة</span>
+                  <Shield className="w-4 h-4" strokeWidth={1.5} />
                 </Link>
               </div>
             </div>
