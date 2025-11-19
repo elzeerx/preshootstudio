@@ -6,29 +6,12 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { FAQSectionSkeleton } from "@/components/landing/FAQSectionSkeleton";
 import { ServiceCard } from "@/components/landing/ServiceCard";
 import { ServiceCardSkeleton } from "@/components/landing/ServiceCardSkeleton";
-import {
-  Zap,
-  Sparkles,
-  Target,
-  Search,
-  Lightbulb,
-  FileText,
-  Video,
-  Image,
-  BookOpen,
-  Film,
-  Mail,
-  Twitter,
-  Linkedin,
-  Shield,
-} from "lucide-react";
+import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
-
 const Landing = () => {
   const [isServicesLoaded, setIsServicesLoaded] = useState(false);
   const [isFAQLoaded, setIsFAQLoaded] = useState(false);
-
   useEffect(() => {
     // Simulate content loading for services section
     const servicesTimer = setTimeout(() => {
@@ -39,24 +22,17 @@ const Landing = () => {
     const faqTimer = setTimeout(() => {
       setIsFAQLoaded(true);
     }, 1200);
-
     return () => {
       clearTimeout(servicesTimer);
       clearTimeout(faqTimer);
     };
   }, []);
-
-  return (
-    <div className="min-h-screen bg-background" dir="rtl">
+  return <div className="min-h-screen bg-background" dir="rtl">
       {/* Header with Logo */}
       <header className="py-6 md:py-8 px-4 bg-background border-b-4 border-foreground">
         <div className="max-w-7xl mx-auto flex justify-center">
           <div className="p-4 border-4 border-button-primary bg-button-primary/10 brutal-shadow">
-            <img 
-              src={preshootLogoNew} 
-              alt="PreShoot Studio" 
-              className="h-12 md:h-16 lg:h-20 w-auto"
-            />
+            <img src={preshootLogoNew} alt="PreShoot Studio" className="h-12 md:h-16 lg:h-20 w-auto" />
           </div>
         </div>
       </header>
@@ -174,55 +150,21 @@ const Landing = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {!isServicesLoaded ? (
-              <>
+            {!isServicesLoaded ? <>
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
-              </>
-            ) : (
-              <>
-                <ServiceCard
-                  icon={Search}
-                  title="بحث ذكي معمّق"
-                  description="احصل على بحث شامل ومعمّق حول أي موضوع مع مصادر موثوقة وتحليل دقيق للمعلومات."
-                  delay={1}
-                />
-                <ServiceCard
-                  icon={Lightbulb}
-                  title="تبسيط الأفكار المعقدة"
-                  description="حوّل المواضيع المعقدة إلى محتوى سهل الفهم ومناسب لجمهورك المستهدف."
-                  delay={2}
-                />
-                <ServiceCard
-                  icon={FileText}
-                  title="سكريبتات جاهزة للتصوير"
-                  description="احصل على سكريبتات احترافية منظمة ومكتوبة بأسلوب جذاب وجاهزة للتصوير مباشرة."
-                  delay={3}
-                />
-                <ServiceCard
-                  icon={Video}
-                  title="خطط B-Roll احترافية"
-                  description="خطط تصوير تفصيلية مع اقتراحات للقطات B-Roll التي تثري محتواك البصري."
-                  delay={4}
-                />
-                <ServiceCard
-                  icon={Image}
-                  title="برومبتات AI للصور"
-                  description="احصل على برومبتات جاهزة لإنشاء صور مذهلة باستخدام أدوات الذكاء الاصطناعي."
-                  delay={5}
-                />
-                <ServiceCard
-                  icon={BookOpen}
-                  title="مقالات SEO محسّنة"
-                  description="مقالات احترافية محسّنة لمحركات البحث مع كلمات مفتاحية وبنية مثالية."
-                  delay={6}
-                />
-              </>
-            )}
+              </> : <>
+                <ServiceCard icon={Search} title="بحث ذكي معمّق" description="احصل على بحث شامل ومعمّق حول أي موضوع مع مصادر موثوقة وتحليل دقيق للمعلومات." delay={1} />
+                <ServiceCard icon={Lightbulb} title="تبسيط الأفكار المعقدة" description="حوّل المواضيع المعقدة إلى محتوى سهل الفهم ومناسب لجمهورك المستهدف." delay={2} />
+                <ServiceCard icon={FileText} title="سكريبتات جاهزة للتصوير" description="احصل على سكريبتات احترافية منظمة ومكتوبة بأسلوب جذاب وجاهزة للتصوير مباشرة." delay={3} />
+                <ServiceCard icon={Video} title="خطط B-Roll احترافية" description="خطط تصوير تفصيلية مع اقتراحات للقطات B-Roll التي تثري محتواك البصري." delay={4} />
+                <ServiceCard icon={Image} title="برومبتات AI للصور" description="احصل على برومبتات جاهزة لإنشاء صور مذهلة باستخدام أدوات الذكاء الاصطناعي." delay={5} />
+                <ServiceCard icon={BookOpen} title="مقالات SEO محسّنة" description="مقالات احترافية محسّنة لمحركات البحث مع كلمات مفتاحية وبنية مثالية." delay={6} />
+              </>}
           </div>
         </div>
       </section>
@@ -261,11 +203,11 @@ const Landing = () => {
                 <Film className="w-16 h-16 text-button-primary" strokeWidth={3} />
               </div>
               
-              <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
+              <h2 className="text-4xl md:text-5xl font-black leading-tight text-amber-950">
                 انضم إلى الوصول المبكر
               </h2>
               
-              <p className="text-xl text-white/80 max-w-2xl mx-auto font-bold">
+              <p className="text-xl max-w-2xl mx-auto font-bold text-yellow-950">
                 كن من أوائل المستخدمين واحصل على ميزات حصرية وأسعار خاصة
               </p>
               
@@ -340,10 +282,7 @@ const Landing = () => {
               <h4 className="text-lg font-black text-white border-r-4 border-button-primary pr-4">
                 للمسؤولين
               </h4>
-              <Link 
-                to="/admin/login" 
-                className="inline-flex items-center gap-2 text-white/70 hover:text-button-primary font-bold transition-colors flex-row-reverse border-b-2 border-transparent hover:border-button-primary pb-1"
-              >
+              <Link to="/admin/login" className="inline-flex items-center gap-2 text-white/70 hover:text-button-primary font-bold transition-colors flex-row-reverse border-b-2 border-transparent hover:border-button-primary pb-1">
                 <span>تسجيل دخول الإدارة</span>
                 <Shield className="w-4 h-4" strokeWidth={3} />
               </Link>
@@ -372,8 +311,6 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
