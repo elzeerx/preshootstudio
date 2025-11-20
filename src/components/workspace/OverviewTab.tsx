@@ -11,10 +11,12 @@ import {
   Lightbulb,
   FileEdit,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  Award
 } from "lucide-react";
-import { ProjectDetail } from "@/hooks/useProjectDetail";
+import { ProjectDetail, QualityMetrics } from "@/hooks/useProjectDetail";
 import { formatDate } from "@/lib/helpers/formatters";
+import { getQualityLabel, getQualityVariant } from "@/lib/helpers/researchQuality";
 
 interface OverviewTabProps {
   project: ProjectDetail;
@@ -81,42 +83,60 @@ export const OverviewTab = ({ project }: OverviewTabProps) => {
         </CardContent>
       </Card>
 
-      {/* Research Summary */}
+      {/* Research Summary with Quality Score */}
       {hasResearch ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-right flex items-center gap-2">
-              <Sparkles className="w-5 h-5" />
-              ملخص البحث
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-right leading-relaxed">{project.research_data?.summary}</p>
-            
-            {project.research_data?.keyPoints && project.research_data.keyPoints.length > 0 && (
-              <>
-                <Separator />
-                <div>
-                  <h4 className="font-semibold mb-3 text-right">النقاط الرئيسية</h4>
-                  <ul className="space-y-2 text-right">
-                    {project.research_data.keyPoints.map((point, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
-                        <span className="flex-1">{point}</span>
-                      </li>
-                    ))}
-                  </ul>
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-right flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  ملخص البحث
                 </div>
-              </>
-            )}
+                {project.research_quality_score && (
+                  <Badge variant={getQualityVariant(project.research_quality_score)}>
+                    <Award className="w-3 h-3 ml-1" />
+                    {getQualityLabel(project.research_quality_score)} ({project.research_quality_score})
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-right leading-relaxed">{project.research_data?.summary}</p>
+              
+              {project.research_data?.keyPoints && project.research_data.keyPoints.length > 0 && (
+                <>
+                  <Separator />
+                  <div>
+                    <h4 className="font-semibold mb-3 text-right">النقاط الرئيسية</h4>
+                    <ul className="space-y-2 text-right">
+                      {project.research_data.keyPoints.map((point, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                          <span className="flex-1">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
 
-            {project.research_data?.sources && project.research_data.sources.length > 0 && (
-              <div className="text-sm text-muted-foreground text-right">
-                المصادر: {project.research_data.sources.length} مصدر
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <div>
+                  {project.research_data?.sources && project.research_data.sources.length > 0 && (
+                    <span>{project.research_data.sources.length} مصدر</span>
+                  )}
+                </div>
+                {project.research_last_run_at && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>آخر تحديث: {formatDate(project.research_last_run_at)}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </>
       ) : (
         <Card>
           <CardContent className="py-8">

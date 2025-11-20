@@ -7,6 +7,13 @@ import { PromptsData } from "@/lib/types/prompts";
 import { ArticleData } from "@/lib/types/article";
 import { SimplifyData } from "@/lib/types/simplify";
 
+export interface QualityMetrics {
+  sourceCount: number;
+  sourceDiversity: number;
+  recencyScore: number;
+  overallScore: number;
+}
+
 export interface ProjectDetail {
   id: string;
   topic: string;
@@ -18,6 +25,9 @@ export interface ProjectDetail {
   research_data?: ResearchData;
   research_summary?: string;
   research_last_run_at?: string | null;
+  research_quality_score?: number | null;
+  research_quality_metrics?: QualityMetrics | null;
+  research_manual_edits?: Record<string, boolean> | null;
   scripts_status: string | null;
   scripts_data?: ScriptsData;
   scripts_last_run_at?: string | null;
@@ -74,6 +84,8 @@ export const useProjectDetail = (projectId: string | undefined) => {
       setProject({
         ...data,
         research_data: data.research_data as unknown as ResearchData | undefined,
+        research_quality_metrics: data.research_quality_metrics as unknown as QualityMetrics | null | undefined,
+        research_manual_edits: data.research_manual_edits as unknown as Record<string, boolean> | null | undefined,
         scripts_data: data.scripts_data as unknown as ScriptsData | undefined,
         broll_data: data.broll_data as unknown as BRollData | undefined,
         prompts_data: data.prompts_data as unknown as PromptsData | undefined,
