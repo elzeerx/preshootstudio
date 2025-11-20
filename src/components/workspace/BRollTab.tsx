@@ -3,7 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Video, Copy, RefreshCw, Loader2, AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import type { BRollData, BRollShot } from "@/lib/types/broll";
 
@@ -180,15 +182,88 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
   if (project.broll_status === 'loading' || isGenerating) {
     return (
       <Card className="p-8">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-accent-green/20 flex items-center justify-center flex-shrink-0">
-            <Loader2 className="w-6 h-6 text-accent-green animate-spin" />
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-56" />
+              </div>
+            </div>
+            <Skeleton className="h-9 w-32" />
           </div>
-          <div className="flex-1">
-            <h3 className="heading-3 mb-2">جاري تجهيز خطة الـ B-Roll…</h3>
-            <p className="body-text text-muted-foreground">
-              نستخدم الذكاء الاصطناعي لاقتراح لقطات تدعم موضوع: {project.topic}
-            </p>
+
+          {/* General tips skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-48" />
+            <div className="space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-2">
+                  <Skeleton className="h-4 w-4 rounded-full flex-shrink-0 mt-1" />
+                  <Skeleton className="h-4 flex-1" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Shots skeleton */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-6 w-56" />
+              <Skeleton className="h-9 w-40" />
+            </div>
+
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="p-6">
+                <div className="space-y-4">
+                  {/* Shot header */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-6 w-2/3" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-4/5" />
+                    </div>
+                    <Skeleton className="w-20 h-20 rounded-lg flex-shrink-0" />
+                  </div>
+
+                  <Separator />
+
+                  {/* Shot details */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-5 w-32" />
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-5 w-32" />
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-5 w-20" />
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-5 w-40" />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* AI prompt section */}
+                  <div className="space-y-3">
+                    <Skeleton className="h-5 w-48" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-9 w-full mt-2" />
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
       </Card>
