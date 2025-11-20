@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { trackTokenUsage } from "../_shared/tokenTracker.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -137,6 +138,20 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await response.json();
+    
+    // Track token usage (no project/user for suggest-topics as it's pre-creation)
+    const usage = aiData.usage || {};
+    await trackTokenUsage(supabaseUrl, supabaseServiceKey, {
+      userId: '', // No user context for topic suggestions
+      projectId: '',
+      functionName: 'suggest-topics',
+      promptTokens: usage.prompt_tokens || 0,
+      completionTokens: usage.completion_tokens || 0,
+      totalTokens: usage.total_tokens || 0,
+      modelUsed: 'google/gemini-2.5-flash',
+      requestStatus: 'success',
+    });
+    
     const aiContent = aiData.choices?.[0]?.message?.content;
 
     if (!aiContent) {

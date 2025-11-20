@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { trackTokenUsage } from "../_shared/tokenTracker.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -241,6 +242,19 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await response.json();
+    
+    // Track token usage
+    const usage = aiData.usage || {};
+    await trackTokenUsage(supabaseUrl, supabaseServiceKey, {
+      userId: project.user_id,
+      projectId: projectId,
+      functionName: 'run-prompts',
+      promptTokens: usage.prompt_tokens || 0,
+      completionTokens: usage.completion_tokens || 0,
+      totalTokens: usage.total_tokens || 0,
+      modelUsed: 'google/gemini-2.5-flash',
+      requestStatus: 'success',
+    });
     
     console.log('AI response received, extracting structured data...');
 

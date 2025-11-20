@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
+import { LiveTokenIndicator } from "@/components/common/LiveTokenIndicator";
 import AuraLayout from "@/components/common/AuraLayout";
 import CreateProject from "./pages/CreateProject";
 import Landing from "./pages/Landing";
@@ -27,6 +28,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <LiveTokenIndicator />
             <Routes>
               <Route path="/" element={<Landing />} />
               {/* Admin Routes */}
