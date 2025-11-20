@@ -7,17 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { ResearchData } from "@/lib/types/research";
 import { extractDomain } from "@/lib/utils";
-
-interface Project {
-  id: string;
-  topic: string;
-  research_status?: string;
-  research_summary?: string;
-  research_data?: ResearchData;
-}
+import { ProjectDetail, QualityMetrics } from "@/hooks/useProjectDetail";
+import { QualityScoreCard } from "@/components/workspace/research/QualityScoreCard";
+import { ResearchHistoryDialog } from "@/components/workspace/research/ResearchHistoryDialog";
 
 interface ResearchTabProps {
-  project: Project;
+  project: ProjectDetail;
 }
 
 export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
@@ -132,11 +127,15 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
       if (!fetchError && updatedProject) {
         setProject({
-          id: updatedProject.id,
-          topic: updatedProject.topic,
-          research_status: updatedProject.research_status || undefined,
-          research_summary: updatedProject.research_summary || undefined,
-          research_data: updatedProject.research_data as unknown as ResearchData | undefined
+          ...updatedProject,
+          research_data: updatedProject.research_data as unknown as ResearchData | undefined,
+          research_quality_metrics: updatedProject.research_quality_metrics as unknown as QualityMetrics | null | undefined,
+          research_manual_edits: updatedProject.research_manual_edits as unknown as Record<string, boolean> | null | undefined,
+          scripts_data: updatedProject.scripts_data as any,
+          broll_data: updatedProject.broll_data as any,
+          prompts_data: updatedProject.prompts_data as any,
+          article_data: updatedProject.article_data as any,
+          simplify_data: updatedProject.simplify_data as any,
         });
         toast.success('تم تجهيز البحث بنجاح!');
       }
@@ -146,6 +145,28 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
       setProject(prev => ({ ...prev, research_status: 'error' }));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const refetchProject = async () => {
+    const { data: updatedProject } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', project.id)
+      .single();
+
+    if (updatedProject) {
+      setProject({
+        ...updatedProject,
+        research_data: updatedProject.research_data as unknown as ResearchData | undefined,
+        research_quality_metrics: updatedProject.research_quality_metrics as unknown as QualityMetrics | null | undefined,
+        research_manual_edits: updatedProject.research_manual_edits as unknown as Record<string, boolean> | null | undefined,
+        scripts_data: updatedProject.scripts_data as any,
+        broll_data: updatedProject.broll_data as any,
+        prompts_data: updatedProject.prompts_data as any,
+        article_data: updatedProject.article_data as any,
+        simplify_data: updatedProject.simplify_data as any,
+      });
     }
   };
 
@@ -230,10 +251,14 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {/* Header with Copy All button */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Header with actions */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         <h2 className="heading-3">نتائج البحث الشامل</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <ResearchHistoryDialog 
+            projectId={project.id}
+            onRestore={refetchProject}
+          />
           <Button
             variant="outline"
             size="sm"
@@ -255,6 +280,12 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
           </Button>
         </div>
       </div>
+
+      {/* Quality Score Card */}
+      <QualityScoreCard 
+        score={project.research_quality_score}
+        metrics={project.research_quality_metrics}
+      />
 
       {/* Research Summary */}
       <Card className="p-6">
