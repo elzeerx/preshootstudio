@@ -37,12 +37,9 @@ Deno.serve(async (req) => {
     // Fetch project data
     const { data: project, error: projectError } = await supabase
       .from('projects')
-      .select('topic, research_data')
+      .select('*')
       .eq('id', projectId)
-      .single() as { 
-        data: { topic: string; research_data: any } | null; 
-        error: any 
-      };
+      .single() as any;
 
     if (projectError || !project) {
       console.error('Error fetching project:', projectError);
