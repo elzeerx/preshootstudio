@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpen, Copy, RefreshCw, Clock, Tag } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleData } from "@/lib/types/article";
 
 interface Project {
@@ -96,19 +97,96 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
   // Loading state
   if (project.article_status === "loading" || isLoading) {
     return (
-      <Card className="p-8" dir="rtl">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 animate-pulse">
-            <BookOpen className="w-6 h-6 text-primary" />
+      <Card className="p-8">
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            </div>
+            <Skeleton className="h-9 w-32" />
           </div>
-          <div className="flex-1">
-            <h3 className="heading-3 mb-3">جاري كتابة المقال…</h3>
-            <p className="body-text text-muted-foreground">
-              نستخدم الذكاء الاصطناعي لكتابة مقال جاهز للنشر عن: <strong>{project.topic}</strong>
-            </p>
-            <div className="mt-4 space-y-2">
-              <div className="h-4 bg-muted/50 rounded animate-pulse w-3/4"></div>
-              <div className="h-4 bg-muted/50 rounded animate-pulse w-1/2"></div>
+
+          {/* Article content skeleton */}
+          <div className="space-y-6">
+            {/* Title */}
+            <div className="space-y-3">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <div className="flex gap-4 mt-4">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-20" />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Introduction */}
+            <div className="space-y-3">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+
+            <Separator />
+
+            {/* Sections */}
+            <div className="space-y-6">
+              <Skeleton className="h-6 w-32" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              ))}
+            </div>
+
+            <Separator />
+
+            {/* Conclusion */}
+            <div className="space-y-3">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+
+            <Separator />
+
+            {/* SEO Meta */}
+            <div className="bg-muted/30 p-6 rounded-lg space-y-4">
+              <Skeleton className="h-6 w-40" />
+              <div className="space-y-3">
+                <div>
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-32 mb-2" />
+                  <div className="flex gap-2 flex-wrap">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Skeleton key={i} className="h-6 w-20" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Copy buttons */}
+            <div className="flex gap-3 pt-4">
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 flex-1" />
             </div>
           </div>
         </div>

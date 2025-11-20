@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Image as ImageIcon, Video, FileImage, Copy, CheckCircle2, AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { PromptsData, ImagePrompt, VideoPrompt, ThumbnailPrompt } from "@/lib/types/prompts";
@@ -129,13 +130,62 @@ export const PromptsTab = ({ project: initialProject, onRefresh }: PromptsTabPro
   // Loading state
   if (isGenerating || project.prompts_status === 'loading') {
     return (
-      <Card className="p-8" dir="rtl">
-        <div className="flex flex-col items-center justify-center gap-4 py-12">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-          <h3 className="heading-3">جاري تجهيز حزمة البرومبتات…</h3>
-          <p className="body-text text-muted-foreground text-center max-w-md">
-            نستخدم الذكاء الاصطناعي لإنشاء برومبتات جاهزة للصور والفيديو حول: <strong>{project.topic}</strong>
-          </p>
+      <Card className="p-8">
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-56" />
+              </div>
+            </div>
+            <Skeleton className="h-9 w-32" />
+          </div>
+
+          {/* Tabs skeleton */}
+          <div className="space-y-4">
+            <div className="flex gap-2 border-b">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-10 w-32" />
+              ))}
+            </div>
+
+            {/* Prompts skeleton */}
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="p-6">
+                  <div className="space-y-4">
+                    {/* Prompt header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-5 w-48" />
+                        <div className="flex gap-2">
+                          <Skeleton className="h-5 w-24" />
+                          <Skeleton className="h-5 w-32" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-9 w-24" />
+                    </div>
+
+                    {/* Prompt content */}
+                    <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex gap-2">
+                      <Skeleton className="h-9 flex-1" />
+                      <Skeleton className="h-9 w-32" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
     );
