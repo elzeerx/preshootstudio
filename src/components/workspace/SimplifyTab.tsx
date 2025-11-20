@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Lightbulb, Sparkles, BookOpen, Layers, CheckCircle2, AlertCircle, Copy } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Lightbulb, Sparkles, BookOpen, Layers, CheckCircle2, AlertCircle, Copy, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { SimplifyData } from "@/lib/types/simplify";
+import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
 
 interface Project {
   id: string;
@@ -13,6 +15,7 @@ interface Project {
   simplify_status?: string | null;
   simplify_data?: any;
   simplify_last_run_at?: string | null;
+  research_data?: any;
 }
 
 interface SimplifyTabProps {
@@ -76,8 +79,18 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
 
   const simplifyStatus = project.simplify_status || 'idle';
   const simplifyData = project.simplify_data as SimplifyData | null;
+  const hasResearch = hasValidResearch(project.research_data);
 
   const runSimplify = async () => {
+    // Check for research before proceeding
+    if (!hasResearch) {
+      toast({
+        title: "البحث مطلوب",
+        description: getMissingResearchMessage(),
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       setIsLoading(true);
       

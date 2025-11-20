@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Video, Copy, RefreshCw, Loader2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Video, Copy, RefreshCw, Loader2, AlertCircle, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import type { BRollData, BRollShot } from "@/lib/types/broll";
+import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
 
 interface Project {
   id: string;
@@ -15,6 +17,7 @@ interface Project {
   broll_status?: string | null;
   broll_data?: BRollData | null;
   broll_last_run_at?: string | null;
+  research_data?: any;
 }
 
 interface BRollTabProps {
@@ -93,7 +96,19 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
     }
   };
 
+  const hasResearch = hasValidResearch(project.research_data);
+  
   const handleGenerateBRoll = async () => {
+    // Check for research before proceeding
+    if (!hasResearch) {
+      toast({
+        title: "البحث مطلوب",
+        description: getMissingResearchMessage(),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     
     try {

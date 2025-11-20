@@ -3,17 +3,20 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Image as ImageIcon, Video, FileImage, Copy, CheckCircle2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2, Image as ImageIcon, Video, FileImage, Copy, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { PromptsData, ImagePrompt, VideoPrompt, ThumbnailPrompt } from "@/lib/types/prompts";
+import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
 
 interface Project {
   id: string;
   topic: string;
   prompts_status?: string | null;
   prompts_data?: PromptsData | null;
+  research_data?: any;
   [key: string]: any;
 }
 
@@ -76,7 +79,15 @@ export const PromptsTab = ({ project: initialProject, onRefresh }: PromptsTabPro
     }
   };
 
+  const hasResearch = hasValidResearch(project.research_data);
+
   const handleGeneratePrompts = async () => {
+    // Check for research before proceeding
+    if (!hasResearch) {
+      toast.error(getMissingResearchMessage());
+      return;
+    }
+
     setIsGenerating(true);
     
     try {
