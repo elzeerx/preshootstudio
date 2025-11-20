@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_token_usage: {
+        Row: {
+          completion_tokens: number
+          created_at: string
+          error_message: string | null
+          estimated_cost_usd: number | null
+          function_name: string
+          id: string
+          model_used: string
+          project_id: string | null
+          prompt_tokens: number
+          request_status: string
+          total_tokens: number
+          user_id: string
+        }
+        Insert: {
+          completion_tokens?: number
+          created_at?: string
+          error_message?: string | null
+          estimated_cost_usd?: number | null
+          function_name: string
+          id?: string
+          model_used: string
+          project_id?: string | null
+          prompt_tokens?: number
+          request_status: string
+          total_tokens?: number
+          user_id: string
+        }
+        Update: {
+          completion_tokens?: number
+          created_at?: string
+          error_message?: string | null
+          estimated_cost_usd?: number | null
+          function_name?: string
+          id?: string
+          model_used?: string
+          project_id?: string | null
+          prompt_tokens?: number
+          request_status?: string
+          total_tokens?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_token_usage_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beta_signups: {
         Row: {
           created_at: string
@@ -255,7 +308,23 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ai_usage_stats: {
+        Row: {
+          failed_requests: number | null
+          function_name: string | null
+          model_used: string | null
+          rate_limited_requests: number | null
+          request_count: number | null
+          successful_requests: number | null
+          total_completion_tokens: number | null
+          total_cost_usd: number | null
+          total_prompt_tokens: number | null
+          total_tokens: number | null
+          usage_date: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_expired_cache: { Args: never; Returns: undefined }
