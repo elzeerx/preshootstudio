@@ -19,6 +19,7 @@ import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { AppFooter } from "@/components/common/AppFooter";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
 import { getStatusLabel, getStatusVariant } from "@/lib/helpers/formatters";
+import { isContentOutdated, getOutdatedBadgeText } from "@/lib/helpers/contentFreshness";
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -144,36 +145,71 @@ const ProjectDetail = () => {
                 value="simplify"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded px-4 py-2 gap-2 whitespace-nowrap"
               >
-                <Lightbulb className="w-4 h-4" />
-                التبسيط
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  <span>التبسيط</span>
+                  {isContentOutdated(project.simplify_last_run_at, project.research_last_run_at) && (
+                    <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                      {getOutdatedBadgeText()}
+                    </Badge>
+                  )}
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="scripts"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded px-4 py-2 gap-2 whitespace-nowrap"
               >
-                <FileText className="w-4 h-4" />
-                السكريبتات
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  <span>السكريبتات</span>
+                  {isContentOutdated(project.scripts_last_run_at, project.research_last_run_at) && (
+                    <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                      {getOutdatedBadgeText()}
+                    </Badge>
+                  )}
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="broll"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded px-4 py-2 gap-2 whitespace-nowrap"
               >
-                <Video className="w-4 h-4" />
-                B-Roll
+                <div className="flex items-center gap-2">
+                  <Video className="w-4 h-4" />
+                  <span>B-Roll</span>
+                  {isContentOutdated(project.broll_last_run_at, project.research_last_run_at) && (
+                    <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                      {getOutdatedBadgeText()}
+                    </Badge>
+                  )}
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="prompts"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded px-4 py-2 gap-2 whitespace-nowrap"
               >
-                <Image className="w-4 h-4" />
-                البرومبتات
+                <div className="flex items-center gap-2">
+                  <Image className="w-4 h-4" />
+                  <span>البرومبتات</span>
+                  {isContentOutdated(project.prompts_last_run_at, project.research_last_run_at) && (
+                    <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                      {getOutdatedBadgeText()}
+                    </Badge>
+                  )}
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="article"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded px-4 py-2 gap-2 whitespace-nowrap"
               >
-                <BookOpen className="w-4 h-4" />
-                المقال
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  <span>المقال</span>
+                  {isContentOutdated(project.article_last_run_at, project.research_last_run_at) && (
+                    <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                      {getOutdatedBadgeText()}
+                    </Badge>
+                  )}
+                </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="export"
