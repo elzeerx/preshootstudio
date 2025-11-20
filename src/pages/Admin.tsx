@@ -11,6 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { BetaSignupsTable } from '@/components/admin/BetaSignupsTable';
+import { TokenUsageStats } from '@/components/admin/TokenUsageStats';
+import { FunctionUsageTable } from '@/components/admin/FunctionUsageTable';
+import { TokenUsageChart } from '@/components/admin/TokenUsageChart';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
@@ -79,6 +82,25 @@ interface Stats {
   activeProjects: number;
 }
 
+interface TokenUsage {
+  totalTokens: number;
+  totalCost: number;
+  requestCount: number;
+  successRate: number;
+  byFunction: Array<{
+    functionName: string;
+    requestCount: number;
+    totalTokens: number;
+    totalCost: number;
+    avgTokensPerRequest: number;
+  }>;
+  overTime: Array<{
+    date: string;
+    totalTokens: number;
+    requestCount: number;
+  }>;
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const { user, signIn } = useAuth();
@@ -93,6 +115,14 @@ export default function Admin() {
     pendingSignups: 0,
     approvedSignups: 0,
     activeProjects: 0
+  });
+  const [tokenUsage, setTokenUsage] = useState<TokenUsage>({
+    totalTokens: 0,
+    totalCost: 0,
+    requestCount: 0,
+    successRate: 0,
+    byFunction: [],
+    overTime: [],
   });
   const [loading, setLoading] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
@@ -195,6 +225,64 @@ export default function Admin() {
         approvedSignups: approvedCount,
         activeProjects: activeProjectsCount
       });
+
+      // Fetch token usage data
+      const { data: usageData } = await supabase
+        .from('ai_token_usage')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (usageData && usageData.length > 0) {
+        // Calculate aggregated stats
+        const totalTokens = usageData.reduce((sum, u) => sum + u.total_tokens, 0);
+        const totalCost = usageData.reduce((sum, u) => sum + (u.estimated_cost_usd || 0), 0);
+        const successCount = usageData.filter(u => u.request_status === 'success').length;
+        
+        // Group by function
+        const functionMap: Record<string, any> = {};
+        usageData.forEach(u => {
+          if (!functionMap[u.function_name]) {
+            functionMap[u.function_name] = {
+              functionName: u.function_name,
+              requestCount: 0,
+              totalTokens: 0,
+              totalCost: 0,
+            };
+          }
+          functionMap[u.function_name].requestCount++;
+          functionMap[u.function_name].totalTokens += u.total_tokens;
+          functionMap[u.function_name].totalCost += u.estimated_cost_usd || 0;
+        });
+
+        const byFunction = Object.values(functionMap).map((item: any) => ({
+          ...item,
+          avgTokensPerRequest: item.totalTokens / item.requestCount,
+        }));
+
+        // Group by date for chart
+        const dateMap: Record<string, any> = {};
+        usageData.forEach(u => {
+          const date = format(new Date(u.created_at), 'yyyy-MM-dd');
+          if (!dateMap[date]) {
+            dateMap[date] = { date, totalTokens: 0, requestCount: 0 };
+          }
+          dateMap[date].totalTokens += u.total_tokens;
+          dateMap[date].requestCount++;
+        });
+
+        const overTime = Object.values(dateMap).sort((a: any, b: any) => 
+          a.date.localeCompare(b.date)
+        );
+
+        setTokenUsage({
+          totalTokens,
+          totalCost,
+          requestCount: usageData.length,
+          successRate: usageData.length > 0 ? (successCount / usageData.length) * 100 : 0,
+          byFunction,
+          overTime,
+        });
+      }
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -445,6 +533,26 @@ export default function Admin() {
 
         {/* Stats Cards */}
         <AdminStats stats={stats} />
+
+        {/* Token Usage Section */}
+        <div className="space-y-6 mb-8">
+          <div className="flex items-center gap-3">
+            <Activity className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">استخدام الـ AI و Tokens</h2>
+          </div>
+          
+          <TokenUsageStats 
+            totalTokens={tokenUsage.totalTokens}
+            totalCost={tokenUsage.totalCost}
+            requestCount={tokenUsage.requestCount}
+            successRate={tokenUsage.successRate}
+          />
+          
+          <div className="grid gap-6 md:grid-cols-2">
+            <FunctionUsageTable data={tokenUsage.byFunction} />
+            <TokenUsageChart data={tokenUsage.overTime} />
+          </div>
+        </div>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

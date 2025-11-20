@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { trackTokenUsage } from "../_shared/tokenTracker.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -357,6 +358,19 @@ ${JSON.stringify(tavilyResults, null, 2)}
     
     console.log('AI response received, extracting structured data...');
 
+    // Track token usage for successful response
+    const usage = aiData.usage || {};
+    await trackTokenUsage(supabaseUrl, supabaseKey, {
+      userId: project.user_id,
+      projectId: projectId,
+      functionName: 'run-research',
+      promptTokens: usage.prompt_tokens || 0,
+      completionTokens: usage.completion_tokens || 0,
+      totalTokens: usage.total_tokens || 0,
+      modelUsed: 'google/gemini-2.5-flash',
+      requestStatus: 'success',
+    });
+
     // Extract research data from tool call response
     let researchData;
     try {
@@ -455,6 +469,26 @@ ${JSON.stringify(tavilyResults, null, 2)}
   } catch (error) {
     console.error('Error in run-research function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Track token usage for error
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      await trackTokenUsage(supabaseUrl, supabaseKey, {
+        userId: '', // Will be empty if we can't get project
+        projectId: '',
+        functionName: 'run-research',
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+        modelUsed: 'google/gemini-2.5-flash',
+        requestStatus: 'error',
+        errorMessage: errorMessage,
+      });
+    } catch (trackError) {
+      console.error('Failed to track error usage:', trackError);
+    }
+    
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
