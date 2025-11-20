@@ -189,19 +189,20 @@ const CreateProject = () => {
                     <Label className="text-sm font-medium text-muted-foreground">
                       اقتراحات AI - اختر موضوعاً أو اكتب موضوعك الخاص
                     </Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                       {suggestions.map((suggestion, index) => (
                         <Button
                           key={index}
                           type="button"
                           variant="outline"
-                          className="h-auto p-4 text-right justify-start hover:bg-primary/10 hover:border-primary/50 transition-colors"
+                          dir="rtl"
+                          className="h-auto min-h-[60px] w-full px-4 py-3 text-right justify-start hover:bg-primary/10 hover:border-primary/50 transition-colors whitespace-normal break-words overflow-hidden"
                           onClick={() => handleSuggestionClick(suggestion)}
                           disabled={isCreating}
                         >
-                          <div className="flex-1 text-sm font-medium leading-relaxed">
+                          <span className="w-full text-sm font-medium leading-relaxed break-words text-right">
                             {suggestion}
-                          </div>
+                          </span>
                         </Button>
                       ))}
                     </div>
