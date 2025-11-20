@@ -110,7 +110,7 @@ const Landing = () => {
             <div className="flex flex-wrap gap-4 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
               <Link to="/auth">
                 <Button className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow flex items-center gap-2">
-yes                  سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
+                  سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
                 </Button>
               </Link>
             </div>
