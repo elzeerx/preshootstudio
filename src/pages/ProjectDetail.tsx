@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,9 @@ const TabTriggerWithBadge = ({ value, icon: Icon, label, isOutdated = false }: T
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { project, isLoading, notFound, refetch } = useProjectDetail(id);
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  const [showLeftGradient, setShowLeftGradient] = useState(false);
+  const [showRightGradient, setShowRightGradient] = useState(false);
 
   const formatDate = (dateString: string) => {
     try {
@@ -72,6 +76,33 @@ const ProjectDetail = () => {
       return dateString;
     }
   };
+
+  // Handle scroll to update gradient visibility
+  useEffect(() => {
+    const tabsList = tabsListRef.current;
+    if (!tabsList) return;
+
+    const handleScroll = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsList;
+      // For RTL, scrollLeft is negative or inverted depending on browser
+      const scrollRight = Math.abs(scrollLeft);
+      const maxScroll = scrollWidth - clientWidth;
+      
+      setShowRightGradient(scrollRight > 10);
+      setShowLeftGradient(scrollRight < maxScroll - 10);
+    };
+
+    // Initial check
+    handleScroll();
+
+    tabsList.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      tabsList.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [project]);
 
   if (isLoading) {
     return (
@@ -166,41 +197,57 @@ const ProjectDetail = () => {
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur -mx-4 px-4 py-4 border-y border-border">
-            <TabsList className="w-full overflow-x-auto bg-muted p-1 rounded-md flex-nowrap justify-start md:justify-center">
-              <TabTriggerWithBadge value="overview" icon={Film} label="نظرة عامة" />
-              <TabTriggerWithBadge value="research" icon={Search} label="البحث" />
-              <TabTriggerWithBadge 
-                value="simplify" 
-                icon={Lightbulb} 
-                label="التبسيط" 
-                isOutdated={isContentOutdated(project.simplify_last_run_at, project.research_last_run_at)}
+            <div className="relative">
+              {/* Right gradient indicator (for RTL, this appears on the right when content is scrollable to the right) */}
+              <div 
+                className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background/95 to-transparent pointer-events-none z-10 transition-opacity duration-300 ${
+                  showRightGradient ? 'opacity-100' : 'opacity-0'
+                }`}
               />
-              <TabTriggerWithBadge 
-                value="scripts" 
-                icon={FileText} 
-                label="السكريبتات" 
-                isOutdated={isContentOutdated(project.scripts_last_run_at, project.research_last_run_at)}
+              
+              {/* Left gradient indicator (for RTL, this appears on the left when content is scrollable to the left) */}
+              <div 
+                className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background/95 to-transparent pointer-events-none z-10 transition-opacity duration-300 ${
+                  showLeftGradient ? 'opacity-100' : 'opacity-0'
+                }`}
               />
-              <TabTriggerWithBadge 
-                value="broll" 
-                icon={Video} 
-                label="B-Roll" 
-                isOutdated={isContentOutdated(project.broll_last_run_at, project.research_last_run_at)}
-              />
-              <TabTriggerWithBadge 
-                value="prompts" 
-                icon={Image} 
-                label="البرومبتات" 
-                isOutdated={isContentOutdated(project.prompts_last_run_at, project.research_last_run_at)}
-              />
-              <TabTriggerWithBadge 
-                value="article" 
-                icon={BookOpen} 
-                label="المقال" 
-                isOutdated={isContentOutdated(project.article_last_run_at, project.research_last_run_at)}
-              />
-              <TabTriggerWithBadge value="export" icon={Package} label="التصدير" />
-            </TabsList>
+              
+              <TabsList ref={tabsListRef} className="w-full overflow-x-auto bg-muted p-1 rounded-md flex-nowrap justify-start md:justify-center">
+                <TabTriggerWithBadge value="overview" icon={Film} label="نظرة عامة" />
+                <TabTriggerWithBadge value="research" icon={Search} label="البحث" />
+                <TabTriggerWithBadge 
+                  value="simplify" 
+                  icon={Lightbulb} 
+                  label="التبسيط" 
+                  isOutdated={isContentOutdated(project.simplify_last_run_at, project.research_last_run_at)}
+                />
+                <TabTriggerWithBadge 
+                  value="scripts" 
+                  icon={FileText} 
+                  label="السكريبتات" 
+                  isOutdated={isContentOutdated(project.scripts_last_run_at, project.research_last_run_at)}
+                />
+                <TabTriggerWithBadge 
+                  value="broll" 
+                  icon={Video} 
+                  label="B-Roll" 
+                  isOutdated={isContentOutdated(project.broll_last_run_at, project.research_last_run_at)}
+                />
+                <TabTriggerWithBadge 
+                  value="prompts" 
+                  icon={Image} 
+                  label="البرومبتات" 
+                  isOutdated={isContentOutdated(project.prompts_last_run_at, project.research_last_run_at)}
+                />
+                <TabTriggerWithBadge 
+                  value="article" 
+                  icon={BookOpen} 
+                  label="المقال" 
+                  isOutdated={isContentOutdated(project.article_last_run_at, project.research_last_run_at)}
+                />
+                <TabTriggerWithBadge value="export" icon={Package} label="التصدير" />
+              </TabsList>
+            </div>
           </div>
 
           <div>
