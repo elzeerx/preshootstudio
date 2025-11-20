@@ -38,7 +38,10 @@ Deno.serve(async (req) => {
       .from('projects')
       .select('topic, research_data')
       .eq('id', projectId)
-      .single();
+      .single() as { 
+        data: { topic: string; research_data: any } | null; 
+        error: any 
+      };
 
     if (projectError || !project) {
       console.error('Error fetching project:', projectError);
@@ -53,6 +56,7 @@ Deno.serve(async (req) => {
     // Update status to processing
     await supabase
       .from('projects')
+      // @ts-ignore - Supabase types not available in edge functions
       .update({ simplify_status: 'processing' })
       .eq('id', projectId);
 
@@ -110,6 +114,7 @@ Deno.serve(async (req) => {
     // Save to database
     const { error: updateError } = await supabase
       .from('projects')
+      // @ts-ignore - Supabase types not available in edge functions
       .update({
         simplify_status: 'ready',
         simplify_last_run_at: new Date().toISOString(),
@@ -140,6 +145,7 @@ Deno.serve(async (req) => {
       try {
         await supabase
           .from('projects')
+          // @ts-ignore - Supabase types not available in edge functions
           .update({ simplify_status: 'error' })
           .eq('id', projectId);
       } catch (statusUpdateError) {
