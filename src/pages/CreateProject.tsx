@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Zap, Lightbulb, Loader2, Wand2 } from "lucide-react";
+import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -211,15 +211,28 @@ const CreateProject = () => {
                         </Button>
                       ))}
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowSuggestions(false)}
-                      className="w-full text-xs"
-                    >
-                      إخفاء الاقتراحات
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={fetchSuggestions}
+                        disabled={isLoadingSuggestions || isCreating}
+                        className="gap-2"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${isLoadingSuggestions ? 'animate-spin' : ''}`} />
+                        تحديث
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowSuggestions(false)}
+                        className="flex-1"
+                      >
+                        إخفاء الاقتراحات
+                      </Button>
+                    </div>
                   </div>
                 )}
 
