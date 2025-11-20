@@ -10,6 +10,7 @@ import { extractDomain } from "@/lib/utils";
 import { ProjectDetail, QualityMetrics } from "@/hooks/useProjectDetail";
 import { QualityScoreCard } from "@/components/workspace/research/QualityScoreCard";
 import { ResearchHistoryDialog } from "@/components/workspace/research/ResearchHistoryDialog";
+import { EditableResearchField } from "@/components/workspace/research/EditableResearchField";
 
 interface ResearchTabProps {
   project: ProjectDetail;
@@ -170,6 +171,11 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
     }
   };
 
+  const handleFieldSave = (field: string, value: string) => {
+    // Update local state after successful save
+    refetchProject();
+  };
+
   const researchStatus = project.research_status || 'idle';
   const researchData = project.research_data as ResearchData | undefined;
 
@@ -292,7 +298,14 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
         <div className="flex items-start justify-between mb-4 text-right">
           <h3 className="heading-3">ملخص البحث</h3>
         </div>
-        <p className="body-text leading-relaxed">{researchData.summary}</p>
+        <EditableResearchField
+          projectId={project.id}
+          field="summary"
+          value={researchData.summary}
+          isEdited={project.research_manual_edits?.summary}
+          onSave={handleFieldSave}
+          multiline
+        />
       </Card>
 
       {/* Key Points */}
@@ -305,7 +318,15 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
                 <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5 text-sm font-medium">
                   {index + 1}
                 </span>
-                <span className="body-text flex-1">{point}</span>
+                <div className="flex-1">
+                  <EditableResearchField
+                    projectId={project.id}
+                    field={`keyPoints.${index}`}
+                    value={point}
+                    isEdited={project.research_manual_edits?.[`keyPoints.${index}`]}
+                    onSave={handleFieldSave}
+                  />
+                </div>
               </li>
             ))}
           </ul>
@@ -327,7 +348,14 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
                 dir="rtl"
               >
                 <p className="font-semibold text-primary mb-2">{fact.label}</p>
-                <p className="body-text mb-3">{fact.value}</p>
+                <EditableResearchField
+                  projectId={project.id}
+                  field={`facts.${index}.value`}
+                  value={fact.value}
+                  isEdited={project.research_manual_edits?.[`facts.${index}.value`]}
+                  onSave={handleFieldSave}
+                  multiline
+                />
                 {fact.source && fact.url && (
                   <a
                     href={fact.url}
@@ -448,13 +476,32 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
                 className="p-4 rounded-lg bg-muted/30 border-r-4 border-destructive"
                 dir="rtl"
               >
-                <p className="font-semibold text-destructive mb-2 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
-                  خرافة: {item.myth}
-                </p>
-                <p className="body-text text-foreground">
-                  ✅ الحقيقة: {item.reality}
-                </p>
+                <div className="space-y-2">
+                  <div className="font-semibold text-destructive flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    خرافة:
+                  </div>
+                  <EditableResearchField
+                    projectId={project.id}
+                    field={`mythsVsReality.${index}.myth`}
+                    value={item.myth}
+                    isEdited={project.research_manual_edits?.[`mythsVsReality.${index}.myth`]}
+                    onSave={handleFieldSave}
+                  />
+                </div>
+                <div className="space-y-2 mt-3">
+                  <div className="font-semibold text-foreground">
+                    ✅ الحقيقة:
+                  </div>
+                  <EditableResearchField
+                    projectId={project.id}
+                    field={`mythsVsReality.${index}.reality`}
+                    value={item.reality}
+                    isEdited={project.research_manual_edits?.[`mythsVsReality.${index}.reality`]}
+                    onSave={handleFieldSave}
+                    multiline
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -468,11 +515,18 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
             <TrendingUp className="w-5 h-5 text-primary" />
             <h3 className="heading-3">التوجهات الحالية</h3>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-3">
             {researchData.trends.map((trend, index) => (
-              <Badge key={index} variant="secondary" className="px-4 py-2">
-                {trend}
-              </Badge>
+              <div key={index} className="flex items-start gap-2">
+                <TrendingUp className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <EditableResearchField
+                  projectId={project.id}
+                  field={`trends.${index}`}
+                  value={trend}
+                  isEdited={project.research_manual_edits?.[`trends.${index}`]}
+                  onSave={handleFieldSave}
+                />
+              </div>
             ))}
           </div>
         </Card>
@@ -492,12 +546,27 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
                 className="p-4 rounded-lg bg-muted/30"
                 dir="rtl"
               >
-                <p className="font-semibold text-foreground mb-2">
-                  س: {faq.question}
-                </p>
-                <p className="body-text">
-                  ج: {faq.answer}
-                </p>
+                <div className="space-y-2 mb-3">
+                  <div className="font-semibold text-foreground">س:</div>
+                  <EditableResearchField
+                    projectId={project.id}
+                    field={`faqs.${index}.question`}
+                    value={faq.question}
+                    isEdited={project.research_manual_edits?.[`faqs.${index}.question`]}
+                    onSave={handleFieldSave}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="font-semibold text-foreground">ج:</div>
+                  <EditableResearchField
+                    projectId={project.id}
+                    field={`faqs.${index}.answer`}
+                    value={faq.answer}
+                    isEdited={project.research_manual_edits?.[`faqs.${index}.answer`]}
+                    onSave={handleFieldSave}
+                    multiline
+                  />
+                </div>
               </div>
             ))}
           </div>
