@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw } from "lucide-react";
+import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw, GraduationCap, Briefcase, Heart, Tv } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,15 @@ const CreateProject = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const categories = [
+    { id: "all", label: "الكل", icon: Sparkles },
+    { id: "educational", label: "تعليمية", icon: GraduationCap },
+    { id: "business", label: "أعمال", icon: Briefcase },
+    { id: "lifestyle", label: "أسلوب حياة", icon: Heart },
+    { id: "entertainment", label: "ترفيهية", icon: Tv },
+  ];
 
   const fetchSuggestions = async () => {
     setIsLoadingSuggestions(true);
@@ -35,7 +44,7 @@ const CreateProject = () => {
       }
 
       const { data, error: fetchError } = await supabase.functions.invoke('suggest-topics', {
-        body: { userId: user?.id || null }
+        body: { userId: user?.id || null, category: selectedCategory }
       });
 
       if (fetchError) {
@@ -189,10 +198,40 @@ const CreateProject = () => {
 
                 {/* AI Suggestions */}
                 {!isLoadingSuggestions && showSuggestions && suggestions.length > 0 && (
-                  <div className="space-y-3 animate-fade-in">
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      اقتراحات AI - اختر موضوعاً أو اكتب موضوعك الخاص
-                    </Label>
+                  <div className="space-y-4 animate-fade-in">
+                    {/* Category Filters */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        اختر الفئة
+                      </Label>
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map((cat) => {
+                          const Icon = cat.icon;
+                          return (
+                            <Button
+                              key={cat.id}
+                              type="button"
+                              variant={selectedCategory === cat.id ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => {
+                                setSelectedCategory(cat.id);
+                                fetchSuggestions();
+                              }}
+                              disabled={isLoadingSuggestions || isCreating}
+                              className="gap-2"
+                            >
+                              <Icon className="w-4 h-4" />
+                              {cat.label}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        اقتراحات AI - اختر موضوعاً أو اكتب موضوعك الخاص
+                      </Label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                       {suggestions.map((suggestion, index) => (
                         <Button
@@ -210,28 +249,29 @@ const CreateProject = () => {
                           </span>
                         </Button>
                       ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={fetchSuggestions}
-                        disabled={isLoadingSuggestions || isCreating}
-                        className="gap-2"
-                      >
-                        <RefreshCw className={`w-4 h-4 ${isLoadingSuggestions ? 'animate-spin' : ''}`} />
-                        تحديث
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowSuggestions(false)}
-                        className="flex-1"
-                      >
-                        إخفاء الاقتراحات
-                      </Button>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={fetchSuggestions}
+                          disabled={isLoadingSuggestions || isCreating}
+                          className="gap-2"
+                        >
+                          <RefreshCw className={`w-4 h-4 ${isLoadingSuggestions ? 'animate-spin' : ''}`} />
+                          تحديث
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowSuggestions(false)}
+                          className="flex-1"
+                        >
+                          إخفاء الاقتراحات
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
