@@ -2,18 +2,66 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Zap, Lightbulb, Loader2, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Sparkles, Zap, Lightbulb, Loader2, Wand2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import preshootLogoNew from "@/assets/preshoot-logo-new.png";
+import { AppHeader } from "@/components/common/AppHeader";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { AppFooter } from "@/components/common/AppFooter";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CreateProject = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [topic, setTopic] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const fetchSuggestions = async () => {
+    setIsLoadingSuggestions(true);
+    setError("");
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("يجب تسجيل الدخول أولاً");
+        return;
+      }
+
+      const { data, error: fetchError } = await supabase.functions.invoke('suggest-topics', {
+        body: { userId: user?.id || null }
+      });
+
+      if (fetchError) {
+        console.error('Error fetching suggestions:', fetchError);
+        toast.error("حدث خطأ في جلب الاقتراحات");
+        return;
+      }
+
+      if (data?.suggestions && Array.isArray(data.suggestions)) {
+        setSuggestions(data.suggestions);
+        setShowSuggestions(true);
+        toast.success("تم جلب الاقتراحات بنجاح!");
+      } else {
+        toast.error("لم يتم العثور على اقتراحات");
+      }
+    } catch (err) {
+      console.error("Unexpected error fetching suggestions:", err);
+      toast.error("حدث خطأ غير متوقع");
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setTopic(suggestion);
+    setShowSuggestions(false);
+  };
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,27 +112,12 @@ const CreateProject = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/10 border-b border-white/10 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto brightness-0 invert" />
-            </Link>
-
-            <Link to="/projects">
-              <Button variant="outline" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                مشاريعي
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen relative overflow-hidden flex flex-col">
+      <AppHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12 relative z-10">
+      <main className="container mx-auto px-4 py-12 relative z-10 flex-1">
+        <Breadcrumbs />
         <div className="max-w-3xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12 animate-fadeInUp">
@@ -108,9 +141,31 @@ const CreateProject = () => {
             <CardContent className="pt-2">
               <form onSubmit={handleCreateProject} className="space-y-6">
                 <div className="space-y-3">
-                  <Label htmlFor="topic" className="text-base font-semibold">
-                    موضوع المشروع
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="topic" className="text-base font-semibold">
+                      موضوع المشروع
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={fetchSuggestions}
+                      disabled={isLoadingSuggestions || isCreating}
+                      className="gap-2"
+                    >
+                      {isLoadingSuggestions ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          جاري الجلب...
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="w-4 h-4" />
+                          اقتراحات AI
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   <div className="relative">
                     <Input
                       id="topic"
@@ -127,6 +182,40 @@ const CreateProject = () => {
                     <p className="text-sm text-destructive font-medium animate-fade-in">{error}</p>
                   )}
                 </div>
+
+                {/* AI Suggestions */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      اقتراحات AI - اختر موضوعاً أو اكتب موضوعك الخاص
+                    </Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {suggestions.map((suggestion, index) => (
+                        <Button
+                          key={index}
+                          type="button"
+                          variant="outline"
+                          className="h-auto p-4 text-right justify-start hover:bg-primary/10 hover:border-primary/50 transition-colors"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          disabled={isCreating}
+                        >
+                          <div className="flex-1 text-sm font-medium leading-relaxed">
+                            {suggestion}
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowSuggestions(false)}
+                      className="w-full text-xs"
+                    >
+                      إخفاء الاقتراحات
+                    </Button>
+                  </div>
+                )}
 
                 <Button
                   type="submit"
@@ -152,6 +241,8 @@ const CreateProject = () => {
           </Card>
         </div>
       </main>
+
+      <AppFooter />
     </div>
   );
 };

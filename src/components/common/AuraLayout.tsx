@@ -23,3 +23,4 @@ const AuraLayout = ({ children, className, showBackgroundShapes = true }: AuraLa
 };
 
 export default AuraLayout;
+

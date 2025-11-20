@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,89 +14,15 @@ import { BRollTab } from "@/components/workspace/BRollTab";
 import { PromptsTab } from "@/components/workspace/PromptsTab";
 import { ArticleTab } from "@/components/workspace/ArticleTab";
 import { ExportTab } from "@/components/workspace/ExportTab";
-import preshootLogo from "@/assets/preshoot-logo.png";
-
-interface Project {
-  id: string;
-  topic: string;
-  status: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  research_status: string | null;
-  scripts_status: string | null;
-  broll_status: string | null;
-  prompts_status: string | null;
-  article_status: string | null;
-  simplify_status: string | null;
-}
+import { AppHeader } from "@/components/common/AppHeader";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { AppFooter } from "@/components/common/AppFooter";
+import { useProjectDetail } from "@/hooks/useProjectDetail";
+import { getStatusLabel, getStatusVariant } from "@/lib/helpers/formatters";
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [project, setProject] = useState<Project | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-
-  useEffect(() => {
-    if (id) {
-      loadProject(id);
-    }
-  }, [id]);
-
-  const loadProject = async (projectId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        setNotFound(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", projectId)
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error loading project:", error);
-        setNotFound(true);
-        return;
-      }
-
-      if (!data) {
-        setNotFound(true);
-        return;
-      }
-
-      setProject(data);
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      setNotFound(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, string> = {
-      new: "جديد",
-      processing: "قيد التجهيز",
-      ready: "جاهز",
-    };
-    return statusMap[status] || status;
-  };
-
-  const getStatusVariant = (status: string): "default" | "secondary" | "outline" => {
-    const variantMap: Record<string, "default" | "secondary" | "outline"> = {
-      new: "secondary",
-      processing: "default",
-      ready: "outline",
-    };
-    return variantMap[status] || "default";
-  };
+  const { project, isLoading, notFound, refetch } = useProjectDetail(id);
 
   const formatDate = (dateString: string) => {
     try {
@@ -110,39 +34,29 @@ const ProjectDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
-          <p className="body-text-secondary">جاري تحميل المشروع...</p>
-        </div>
+      <div className="min-h-screen bg-background flex flex-col">
+        <AppHeader />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+            <p className="body-text-secondary">جاري تحميل المشروع...</p>
+          </div>
+        </main>
+        <AppFooter />
       </div>
     );
   }
 
-  if (notFound || !project) {
+  if (notFound || (!isLoading && !project)) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="sticky top-0 z-50 bg-background border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
-              <Link to="/" className="flex-shrink-0">
-                <img 
-                  src={preshootLogo} 
-                  alt="PreShoot Studio" 
-                  className="h-8 md:h-10 w-auto"
-                />
-              </Link>
-              <Link to="/projects">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="ml-2 h-4 w-4" />
-                  مشاريعي
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="min-h-screen bg-background flex flex-col">
+        <AppHeader />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex-1">
+          <Breadcrumbs items={[
+            { label: "الرئيسية", href: "/" },
+            { label: "مشاريعي", href: "/projects" },
+            { label: "المشروع غير موجود" },
+          ]} />
           <Card variant="subtle" className="max-w-xl mx-auto">
             <CardContent className="pt-16 pb-16 text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-6">
@@ -161,35 +75,26 @@ const ProjectDetail = () => {
             </CardContent>
           </Card>
         </main>
+        <AppFooter />
       </div>
     );
   }
 
+  if (!project) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 flex-row-reverse">
-            <Link to="/" className="flex-shrink-0">
-              <img 
-                src={preshootLogo} 
-                alt="PreShoot Studio" 
-                className="h-8 md:h-10 w-auto"
-              />
-            </Link>
-            <Link to="/projects">
-              <Button variant="ghost" size="sm" className="gap-2 flex-row-reverse">
-                <span>مشاريعي</span>
-                <ArrowLeft className="h-4 w-4 rotate-180" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <AppHeader />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+        <Breadcrumbs items={[
+          { label: "الرئيسية", href: "/" },
+          { label: "مشاريعي", href: "/projects" },
+          { label: project.topic },
+        ]} />
         {/* Project Header Card */}
         <Card variant="editorial" className="mb-8">
           <CardHeader>
@@ -294,7 +199,7 @@ const ProjectDetail = () => {
             </TabsContent>
 
             <TabsContent value="scripts" className="mt-0">
-              <ScriptsTab project={project} onRefresh={() => id && loadProject(id)} />
+              <ScriptsTab project={project} onRefresh={() => refetch?.()} />
             </TabsContent>
 
             <TabsContent value="broll" className="mt-0">
@@ -315,6 +220,8 @@ const ProjectDetail = () => {
           </div>
         </Tabs>
       </main>
+
+      <AppFooter />
     </div>
   );
 };

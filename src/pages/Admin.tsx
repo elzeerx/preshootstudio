@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { AdminStats } from '@/components/admin/AdminStats';
+import { BetaSignupsTable } from '@/components/admin/BetaSignupsTable';
+import { AppHeader } from '@/components/common/AppHeader';
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { AppFooter } from '@/components/common/AppFooter';
 import { 
   Loader2, 
   Users, 
@@ -15,7 +23,10 @@ import {
   XCircle,
   FolderOpen,
   Activity,
-  UserCheck
+  UserCheck,
+  Shield,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -70,6 +81,7 @@ interface Stats {
 
 export default function Admin() {
   const navigate = useNavigate();
+  const { user, signIn } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
   const [signups, setSignups] = useState<BetaSignup[]>([]);
   const [users, setUsers] = useState<Profile[]>([]);
@@ -83,19 +95,60 @@ export default function Admin() {
     activeProjects: 0
   });
   const [loading, setLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    if (!roleLoading && !isAdmin) {
+    if (user && !roleLoading && isAdmin) {
+      fetchAllData();
+    } else if (!roleLoading && user && !isAdmin) {
       toast.error('ليس لديك صلاحية للوصول إلى هذه الصفحة');
       navigate('/');
     }
-  }, [isAdmin, roleLoading, navigate]);
+  }, [user, isAdmin, roleLoading, navigate]);
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchAllData();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!loginEmail || !loginPassword) {
+      toast.error('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+      return;
     }
-  }, [isAdmin]);
+
+    setLoginLoading(true);
+
+    try {
+      const { error } = await signIn(loginEmail, loginPassword);
+      
+      if (error) {
+        toast.error('خطأ في تسجيل الدخول. تحقق من بياناتك.');
+        setLoginLoading(false);
+        return;
+      }
+
+      // Wait for auth state to update and check admin role
+      setTimeout(async () => {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user?.id)
+          .maybeSingle();
+        
+        if (roleData?.role === 'admin') {
+          toast.success('مرحباً بك في لوحة التحكم');
+        } else {
+          toast.error('ليس لديك صلاحيات الوصول إلى لوحة التحكم');
+          setLoginLoading(false);
+        }
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('حدث خطأ أثناء تسجيل الدخول');
+      setLoginLoading(false);
+    }
+  };
 
   const fetchAllData = async () => {
     try {
@@ -208,16 +261,6 @@ export default function Admin() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <Badge className="bg-accent text-accent-foreground">تمت الموافقة</Badge>;
-      case 'notified':
-        return <Badge className="bg-secondary text-secondary-foreground">تم الإشعار</Badge>;
-      default:
-        return <Badge variant="outline">قيد الانتظار</Badge>;
-    }
-  };
 
   // Chart data
   const signupStatusData = [
@@ -247,7 +290,8 @@ export default function Admin() {
     };
   });
 
-  if (roleLoading || loading) {
+  // Show loading state
+  if (roleLoading || (user && isAdmin && loading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-foreground" />
@@ -255,88 +299,152 @@ export default function Admin() {
     );
   }
 
-  if (!isAdmin) {
-    return null;
+  // Show login form if not authenticated or not admin
+  if (!user || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
+        <div className="w-full max-w-md">
+          {/* Logo/Brand Section */}
+          <div className="text-center mb-8 animate-fadeInUp">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-accent rounded-lg mb-4 shadow-editorial">
+              <Shield className="w-12 h-12 text-accent-foreground" />
+            </div>
+            <h1 className="text-4xl font-black mb-2">
+              لوحة التحكم
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              PreShoot Studio - Admin Access
+            </p>
+          </div>
+
+          {/* Login Card */}
+          <Card variant="editorial" className="animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                <Lock className="w-6 h-6" />
+                تسجيل دخول المسؤول
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleLogin} className="space-y-6">
+                {/* Email Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-base font-bold">
+                    البريد الإلكتروني
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      placeholder="admin@preshoot.studio"
+                      className="pr-10 h-12 text-lg border-2 border-foreground/20 focus:border-foreground transition-colors"
+                      disabled={loginLoading}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-base font-bold">
+                    كلمة المرور
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="pr-10 h-12 text-lg border-2 border-foreground/20 focus:border-foreground transition-colors"
+                      disabled={loginLoading}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="w-full h-12 text-lg font-bold gap-2"
+                  disabled={loginLoading}
+                >
+                  {loginLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      جاري التحقق...
+                    </>
+                  ) : (
+                    <>
+                      دخول لوحة التحكم
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              {/* Security Notice */}
+              <div className="mt-6 p-4 bg-muted/50 rounded-lg border-2 border-muted">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-muted-foreground">
+                    <p className="font-bold text-foreground mb-1">
+                      تنبيه أمني
+                    </p>
+                    <p>
+                      هذه الصفحة مخصصة للمسؤولين فقط. سيتم تسجيل جميع محاولات الدخول غير المصرح بها.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Back to Home Link */}
+          <div className="text-center mt-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              العودة إلى الصفحة الرئيسية
+            </Button>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-8 text-sm text-muted-foreground animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+            <p>© 2025 PreShoot Studio. جميع الحقوق محفوظة.</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      <div className="container max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Activity className="w-8 h-8 text-accent" strokeWidth={1.5} />
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              لوحة التحكم
-            </h1>
+    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+      <AppHeader />
+      <main className="flex-1">
+        <div className="container max-w-7xl mx-auto px-4 py-8">
+          <Breadcrumbs />
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Activity className="w-8 h-8 text-accent" strokeWidth={1.5} />
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                لوحة التحكم
+              </h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              إحصائيات وبيانات شاملة عن المنصة
+            </p>
           </div>
-          <p className="text-muted-foreground text-lg">
-            إحصائيات وبيانات شاملة عن المنصة
-          </p>
-        </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-all border-border/50 backdrop-blur-sm bg-card/95">
-            <CardHeader className="flex flex-row-reverse items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-right">
-                إجمالي المستخدمين
-              </CardTitle>
-              <Users className="w-5 h-5 text-button-primary" strokeWidth={2} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground text-right">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                مستخدم مسجل
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all border-border/50 backdrop-blur-sm bg-card/95">
-            <CardHeader className="flex flex-row-reverse items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-right">
-                المشاريع
-              </CardTitle>
-              <FolderOpen className="w-5 h-5 text-button-primary" strokeWidth={2} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground text-right">{stats.totalProjects}</div>
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                {stats.activeProjects} نشط
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all border-border/50 backdrop-blur-sm bg-card/95">
-            <CardHeader className="flex flex-row-reverse items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-right">
-                طلبات Beta
-              </CardTitle>
-              <Mail className="w-5 h-5 text-button-primary" strokeWidth={2} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground text-right">{stats.totalBetaSignups}</div>
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                {stats.pendingSignups} قيد المراجعة
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all border-border/50 backdrop-blur-sm bg-card/95">
-            <CardHeader className="flex flex-row-reverse items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-right">
-                الموافقات
-              </CardTitle>
-              <UserCheck className="w-5 h-5 text-button-primary" strokeWidth={2} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground text-right">{stats.approvedSignups}</div>
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                طلب تمت الموافقة عليه
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <AdminStats stats={stats} />
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -447,84 +555,11 @@ export default function Admin() {
         )}
 
         {/* Beta Signups Table */}
-        <Card variant="editorial">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <Mail className="w-6 h-6 text-accent" strokeWidth={1.5} />
-              طلبات الانضمام للنسخة التجريبية
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border-2 border-foreground overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="text-right font-bold">الاسم</TableHead>
-                    <TableHead className="text-right font-bold">البريد الإلكتروني</TableHead>
-                    <TableHead className="text-right font-bold">الحالة</TableHead>
-                    <TableHead className="text-right font-bold">تاريخ التسجيل</TableHead>
-                    <TableHead className="text-right font-bold">الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {signups.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                        لا توجد طلبات بعد
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    signups.map((signup) => (
-                      <TableRow key={signup.id} className="hover:bg-muted/20">
-                        <TableCell className="font-medium">{signup.name}</TableCell>
-                        <TableCell className="font-mono text-sm">{signup.email}</TableCell>
-                        <TableCell>{getStatusBadge(signup.status)}</TableCell>
-                        <TableCell className="text-sm">
-                          {format(new Date(signup.created_at), 'dd MMMM yyyy', { locale: ar })}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2 justify-end">
-                            {signup.status !== 'approved' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateStatus(signup.id, 'approved')}
-                                className="gap-2"
-                              >
-                                <CheckCircle className="w-4 h-4" strokeWidth={1.5} />
-                                موافقة
-                              </Button>
-                            )}
-                            {signup.status !== 'pending' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateStatus(signup.id, 'pending')}
-                                className="gap-2"
-                              >
-                                <XCircle className="w-4 h-4" strokeWidth={1.5} />
-                                إلغاء
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => deleteSignup(signup.id)}
-                              className="gap-2 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                            >
-                              <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-                              حذف
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        <BetaSignupsTable
+          signups={signups}
+          onUpdateStatus={updateStatus}
+          onDelete={deleteSignup}
+        />
 
         {/* Recent Users Table */}
         <Card variant="editorial" className="mt-8">
@@ -613,7 +648,9 @@ export default function Admin() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
+      <AppFooter />
     </div>
   );
 }

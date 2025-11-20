@@ -8,6 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, User, Mail, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AppHeader } from '@/components/common/AppHeader';
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { AppFooter } from '@/components/common/AppFooter';
+import { formatDate } from '@/lib/helpers/formatters';
 
 export default function Profile() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -90,12 +94,15 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">الملف الشخصي</h1>
-          <p className="text-muted-foreground">إدارة معلومات حسابك</p>
-        </div>
+    <div className="min-h-screen flex flex-col">
+      <AppHeader />
+      <main className="flex-1 p-4 md:p-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <Breadcrumbs />
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">الملف الشخصي</h1>
+            <p className="text-muted-foreground">إدارة معلومات حسابك</p>
+          </div>
 
         <Card className="border-border/50 backdrop-blur-sm bg-card/95">
           <CardHeader>
@@ -148,11 +155,7 @@ export default function Profile() {
                 </Label>
                 <Input
                   type="text"
-                  value={profile?.created_at ? new Date(profile.created_at).toLocaleDateString('ar-SA', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : ''}
+                  value={profile?.created_at ? formatDate(profile.created_at) : ''}
                   disabled
                   className="bg-muted/50"
                 />
@@ -181,7 +184,9 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
+      <AppFooter />
     </div>
   );
 }

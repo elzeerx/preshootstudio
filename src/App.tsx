@@ -4,13 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import AuraLayout from "@/components/AuraLayout";
+import { ProtectedRoute } from "@/components/common/ProtectedRoute";
+import AuraLayout from "@/components/common/AuraLayout";
 import CreateProject from "./pages/CreateProject";
 import Landing from "./pages/Landing";
 import Admin from "./pages/Admin";
-import AdminLogin from "./pages/AdminLogin";
-import Instructions from "./pages/Instructions";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -31,16 +29,8 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<Landing />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <Admin />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/instructions" element={<Instructions />} />
+              {/* Admin Routes */}
+              <Route path="/admin" element={<Admin />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
