@@ -15,7 +15,10 @@ import {
   TrendingUp,
   Award,
   RefreshCw,
-  Loader2
+  Loader2,
+  Circle,
+  XCircle,
+  BookOpen
 } from "lucide-react";
 import { ProjectDetail, QualityMetrics } from "@/hooks/useProjectDetail";
 import { formatDate } from "@/lib/helpers/formatters";
@@ -24,6 +27,16 @@ import { isContentOutdated } from "@/lib/helpers/contentFreshness";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+
+type TaskStatus = "pending" | "in-progress" | "completed" | "error";
+
+interface RegenerationTask {
+  name: string;
+  key: string;
+  functionName: string;
+  icon: React.ElementType;
+  status: TaskStatus;
+}
 
 interface OverviewTabProps {
   project: ProjectDetail;
@@ -55,7 +68,7 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
   const hasResearch = project.research_data && project.research_data.summary;
   const progressPercentage = calculateProgress(project);
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [currentTask, setCurrentTask] = useState<string>("");
+  const [regenerationTasks, setRegenerationTasks] = useState<RegenerationTask[]>([]);
 
   // Check which content is outdated
   const outdatedContent = {
@@ -72,19 +85,25 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
     if (!hasOutdatedContent) return;
 
     setIsRegenerating(true);
-    const tasks: Array<{ name: string; key: keyof typeof outdatedContent; functionName: string }> = [];
+    
+    // Initialize tasks list
+    const tasks: RegenerationTask[] = [];
+    if (outdatedContent.simplify) tasks.push({ name: "التبسيط", key: "simplify", functionName: "run-simplify", icon: Lightbulb, status: "pending" });
+    if (outdatedContent.scripts) tasks.push({ name: "السكريبتات", key: "scripts", functionName: "run-scripts", icon: FileText, status: "pending" });
+    if (outdatedContent.broll) tasks.push({ name: "B-Roll", key: "broll", functionName: "run-broll", icon: Video, status: "pending" });
+    if (outdatedContent.prompts) tasks.push({ name: "البرومبتات", key: "prompts", functionName: "run-prompts", icon: Image, status: "pending" });
+    if (outdatedContent.article) tasks.push({ name: "المقال", key: "article", functionName: "run-article", icon: BookOpen, status: "pending" });
 
-    // Build list of tasks to regenerate
-    if (outdatedContent.simplify) tasks.push({ name: "التبسيط", key: "simplify", functionName: "run-simplify" });
-    if (outdatedContent.scripts) tasks.push({ name: "السكريبتات", key: "scripts", functionName: "run-scripts" });
-    if (outdatedContent.broll) tasks.push({ name: "B-Roll", key: "broll", functionName: "run-broll" });
-    if (outdatedContent.prompts) tasks.push({ name: "البرومبتات", key: "prompts", functionName: "run-prompts" });
-    if (outdatedContent.article) tasks.push({ name: "المقال", key: "article", functionName: "run-article" });
+    setRegenerationTasks(tasks);
 
     try {
       for (let i = 0; i < tasks.length; i++) {
         const task = tasks[i];
-        setCurrentTask(`جاري تحديث ${task.name} (${i + 1}/${tasks.length})...`);
+        
+        // Update task to in-progress
+        setRegenerationTasks(prev => 
+          prev.map((t, idx) => idx === i ? { ...t, status: "in-progress" as TaskStatus } : t)
+        );
 
         // Update status to loading
         await supabase
@@ -99,6 +118,12 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
 
         if (error) {
           console.error(`Error regenerating ${task.name}:`, error);
+          
+          // Update task to error
+          setRegenerationTasks(prev => 
+            prev.map((t, idx) => idx === i ? { ...t, status: "error" as TaskStatus } : t)
+          );
+          
           toast({
             variant: "destructive",
             title: "خطأ",
@@ -110,15 +135,25 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
             .from("projects")
             .update({ [`${task.key}_status`]: "error" })
             .eq("id", project.id);
+        } else {
+          // Update task to completed
+          setRegenerationTasks(prev => 
+            prev.map((t, idx) => idx === i ? { ...t, status: "completed" as TaskStatus } : t)
+          );
         }
 
         // Small delay between tasks
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
+      const completedCount = tasks.filter((_, i) => {
+        const currentTasks = regenerationTasks.length > 0 ? regenerationTasks : tasks;
+        return currentTasks[i]?.status === "completed";
+      }).length;
+
       toast({
         title: "تم التحديث",
-        description: `تم تحديث ${tasks.length} ${tasks.length === 1 ? 'عنصر' : 'عناصر'} بنجاح`,
+        description: `تم تحديث ${completedCount} من ${tasks.length} ${tasks.length === 1 ? 'عنصر' : 'عناصر'} بنجاح`,
       });
 
       // Refresh project data
@@ -133,8 +168,23 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
         description: "حدث خطأ أثناء تحديث المحتوى",
       });
     } finally {
-      setIsRegenerating(false);
-      setCurrentTask("");
+      setTimeout(() => {
+        setIsRegenerating(false);
+        setRegenerationTasks([]);
+      }, 2000);
+    }
+  };
+
+  const getTaskStatusIcon = (status: TaskStatus) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case "in-progress":
+        return <Loader2 className="w-5 h-5 text-primary animate-spin" />;
+      case "error":
+        return <XCircle className="w-5 h-5 text-destructive" />;
+      default:
+        return <Circle className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
@@ -173,7 +223,7 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
           </div>
 
           {/* Regenerate Outdated Content Button */}
-          {hasOutdatedContent && (
+          {hasOutdatedContent && !isRegenerating && (
             <div className="pt-4 border-t">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -184,22 +234,68 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
                 </div>
                 <Button
                   onClick={regenerateAllOutdated}
-                  disabled={isRegenerating}
                   className="w-full"
                   variant="default"
                 >
-                  {isRegenerating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                      {currentTask || "جاري التحديث..."}
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="w-4 h-4 ml-2" />
-                      تحديث جميع المحتوى القديم
-                    </>
-                  )}
+                  <RefreshCw className="w-4 h-4 ml-2" />
+                  تحديث جميع المحتوى القديم
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Progress Timeline */}
+          {isRegenerating && regenerationTasks.length > 0 && (
+            <div className="pt-4 border-t">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <span>جاري تحديث المحتوى...</span>
+                </div>
+                
+                <div className="space-y-3">
+                  {regenerationTasks.map((task, index) => {
+                    const TaskIcon = task.icon;
+                    return (
+                      <div
+                        key={task.key}
+                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                          task.status === "in-progress" 
+                            ? "bg-primary/5 border-primary/20" 
+                            : task.status === "completed"
+                            ? "bg-green-500/5 border-green-500/20"
+                            : task.status === "error"
+                            ? "bg-destructive/5 border-destructive/20"
+                            : "bg-muted/30 border-border"
+                        }`}
+                      >
+                        <div className="flex-shrink-0">
+                          {getTaskStatusIcon(task.status)}
+                        </div>
+                        <div className="flex items-center gap-2 flex-1">
+                          <TaskIcon className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">{task.name}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {task.status === "pending" && "في الانتظار"}
+                          {task.status === "in-progress" && "جاري التنفيذ"}
+                          {task.status === "completed" && "مكتمل"}
+                          {task.status === "error" && "فشل"}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    {regenerationTasks.filter(t => t.status === "completed").length} / {regenerationTasks.length} مكتمل
+                  </span>
+                  <Progress 
+                    value={(regenerationTasks.filter(t => t.status === "completed").length / regenerationTasks.length) * 100} 
+                    className="h-2 flex-1 mx-4 max-w-xs"
+                  />
+                </div>
               </div>
             </div>
           )}
