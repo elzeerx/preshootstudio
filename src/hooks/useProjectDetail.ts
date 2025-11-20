@@ -17,16 +17,22 @@ export interface ProjectDetail {
   research_status: string | null;
   research_data?: ResearchData;
   research_summary?: string;
+  research_last_run_at?: string | null;
   scripts_status: string | null;
   scripts_data?: ScriptsData;
+  scripts_last_run_at?: string | null;
   broll_status: string | null;
   broll_data?: BRollData;
+  broll_last_run_at?: string | null;
   prompts_status: string | null;
   prompts_data?: PromptsData;
+  prompts_last_run_at?: string | null;
   article_status: string | null;
   article_data?: ArticleData;
+  article_last_run_at?: string | null;
   simplify_status: string | null;
   simplify_data?: SimplifyData;
+  simplify_last_run_at?: string | null;
 }
 
 export const useProjectDetail = (projectId: string | undefined) => {
