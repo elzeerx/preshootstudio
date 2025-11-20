@@ -3,11 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, Copy, RefreshCw, Clock, Tag } from "lucide-react";
+import { BookOpen, Copy, RefreshCw, Clock, Tag, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleData } from "@/lib/types/article";
+import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
 
 interface Project {
   id: string;
@@ -15,6 +17,7 @@ interface Project {
   article_status?: string;
   article_data?: ArticleData;
   article_last_run_at?: string;
+  research_data?: any;
 }
 
 interface ArticleTabProps {
@@ -26,7 +29,19 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const hasResearch = hasValidResearch(project.research_data);
+
   const handleGenerateArticle = async () => {
+    // Check for research before proceeding
+    if (!hasResearch) {
+      toast({
+        title: "البحث مطلوب",
+        description: getMissingResearchMessage(),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("run-article", {
@@ -335,6 +350,16 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
   // Idle state - no article yet
   return (
     <Card className="p-8">
+      {!hasResearch && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>البحث مطلوب</AlertTitle>
+          <AlertDescription>
+            {getMissingResearchMessage()}
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
           <BookOpen className="w-6 h-6 text-primary" />
@@ -344,7 +369,7 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
           <p className="body-text text-muted-foreground mb-6">
             ما تم تجهيز مقال لهذا الموضوع بعد.
           </p>
-          <Button onClick={handleGenerateArticle} size="lg">
+          <Button onClick={handleGenerateArticle} size="lg" disabled={!hasResearch}>
             <BookOpen className="w-5 h-5 ml-2" />
             تجهيز المقال بالذكاء الاصطناعي
           </Button>

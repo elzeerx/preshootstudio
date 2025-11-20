@@ -2,16 +2,19 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Loader2, RefreshCw, Copy, CheckCircle2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FileText, Loader2, RefreshCw, Copy, CheckCircle2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ScriptsData, getToneLabel } from "@/lib/types/scripts";
+import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
 
 interface Project {
   id: string;
   topic: string;
   scripts_status?: string;
   scripts_data?: ScriptsData;
+  research_data?: any;
 }
 
 interface ScriptsTabProps {
@@ -71,7 +74,19 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
     }
   };
 
+  const hasResearch = hasValidResearch(project.research_data);
+
   const runScripts = async () => {
+    // Check for research before proceeding
+    if (!hasResearch) {
+      toast({
+        title: "البحث مطلوب",
+        description: getMissingResearchMessage(),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('run-scripts', {
@@ -124,6 +139,16 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
   if (status === 'idle' || !scriptsData) {
     return (
       <Card className="p-8" dir="rtl">
+        {!hasResearch && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>البحث مطلوب</AlertTitle>
+            <AlertDescription>
+              {getMissingResearchMessage()}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
             <FileText className="w-6 h-6 text-primary" />
@@ -133,7 +158,7 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
             <p className="body-text mb-6 text-right">
               ما تم تجهيز سكريبتات لهذا الموضوع بعد.
             </p>
-            <Button onClick={runScripts} disabled={isLoading}>
+            <Button onClick={runScripts} disabled={isLoading || !hasResearch}>
               {isLoading ? (
                 <>
                   <Loader2 className="ms-2 h-4 w-4 animate-spin" />
