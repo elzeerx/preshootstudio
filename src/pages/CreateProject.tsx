@@ -11,6 +11,7 @@ import { AppHeader } from "@/components/common/AppHeader";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { AppFooter } from "@/components/common/AppFooter";
 import { useAuth } from "@/contexts/AuthContext";
+import { AISuggestionsSkeleton } from "@/components/projects/AISuggestionsSkeleton";
 
 const CreateProject = () => {
   const navigate = useNavigate();
@@ -183,9 +184,12 @@ const CreateProject = () => {
                   )}
                 </div>
 
+                {/* AI Suggestions Loading */}
+                {isLoadingSuggestions && <AISuggestionsSkeleton />}
+
                 {/* AI Suggestions */}
-                {showSuggestions && suggestions.length > 0 && (
-                  <div className="space-y-3">
+                {!isLoadingSuggestions && showSuggestions && suggestions.length > 0 && (
+                  <div className="space-y-3 animate-fade-in">
                     <Label className="text-sm font-medium text-muted-foreground">
                       اقتراحات AI - اختر موضوعاً أو اكتب موضوعك الخاص
                     </Label>
@@ -196,7 +200,8 @@ const CreateProject = () => {
                           type="button"
                           variant="outline"
                           dir="rtl"
-                          className="h-auto min-h-[60px] w-full px-4 py-3 text-right justify-start hover:bg-primary/10 hover:border-primary/50 transition-colors whitespace-normal break-words overflow-hidden"
+                          className="h-auto min-h-[60px] w-full px-4 py-3 text-right justify-start hover:bg-primary/10 hover:border-primary/50 transition-colors whitespace-normal break-words overflow-hidden animate-fade-in"
+                          style={{ animationDelay: `${index * 0.05}s` }}
                           onClick={() => handleSuggestionClick(suggestion)}
                           disabled={isCreating}
                         >
