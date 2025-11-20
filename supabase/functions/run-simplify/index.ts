@@ -88,6 +88,63 @@ Deno.serve(async (req) => {
           { role: 'system', content: SIMPLIFY_SYSTEM_PROMPT },
           { role: 'user', content: userPrompt }
         ],
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'provide_simplification',
+              description: 'Provide a simplified explanation of the topic',
+              parameters: {
+                type: 'object',
+                properties: {
+                  simplified_explanation: {
+                    type: 'string',
+                    description: 'A clear, simplified explanation of the topic'
+                  },
+                  everyday_examples: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        title: { type: 'string' },
+                        description: { type: 'string' }
+                      },
+                      required: ['title', 'description'],
+                      additionalProperties: false
+                    },
+                    description: 'Everyday examples that illustrate the concept'
+                  },
+                  analogies: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        concept: { type: 'string' },
+                        analogy: { type: 'string' }
+                      },
+                      required: ['concept', 'analogy'],
+                      additionalProperties: false
+                    },
+                    description: 'Analogies to help understand complex concepts'
+                  },
+                  key_takeaways: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Key points to remember'
+                  },
+                  difficulty_level: {
+                    type: 'string',
+                    enum: ['beginner', 'intermediate', 'advanced'],
+                    description: 'The difficulty level of the topic'
+                  }
+                },
+                required: ['simplified_explanation', 'everyday_examples', 'analogies', 'key_takeaways', 'difficulty_level'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'provide_simplification' } }
       }),
     });
 
@@ -98,17 +155,22 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await aiResponse.json();
-    const simplifiedContent = aiData.choices[0].message.content;
     
     console.log('Received simplification from AI');
 
-    // Parse JSON response
+    // Extract structured data from tool call
+    const toolCall = aiData.choices[0].message.tool_calls?.[0];
+    if (!toolCall || toolCall.function.name !== 'provide_simplification') {
+      console.error('No valid tool call in AI response');
+      throw new Error('Invalid AI response format');
+    }
+
     let simplifyData;
     try {
-      simplifyData = JSON.parse(simplifiedContent);
+      simplifyData = JSON.parse(toolCall.function.arguments);
     } catch (parseError) {
-      console.error('Failed to parse AI response as JSON:', parseError);
-      throw new Error('Invalid JSON response from AI');
+      console.error('Failed to parse tool call arguments:', parseError);
+      throw new Error('Invalid JSON in tool call arguments');
     }
 
     // Save to database
