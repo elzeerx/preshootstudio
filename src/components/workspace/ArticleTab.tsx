@@ -18,7 +18,7 @@ interface Project {
 
 interface ArticleTabProps {
   project: Project;
-  onProjectUpdate?: (updates: Partial<Project>) => void;
+  onProjectUpdate?: () => void;
 }
 
 export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
@@ -34,20 +34,8 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
 
       if (error) throw error;
 
-      // Refresh project data
-      const { data: updatedProject } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", project.id)
-        .single();
-
-      if (updatedProject && onProjectUpdate) {
-        onProjectUpdate({
-          article_status: updatedProject.article_status,
-          article_data: updatedProject.article_data as any as ArticleData,
-          article_last_run_at: updatedProject.article_last_run_at,
-        });
-      }
+      // Trigger parent refetch
+      onProjectUpdate?.();
 
       toast({
         title: "تم تجهيز المقال بنجاح",

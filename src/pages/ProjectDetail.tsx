@@ -203,15 +203,15 @@ const ProjectDetail = () => {
             </TabsContent>
 
             <TabsContent value="broll" className="mt-0">
-              <BRollTab project={project} />
+              <BRollTab project={project} onRefresh={() => refetch?.()} />
             </TabsContent>
 
             <TabsContent value="prompts" className="mt-0">
-              <PromptsTab project={project} />
+              <PromptsTab project={project} onRefresh={() => refetch?.()} />
             </TabsContent>
 
             <TabsContent value="article" className="mt-0">
-              <ArticleTab project={project} />
+              <ArticleTab project={project} onProjectUpdate={() => refetch?.()} />
             </TabsContent>
 
             <TabsContent value="export" className="mt-0">

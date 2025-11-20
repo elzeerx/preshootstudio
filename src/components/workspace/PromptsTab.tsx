@@ -18,9 +18,10 @@ interface Project {
 
 interface PromptsTabProps {
   project: Project;
+  onRefresh?: () => void;
 }
 
-export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
+export const PromptsTab = ({ project: initialProject, onRefresh }: PromptsTabProps) => {
   const [project, setProject] = useState(initialProject);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -98,6 +99,7 @@ export const PromptsTab = ({ project: initialProject }: PromptsTabProps) => {
         prompts_data: updatedProject.prompts_data as any
       } as Project);
       toast.success('تم تجهيز حزمة البرومبتات بنجاح!');
+      onRefresh?.();
     } catch (error) {
       console.error('Error generating prompts:', error);
       toast.error('حدث خطأ أثناء تجهيز البرومبتات');
