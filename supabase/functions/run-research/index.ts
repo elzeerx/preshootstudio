@@ -214,8 +214,66 @@ ${JSON.stringify(tavilyResults, null, 2)}
             content: userPrompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 4000,
+        tools: [{
+          type: "function",
+          function: {
+            name: "provide_research_data",
+            description: "Provide comprehensive research data about the topic",
+            parameters: {
+              type: "object",
+              properties: {
+                summary: { type: "string", description: "ملخص شامل للموضوع بناءً على نتائج البحث" },
+                keyPoints: { 
+                  type: "array", 
+                  items: { type: "string" },
+                  description: "نقاط رئيسية من البحث (3-5 نقاط)"
+                },
+                facts: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      label: { type: "string" },
+                      value: { type: "string" },
+                      source: { type: "string" },
+                      url: { type: "string" }
+                    },
+                    required: ["label", "value", "source", "url"]
+                  },
+                  description: "حقائق وإحصائيات مع المصادر (3-5 حقائق)"
+                },
+                sources: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string" },
+                      url: { type: "string" },
+                      type: { type: "string", enum: ["article", "blog", "news", "video", "official", "research"] }
+                    },
+                    required: ["title", "url", "type"]
+                  },
+                  description: "قائمة المصادر المستخدمة"
+                },
+                mythsVsReality: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      myth: { type: "string" },
+                      reality: { type: "string" }
+                    },
+                    required: ["myth", "reality"]
+                  },
+                  description: "خرافات شائعة والحقيقة عنها (2-3 خرافات)"
+                }
+              },
+              required: ["summary", "keyPoints", "facts", "sources"],
+              additionalProperties: false
+            }
+          }
+        }],
+        tool_choice: { type: "function", function: { name: "provide_research_data" } }
       }),
     });
 
@@ -236,26 +294,22 @@ ${JSON.stringify(tavilyResults, null, 2)}
     }
 
     const aiData = await aiResponse.json();
-    const content = aiData.choices[0].message.content;
+    
+    console.log('AI response received, extracting structured data...');
 
-    console.log('AI response received, parsing JSON...');
-
-    // Parse JSON response
+    // Extract research data from tool call response
     let researchData;
     try {
-      // Clean the content - remove markdown code blocks if present
-      let cleanContent = content.trim();
-      if (cleanContent.startsWith('```json')) {
-        cleanContent = cleanContent.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-      } else if (cleanContent.startsWith('```')) {
-        cleanContent = cleanContent.replace(/```\n?/g, '');
+      const toolCall = aiData.choices[0].message.tool_calls?.[0];
+      if (!toolCall || !toolCall.function || !toolCall.function.arguments) {
+        throw new Error('No tool call found in AI response');
       }
       
-      researchData = JSON.parse(cleanContent);
-      console.log('JSON parsed successfully');
+      researchData = JSON.parse(toolCall.function.arguments);
+      console.log('Structured data extracted successfully');
     } catch (parseError) {
-      console.error('Failed to parse AI response as JSON:', parseError);
-      console.error('Content was:', content);
+      console.error('Failed to extract research data:', parseError);
+      console.error('AI response:', JSON.stringify(aiData, null, 2));
       
       // Update status to error
       await supabase
