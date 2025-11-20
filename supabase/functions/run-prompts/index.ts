@@ -158,7 +158,67 @@ Deno.serve(async (req) => {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.7,
+        tools: [{
+          type: "function",
+          function: {
+            name: "provide_prompts",
+            description: "Provide image, video, and thumbnail prompts",
+            parameters: {
+              type: "object",
+              properties: {
+                imagePrompts: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string" },
+                      label: { type: "string" },
+                      model: { type: "string", enum: ["midjourney", "gemini", "generic"] },
+                      aspectRatio: { type: "string" },
+                      style: { type: "string" },
+                      prompt: { type: "string" }
+                    },
+                    required: ["id", "label", "model", "aspectRatio", "style", "prompt"]
+                  }
+                },
+                videoPrompts: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string" },
+                      label: { type: "string" },
+                      durationSec: { type: "number" },
+                      style: { type: "string" },
+                      prompt: { type: "string" }
+                    },
+                    required: ["id", "label", "durationSec", "style", "prompt"]
+                  }
+                },
+                thumbnailPrompts: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string" },
+                      label: { type: "string" },
+                      prompt: { type: "string" }
+                    },
+                    required: ["id", "label", "prompt"]
+                  }
+                },
+                notes: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "نصائح لاستخدام البرومبتات"
+                }
+              },
+              required: ["imagePrompts", "videoPrompts", "thumbnailPrompts", "notes"],
+              additionalProperties: false
+            }
+          }
+        }],
+        tool_choice: { type: "function", function: { name: "provide_prompts" } }
       }),
     });
 
@@ -181,37 +241,22 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await response.json();
-    const aiContent = aiData.choices?.[0]?.message?.content;
+    
+    console.log('AI response received, extracting structured data...');
 
-    if (!aiContent) {
-      console.error('No content in AI response');
-      
-      await supabase
-        .from('projects')
-        .update({ 
-          prompts_status: 'error',
-          prompts_last_run_at: new Date().toISOString()
-        })
-        .eq('id', projectId);
-
-      return new Response(
-        JSON.stringify({ error: 'No AI response' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log('AI response received, parsing JSON...');
-
-    // Parse JSON from AI response
+    // Extract prompts data from tool call response
     let promptsData;
     try {
-      // Try to extract JSON from markdown code blocks if present
-      const jsonMatch = aiContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      const jsonText = jsonMatch ? jsonMatch[1] : aiContent;
-      promptsData = JSON.parse(jsonText.trim());
+      const toolCall = aiData.choices[0].message.tool_calls?.[0];
+      if (!toolCall || !toolCall.function || !toolCall.function.arguments) {
+        throw new Error('No tool call found in AI response');
+      }
+      
+      promptsData = JSON.parse(toolCall.function.arguments);
+      console.log('Prompts data extracted successfully');
     } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('AI content:', aiContent);
+      console.error('Failed to extract prompts data:', parseError);
+      console.error('AI response:', JSON.stringify(aiData, null, 2));
       
       await supabase
         .from('projects')
