@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { 
   FileText, 
   CheckCircle2, 
@@ -12,14 +13,21 @@ import {
   FileEdit,
   Sparkles,
   TrendingUp,
-  Award
+  Award,
+  RefreshCw,
+  Loader2
 } from "lucide-react";
 import { ProjectDetail, QualityMetrics } from "@/hooks/useProjectDetail";
 import { formatDate } from "@/lib/helpers/formatters";
 import { getQualityLabel, getQualityVariant } from "@/lib/helpers/researchQuality";
+import { isContentOutdated } from "@/lib/helpers/contentFreshness";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface OverviewTabProps {
   project: ProjectDetail;
+  onProjectUpdate?: () => void;
 }
 
 const getStatusInfo = (status: string | null) => {
@@ -43,9 +51,92 @@ const calculateProgress = (project: ProjectDetail): number => {
   return Math.round((completed / tasks.length) * 100);
 };
 
-export const OverviewTab = ({ project }: OverviewTabProps) => {
+export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
   const hasResearch = project.research_data && project.research_data.summary;
   const progressPercentage = calculateProgress(project);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [currentTask, setCurrentTask] = useState<string>("");
+
+  // Check which content is outdated
+  const outdatedContent = {
+    simplify: isContentOutdated(project.simplify_last_run_at, project.research_last_run_at),
+    scripts: isContentOutdated(project.scripts_last_run_at, project.research_last_run_at),
+    broll: isContentOutdated(project.broll_last_run_at, project.research_last_run_at),
+    prompts: isContentOutdated(project.prompts_last_run_at, project.research_last_run_at),
+    article: isContentOutdated(project.article_last_run_at, project.research_last_run_at),
+  };
+
+  const hasOutdatedContent = Object.values(outdatedContent).some(Boolean);
+
+  const regenerateAllOutdated = async () => {
+    if (!hasOutdatedContent) return;
+
+    setIsRegenerating(true);
+    const tasks: Array<{ name: string; key: keyof typeof outdatedContent; functionName: string }> = [];
+
+    // Build list of tasks to regenerate
+    if (outdatedContent.simplify) tasks.push({ name: "التبسيط", key: "simplify", functionName: "run-simplify" });
+    if (outdatedContent.scripts) tasks.push({ name: "السكريبتات", key: "scripts", functionName: "run-scripts" });
+    if (outdatedContent.broll) tasks.push({ name: "B-Roll", key: "broll", functionName: "run-broll" });
+    if (outdatedContent.prompts) tasks.push({ name: "البرومبتات", key: "prompts", functionName: "run-prompts" });
+    if (outdatedContent.article) tasks.push({ name: "المقال", key: "article", functionName: "run-article" });
+
+    try {
+      for (let i = 0; i < tasks.length; i++) {
+        const task = tasks[i];
+        setCurrentTask(`جاري تحديث ${task.name} (${i + 1}/${tasks.length})...`);
+
+        // Update status to loading
+        await supabase
+          .from("projects")
+          .update({ [`${task.key}_status`]: "loading" })
+          .eq("id", project.id);
+
+        // Call the edge function
+        const { error } = await supabase.functions.invoke(task.functionName, {
+          body: { projectId: project.id },
+        });
+
+        if (error) {
+          console.error(`Error regenerating ${task.name}:`, error);
+          toast({
+            variant: "destructive",
+            title: "خطأ",
+            description: `فشل تحديث ${task.name}. ${error.message}`,
+          });
+          
+          // Update status to error
+          await supabase
+            .from("projects")
+            .update({ [`${task.key}_status`]: "error" })
+            .eq("id", project.id);
+        }
+
+        // Small delay between tasks
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      toast({
+        title: "تم التحديث",
+        description: `تم تحديث ${tasks.length} ${tasks.length === 1 ? 'عنصر' : 'عناصر'} بنجاح`,
+      });
+
+      // Refresh project data
+      if (onProjectUpdate) {
+        onProjectUpdate();
+      }
+    } catch (error) {
+      console.error("Error during regeneration:", error);
+      toast({
+        variant: "destructive",
+        title: "خطأ",
+        description: "حدث خطأ أثناء تحديث المحتوى",
+      });
+    } finally {
+      setIsRegenerating(false);
+      setCurrentTask("");
+    }
+  };
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -80,6 +171,38 @@ export const OverviewTab = ({ project }: OverviewTabProps) => {
             </div>
             <Progress value={progressPercentage} className="h-2" />
           </div>
+
+          {/* Regenerate Outdated Content Button */}
+          {hasOutdatedContent && (
+            <div className="pt-4 border-t">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <p className="text-right">
+                    يوجد محتوى تم إنشاؤه قبل آخر بحث. ننصح بتحديثه للحصول على أفضل النتائج.
+                  </p>
+                </div>
+                <Button
+                  onClick={regenerateAllOutdated}
+                  disabled={isRegenerating}
+                  className="w-full"
+                  variant="default"
+                >
+                  {isRegenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                      {currentTask || "جاري التحديث..."}
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 ml-2" />
+                      تحديث جميع المحتوى القديم
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

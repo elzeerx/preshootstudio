@@ -223,7 +223,7 @@ const ProjectDetail = () => {
 
           <div>
             <TabsContent value="overview" className="mt-0">
-              <OverviewTab project={project} />
+              <OverviewTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
 
             <TabsContent value="research" className="mt-0">
