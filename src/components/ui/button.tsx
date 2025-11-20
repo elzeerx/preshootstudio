@@ -5,15 +5,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-button-primary text-button-foreground hover:bg-button-primary-hover active:bg-button-primary-active",
+        default: "bg-button-primary text-button-foreground hover:bg-button-primary-hover active:bg-button-primary-active neon-glow hover:scale-105",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border-2 border-button-primary bg-transparent text-button-primary hover:bg-button-primary hover:text-button-foreground active:bg-button-primary-active active:border-button-primary-active",
+        outline: "border border-white/20 bg-transparent text-white hover:bg-white/10 active:bg-white/20 backdrop-blur-sm",
         secondary: "bg-button-primary-light text-button-foreground hover:bg-button-primary active:bg-button-primary-hover",
-        ghost: "hover:bg-button-primary/10 text-button-primary hover:text-button-primary-hover active:bg-button-primary/20",
+        ghost: "hover:bg-white/10 text-white hover:text-white active:bg-white/20",
         link: "text-button-primary underline-offset-4 hover:underline hover:text-button-primary-hover",
       },
       size: {

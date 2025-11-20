@@ -48,7 +48,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-l from-primary via-primary-glow to-accent-purple bg-clip-text text-transparent">
@@ -59,7 +59,7 @@ export default function Auth() {
           </p>
         </div>
 
-        <Card className="border-border/50 backdrop-blur-sm bg-card/95">
+        <Card variant="editorial">
           <CardHeader>
             <CardTitle className="text-2xl text-center">مرحباً بك</CardTitle>
             <CardDescription className="text-center">

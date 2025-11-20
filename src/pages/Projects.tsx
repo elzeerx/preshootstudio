@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Sparkles, FolderOpen, ArrowLeft, Plus, Inbox, Search, Filter, CheckCircle2, Clock, Rocket, TrendingUp, Calendar } from "lucide-react";
+import { FolderOpen, ArrowLeft, Plus, Inbox, Search, Filter, CheckCircle2, Clock, Rocket, TrendingUp, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 
 interface Project {
   id: string;
@@ -117,30 +118,13 @@ const Projects = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen relative overflow-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50 shadow-sm">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/10 border-b border-white/10 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-2xl blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-2xl shadow-lg">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-l from-primary via-foreground to-primary bg-clip-text text-transparent">
-                  PreShoot AI
-                </h1>
-                <p className="text-xs text-muted-foreground">مساعدك الشخصي قبل التصوير وبعده</p>
-              </div>
+            <Link to="/" className="flex items-center gap-2">
+              <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto brightness-0 invert" />
             </Link>
 
             <Link to="/">
@@ -275,7 +259,7 @@ const Projects = () => {
                 </Button>
               </div>
 
-              <Link to="/">
+              <Link to="/create">
                 <Button variant="default" size="sm" className="gap-2">
                   <Plus className="w-4 h-4" />
                   مشروع جديد
@@ -303,7 +287,7 @@ const Projects = () => {
                 <p className="body-text-secondary mb-8 max-w-md mx-auto">
                   ابدأ من الصفحة الرئيسية بإدخال موضوع جديد، وخلي PreShoot AI يجهز لك كل شيء
                 </p>
-                <Link to="/">
+                <Link to="/create">
                   <Button variant="default" size="lg" className="gap-2">
                     <Plus className="w-5 h-5" />
                     إنشاء مشروع جديد

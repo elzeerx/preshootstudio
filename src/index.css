@@ -9,38 +9,57 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Linen Color Palette Design System */
-    --background: 32 55% 95%;        /* #FCF2E7 Linen - الخلفية الرئيسية */
-    --foreground: 0 0% 11%;          /* #1B1B1B Near Black - النص الأساسي */
+    --background: 32 55% 95%;
+    /* #FCF2E7 Linen - الخلفية الرئيسية */
+    --foreground: 0 0% 11%;
+    /* #1B1B1B Near Black - النص الأساسي */
 
-    --card: 0 0% 95%;                /* #F1F1F1 Off-White - كروت فاتحة */
-    --card-foreground: 0 0% 11%;     /* #1B1B1B - نص الكروت */
-    --card-border: 12 25% 65%;       /* Dusty Rose مخفف للحدود */
-    --card-shadow: 12 25% 57%;       /* #A97C73 Dusty Rose للظلال */
+    --card: 0 0% 95%;
+    /* #F1F1F1 Off-White - كروت فاتحة */
+    --card-foreground: 0 0% 11%;
+    /* #1B1B1B - نص الكروت */
+    --card-border: 12 25% 65%;
+    /* Dusty Rose مخفف للحدود */
+    --card-shadow: 12 25% 57%;
+    /* #A97C73 Dusty Rose للظلال */
 
     --popover: 0 0% 95%;
     --popover-foreground: 0 0% 11%;
 
-    --primary: 0 0% 11%;             /* #1B1B1B - أسود للأزرار */
-    --primary-dark: 0 0% 7%;         /* أغمق قليلاً عند الـ hover */
-    --primary-foreground: 32 55% 95%; /* Linen للنص على الأزرار */
+    --primary: 0 0% 11%;
+    /* #1B1B1B - أسود للأزرار */
+    --primary-dark: 0 0% 7%;
+    /* أغمق قليلاً عند الـ hover */
+    --primary-foreground: 32 55% 95%;
+    /* Linen للنص على الأزرار */
 
-    --secondary: 12 25% 57%;         /* #A97C73 Dusty Rose */
-    --secondary-foreground: 0 0% 95%; /* Off-white للنص */
+    --secondary: 12 25% 57%;
+    /* #A97C73 Dusty Rose */
+    --secondary-foreground: 0 0% 95%;
+    /* Off-white للنص */
 
-    --muted: 32 40% 88%;             /* Linen أغمق قليلاً */
-    --muted-foreground: 0 0% 30%;    /* رمادي داكن للنصوص الثانوية */
+    --muted: 32 40% 88%;
+    /* Linen أغمق قليلاً */
+    --muted-foreground: 0 0% 30%;
+    /* رمادي داكن للنصوص الثانوية */
 
-    --accent: 204 26% 46%;           /* #587792 Blue-Grey */
-    --accent-foreground: 0 0% 100%;  /* أبيض للنص */
+    --accent: 204 26% 46%;
+    /* #587792 Blue-Grey */
+    --accent-foreground: 0 0% 100%;
+    /* أبيض للنص */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 12 25% 75%;            /* Dusty Rose فاتح للحدود */
-    --input: 0 0% 98%;               /* أبيض تقريباً للـ inputs */
-    --ring: 204 26% 46%;             /* Blue-Grey للـ focus ring */
+    --border: 12 25% 75%;
+    /* Dusty Rose فاتح للحدود */
+    --input: 0 0% 98%;
+    /* أبيض تقريباً للـ inputs */
+    --ring: 204 26% 46%;
+    /* Blue-Grey للـ focus ring */
 
-    --radius: 0.625rem;              /* 10px */
+    --radius: 0.625rem;
+    /* 10px */
 
     /* Editorial Shadows - Dusty Rose */
     --shadow-editorial: 6px 6px 0 hsl(12 25% 65%);
@@ -58,36 +77,53 @@ All colors MUST be HSL.
     --sidebar-ring: 204 26% 46%;
 
     /* Button Color System - Dusty Rose Based */
-    --button-primary: 12 25% 57%;           /* #A97C73 Dusty Rose - اللون الأساسي */
-    --button-primary-hover: 12 25% 50%;     /* أغمق للـ hover */
-    --button-primary-active: 12 25% 45%;    /* أغمق للـ active/clicked */
-    --button-primary-light: 12 25% 65%;     /* أفتح للـ outline */
-    --button-foreground: 0 0% 100%;         /* أبيض للنص */
+    --button-primary: 12 25% 57%;
+    /* #A97C73 Dusty Rose - اللون الأساسي */
+    --button-primary-hover: 12 25% 50%;
+    /* أغمق للـ hover */
+    --button-primary-active: 12 25% 45%;
+    /* أغمق للـ active/clicked */
+    --button-primary-light: 12 25% 65%;
+    /* أفتح للـ outline */
+    --button-foreground: 0 0% 100%;
+    /* أبيض للنص */
   }
 
   .dark {
-    --background: 0 0% 16%;          /* #2A2A2A - خلفية داكنة (أفتح من الأسود) */
-    --foreground: 32 55% 95%;        /* Linen - نص فاتح */
+    --background: 0 0% 16%;
+    /* #2A2A2A - خلفية داكنة (أفتح من الأسود) */
+    --foreground: 32 55% 95%;
+    /* Linen - نص فاتح */
 
-    --card: 0 0% 15%;                /* رمادي داكن للكروت */
-    --card-foreground: 32 55% 95%;   /* Linen للنص */
-    --card-border: 12 25% 35%;       /* Dusty Rose داكن */
-    --card-shadow: 12 25% 25%;       /* ظل أغمق */
+    --card: 0 0% 15%;
+    /* رمادي داكن للكروت */
+    --card-foreground: 32 55% 95%;
+    /* Linen للنص */
+    --card-border: 12 25% 35%;
+    /* Dusty Rose داكن */
+    --card-shadow: 12 25% 25%;
+    /* ظل أغمق */
 
     --popover: 0 0% 15%;
     --popover-foreground: 32 55% 95%;
 
-    --primary: 32 55% 95%;           /* Linen للأزرار */
-    --primary-dark: 0 0% 95%;        /* Off-white */
-    --primary-foreground: 0 0% 11%;  /* أسود للنص */
+    --primary: 32 55% 95%;
+    /* Linen للأزرار */
+    --primary-dark: 0 0% 95%;
+    /* Off-white */
+    --primary-foreground: 0 0% 11%;
+    /* أسود للنص */
 
-    --secondary: 12 25% 50%;         /* Dusty Rose معدل */
+    --secondary: 12 25% 50%;
+    /* Dusty Rose معدل */
     --secondary-foreground: 0 0% 95%;
 
     --muted: 0 0% 20%;
-    --muted-foreground: 32 40% 75%;  /* Linen للنصوص الثانوية */
+    --muted-foreground: 32 40% 75%;
+    /* Linen للنصوص الثانوية */
 
-    --accent: 204 26% 55%;           /* Blue-Grey أفتح */
+    --accent: 204 26% 55%;
+    /* Blue-Grey أفتح */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -153,7 +189,7 @@ All colors MUST be HSL.
   }
 
   /* RTL للمحتوى العربي */
-  [lang="ar"], 
+  [lang="ar"],
   [dir="rtl"] {
     direction: rtl;
     text-align: right;
@@ -227,6 +263,7 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+
   /* RTL Text Breaking & Overflow Utilities */
   .break-words-rtl {
     word-wrap: break-word;
@@ -283,7 +320,7 @@ All colors MUST be HSL.
     overflow-wrap: break-word;
   }
 
-  .card-fluid > * {
+  .card-fluid>* {
     min-width: 0;
     max-width: 100%;
   }
@@ -315,6 +352,7 @@ All colors MUST be HSL.
     from {
       height: 0;
     }
+
     to {
       height: var(--radix-accordion-content-height);
     }
@@ -324,6 +362,7 @@ All colors MUST be HSL.
     from {
       height: var(--radix-accordion-content-height);
     }
+
     to {
       height: 0;
     }
@@ -334,6 +373,7 @@ All colors MUST be HSL.
       opacity: 0;
       transform: translateY(30px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -345,6 +385,7 @@ All colors MUST be HSL.
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -397,19 +438,19 @@ All colors MUST be HSL.
   .bg-gradient-main {
     background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1f1f1f 100%);
   }
-  
+
   .bg-gradient-hero {
     background: linear-gradient(135deg, #0f0f0f 0%, #2a2a2a 40%, #1a1515 100%);
   }
-  
+
   .bg-gradient-accent {
     background: linear-gradient(135deg, #2a2a2a 0%, rgba(169, 124, 115, 0.15) 50%, #2a2a2a 100%);
   }
-  
+
   .bg-gradient-footer {
     background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
   }
-  
+
   .bg-gradient-header {
     background: linear-gradient(180deg, #2a2a2a 0%, #252525 100%);
   }
@@ -419,37 +460,291 @@ All colors MUST be HSL.
     background: rgba(169, 124, 115, 0.08);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    box-shadow: 
+    box-shadow:
       0 8px 32px 0 rgba(0, 0, 0, 0.25),
       inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   }
-  
+
   .glass-card-hover {
     background: rgba(169, 124, 115, 0.12);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    box-shadow: 
+    box-shadow:
       0 12px 40px 0 rgba(0, 0, 0, 0.3),
       inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
   }
-  
+
   /* Brutalism Utilities */
   .brutal-border {
     border-width: 4px;
     border-style: solid;
   }
-  
+
   .brutal-shadow {
     box-shadow: 8px 8px 0 rgba(169, 124, 115, 0.4);
   }
-  
+
   .brutal-shadow-hover {
     box-shadow: 12px 12px 0 rgba(169, 124, 115, 0.6);
   }
-  
+
   /* Typography - Brutalist */
   .text-brutal {
     font-weight: 900;
     letter-spacing: -0.02em;
   }
+
+  /* Premium Design System Additions */
+  .glass-premium {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .dark .glass-premium {
+    background: rgba(17, 25, 40, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .text-gradient-premium {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dark .text-gradient-premium {
+    background: linear-gradient(135deg, #fff 0%, hsl(var(--secondary)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Premium Animations */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 8s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+/* Aura "Creative Design Studio" Remix Styles */
+.theme-aura {
+  --background: 240 8% 6%;
+  --foreground: 0 0% 100%;
+  --card: 240 10% 12%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 240 10% 20%;
+  --card-shadow: 240 30% 8%;
+  --popover: 240 12% 10%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 258 90% 70%;
+  --primary-dark: 258 90% 60%;
+  --primary-foreground: 0 0% 8%;
+  --secondary: 220 14% 20%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 240 10% 18%;
+  --muted-foreground: 0 0% 70%;
+  --accent: 200 90% 60%;
+  --accent-foreground: 0 0% 8%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 10% 22%;
+  --input: 240 10% 16%;
+  --ring: 258 90% 70%;
+  --shadow-editorial: 6px 6px 0 hsl(258 45% 30%);
+  --shadow-editorial-hover: 8px 8px 0 hsl(258 55% 35%);
+  --shadow-sm: 0 1px 2px 0 hsl(258 35% 20% / 0.35);
+  --shadow-md: 0 2px 4px 0 hsl(258 35% 22% / 0.45);
+  --sidebar-background: 240 10% 6%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-primary: 258 90% 70%;
+  --sidebar-primary-foreground: 0 0% 8%;
+  --sidebar-accent: 240 10% 14%;
+  --sidebar-accent-foreground: 0 0% 96%;
+  --sidebar-border: 240 10% 22%;
+  --sidebar-ring: 258 90% 70%;
+  --button-primary: 0 0% 100%;
+  --button-primary-hover: 0 0% 88%;
+  --button-primary-active: 0 0% 78%;
+  --button-primary-light: 258 90% 70%;
+  --button-foreground: 0 0% 6%;
+  --radius: 1.5rem;
+}
+
+.theme-aura .glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+}
+
+.theme-aura .glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.bg-aura-dark {
+  background-color: #0a0a0a;
+}
+
+.text-massive {
+  font-size: clamp(3rem, 8vw, 8rem);
+  line-height: 0.9;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+  }
+}
+
+.bento-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.bento-card-wide {
+  grid-column: span 1;
+}
+
+@media (min-width: 768px) {
+  .bento-card-wide {
+    grid-column: span 2;
+  }
+}
+
+.bento-card-tall {
+  grid-row: span 1;
+}
+
+@media (min-width: 768px) {
+  .bento-card-tall {
+    grid-row: span 2;
+  }
+}
+
+.neon-glow {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-glow:hover {
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+}
+
+/* Marquee Animation */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.text-outline {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+  color: transparent;
 }

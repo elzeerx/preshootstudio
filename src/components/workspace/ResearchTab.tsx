@@ -1,11 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, AlertCircle, RefreshCw, ExternalLink, Lightbulb, TrendingUp, HelpCircle, Copy } from "lucide-react";
+import { Search, Sparkles, AlertCircle, RefreshCw, ExternalLink, Lightbulb, TrendingUp, HelpCircle, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { ResearchData } from "@/lib/types/research";
+import { extractDomain } from "@/lib/utils";
 
 interface Project {
   id: string;
@@ -22,6 +23,18 @@ interface ResearchTabProps {
 export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
   const [project, setProject] = useState(initialProject);
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+  const copyUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedUrl(url);
+      toast.success('تم نسخ الرابط');
+      setTimeout(() => setCopiedUrl(null), 2000);
+    } catch (error) {
+      toast.error('فشل نسخ الرابط');
+    }
+  };
 
   const copyAllResearch = async () => {
     if (!researchData) return;
@@ -310,41 +323,84 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
       {/* Sources Section */}
       {researchData.sources && researchData.sources.length > 0 && (
         <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-6">
             <ExternalLink className="w-5 h-5 text-primary" />
             <h3 className="heading-3">المصادر والمراجع</h3>
           </div>
-          <div className="grid gap-3">
-            {researchData.sources.map((source, index) => (
-              <a
-                key={index}
-                href={source.url || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all duration-200"
-              >
-                <Badge variant="outline" className="mt-1 shrink-0">
-                  {source.type === "official" ? "رسمي" : 
-                   source.type === "article" ? "مقال" : 
-                   source.type === "blog" ? "مدونة" :
-                   source.type === "video" ? "فيديو" :
-                   source.type === "news" ? "خبر" : "عام"}
-                </Badge>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                    {source.title}
-                  </p>
+          <div className="grid gap-4">
+            {researchData.sources.map((source, index) => {
+              const domain = source.url ? extractDomain(source.url) : '';
+              const isCopied = copiedUrl === source.url;
+              
+              return (
+                <div
+                  key={index}
+                  className="group relative rounded-[1.5rem] border border-white/10 bg-white/5 p-5 hover:border-white/20 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl overflow-hidden"
+                >
+                  {/* Badge - Top Right */}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 break-words-rtl mb-2">
+                        {source.title}
+                      </h4>
+                    </div>
+                    <Badge 
+                      variant="secondary" 
+                      className="shrink-0 text-xs px-2.5 py-1"
+                    >
+                      {source.type === "official" ? "رسمي" : 
+                       source.type === "article" ? "مقال" : 
+                       source.type === "blog" ? "مدونة" :
+                       source.type === "video" ? "فيديو" :
+                       source.type === "news" ? "خبر" : "عام"}
+                    </Badge>
+                  </div>
+
+                  {/* URL Section */}
                   {source.url && (
-                    <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {source.url}
-                    </p>
+                    <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground font-mono break-all break-words-rtl">
+                            {domain}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyUrl(source.url!);
+                          }}
+                          title="نسخ الرابط"
+                        >
+                          {isCopied ? (
+                            <Check className="w-3.5 h-3.5 text-green-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </Button>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                          title="فتح الرابط"
+                        >
+                          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </a>
+                      </div>
+                    </div>
                   )}
                 </div>
-                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-1" />
-              </a>
-            ))}
+              );
+            })}
           </div>
-          <p className="text-xs text-muted-foreground mt-4 text-center">
+          <p className="text-xs text-muted-foreground mt-6 text-center">
             جميع المصادر أعلاه حقيقية ومستمدة من Tavily Web Search
           </p>
         </Card>

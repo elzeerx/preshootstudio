@@ -1,5 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SIMPLIFY_SYSTEM_PROMPT } from '../_shared/systemPrompts.ts';
 
 const corsHeaders = {
@@ -8,38 +7,51 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let projectId: string | null = null;
+  let supabase: ReturnType<typeof createClient> | null = null;
+
   try {
-    const { projectId } = await req.json();
+    const body = await req.json();
+    projectId = body.projectId;
+
+    if (!projectId) {
+      return new Response(
+        JSON.stringify({ error: 'Missing projectId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     console.log('Starting simplify for project:', projectId);
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    );
+    // Create Supabase client with service role key
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch project data
-    const { data: project, error: projectError } = await supabaseClient
+    const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('topic, research_data')
       .eq('id', projectId)
       .single();
 
-    if (projectError) {
+    if (projectError || !project) {
       console.error('Error fetching project:', projectError);
-      throw new Error('Failed to fetch project');
+      return new Response(
+        JSON.stringify({ error: 'Project not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
+    console.log('Project found:', project.topic);
+
     // Update status to processing
-    await supabaseClient
+    await supabase
       .from('projects')
       .update({ simplify_status: 'processing' })
       .eq('id', projectId);
@@ -96,7 +108,7 @@ Deno.serve(async (req) => {
     }
 
     // Save to database
-    const { error: updateError } = await supabaseClient
+    const { error: updateError } = await supabase
       .from('projects')
       .update({
         simplify_status: 'ready',
@@ -113,17 +125,31 @@ Deno.serve(async (req) => {
     console.log('Simplification completed successfully');
 
     return new Response(
-      JSON.stringify({ success: true, data: simplifyData }),
+      JSON.stringify({ 
+        success: true,
+        data: simplifyData 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in run-simplify:', error);
+    console.error('Error in run-simplify function:', error);
     
+    // Try to update project status to error if we have projectId and supabase client
+    if (projectId && supabase) {
+      try {
+        await supabase
+          .from('projects')
+          .update({ simplify_status: 'error' })
+          .eq('id', projectId);
+      } catch (statusUpdateError) {
+        console.error('Failed to update error status:', statusUpdateError);
+      }
+    }
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
-      }),
+      JSON.stringify({ error: errorMessage }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

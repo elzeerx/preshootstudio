@@ -1,316 +1,272 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { BetaSignupForm } from "@/components/landing/BetaSignupForm";
-import { FAQSection } from "@/components/landing/FAQSection";
-import { FAQSectionSkeleton } from "@/components/landing/FAQSectionSkeleton";
-import { ServiceCard } from "@/components/landing/ServiceCard";
-import { ServiceCardSkeleton } from "@/components/landing/ServiceCardSkeleton";
-import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, ArrowUpRight, Loader2 } from "lucide-react";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
-const Landing = () => {
-  const [isServicesLoaded, setIsServicesLoaded] = useState(false);
-  const [isFAQLoaded, setIsFAQLoaded] = useState(false);
-  useEffect(() => {
-    // Simulate content loading for services section
-    const servicesTimer = setTimeout(() => {
-      setIsServicesLoaded(true);
-    }, 800);
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-    // Simulate content loading for FAQ section (slightly delayed)
-    const faqTimer = setTimeout(() => {
-      setIsFAQLoaded(true);
-    }, 1200);
-    return () => {
-      clearTimeout(servicesTimer);
-      clearTimeout(faqTimer);
+const Landing = () => {
+  const [scrolled, setScrolled] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
     };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  return <div className="min-h-screen bg-background" dir="rtl">
-      {/* Header with Logo */}
-      <header className="py-6 md:py-8 px-4 bg-gradient-header border-b-4 border-foreground">
-        <div className="max-w-7xl mx-auto flex justify-center">
-          <div className="p-4 border-4 border-button-primary bg-button-primary/10 brutal-shadow">
-            <img src={preshootLogoNew} alt="PreShoot Studio" className="h-12 md:h-16 lg:h-20 w-auto" />
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      toast.error("يرجى إدخال البريد الإلكتروني");
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("البريد الإلكتروني غير صحيح");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from("beta_signups")
+        .insert([{
+          name: email, // Using email as name since name is required
+          email: email.trim().toLowerCase()
+        }]);
+
+      if (error) {
+        if (error.code === "23505") {
+          toast.error("هذا البريد الإلكتروني مسجل مسبقاً");
+        } else {
+          toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
+        }
+        return;
+      }
+
+      setIsSuccess(true);
+      toast.success("تم التسجيل بنجاح! سنتواصل معك قريباً");
+      setEmail("");
+    } catch (err) {
+      toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="text-white font-sans selection:bg-white/20">
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "py-4 bg-black/50 backdrop-blur-md border-b border-white/10" : "py-8"}`}>
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto brightness-0 invert" />
+          </div>
+          <div className="flex items-center gap-6">
+            <Link to="/auth" className="hidden md:block text-sm font-medium hover:text-gray-300 transition-colors">تسجيل الدخول</Link>
+            <Link to="/auth">
+              <Button className="rounded-full bg-white text-black hover:bg-gray-200 px-6 font-bold neon-glow transition-all">
+                ابدأ المشروع
+              </Button>
+            </Link>
           </div>
         </div>
-      </header>
+      </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-gradient-hero">
-        {/* Brutalist geometric shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" dir="ltr">
-          <div className="absolute top-20 left-10 w-32 h-32 border-4 border-button-primary/20 rotate-12" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 border-4 border-button-primary/15" />
-          <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-button-primary/10 border-4 border-button-primary/30 -rotate-45" />
-          <div className="absolute top-40 right-1/4 w-16 h-16 border-4 border-button-primary/20 rotate-45" />
+      <section className="pt-40 pb-20 px-6 min-h-screen flex flex-col justify-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col items-center text-center space-y-8 animate-fadeInUp">
-            <div className="flex items-center gap-3 px-6 py-3 border-4 border-button-primary bg-button-primary/10">
-              <span className="text-sm md:text-base font-black text-button-primary">
-                الأداة الاحترافية لصنّاع المحتوى
-              </span>
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-5xl">
+            <div className="flex items-center gap-3 mb-8 animate-fadeInUp">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm font-mono text-gray-400 tracking-wider">AI-POWERED STUDIO</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-foreground leading-tight max-w-5xl">
-              حوّل أفكارك إلى محتوى احترافي في دقائق
+            <h1 className="text-massive mb-8 leading-none animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
+              PRESHOOT <br />
+              <span className="text-outline">STUDIO</span>
             </h1>
 
-            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl leading-relaxed font-bold">
-              PreShoot Studio هو مساعدك الذكي الذي يجهّز لك كل شيء قبل التصوير وبعده.
-              من البحث إلى السكريبت، من B-Roll إلى المقال. كل ما تحتاجه في مكان واحد.
+            <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mb-12 leading-relaxed animate-fadeInUp" style={{ animationDelay: "0.2s" }}>
+              حول أفكارك إلى محتوى احترافي في ثوانٍ. منصة متكاملة لصناع المحتوى، مدعومة بالذكاء الاصطناعي.
             </p>
 
-            <div className="flex flex-col sm:flex-row-reverse gap-4 w-full sm:w-auto">
-              <Button asChild size="lg" className="text-lg h-16 px-8 border-4 border-button-primary rounded-none font-black brutal-shadow hover:brutal-shadow-hover transition-all">
-                <Link to="/auth">ابدأ الآن مجانًا</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="text-lg h-16 px-8 border-4 rounded-none font-black hover:bg-foreground hover:text-background transition-all">
-                <Link to="#services">شاهد كيف يعمل</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What We Offer */}
-      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-gradient-main">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
-              ماذا نقدم لك؟
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-bold">
-              نظام متكامل يختصر ساعات العمل إلى دقائق معدودة
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <Card variant="glass" className="p-8 md:p-10 border-4 border-white/20">
-              <div className="flex flex-col items-end text-right space-y-6">
-                <div className="w-16 h-16 rounded border-4 border-button-primary/30 flex items-center justify-center">
-                  <Zap className="w-10 h-10 md:w-12 md:h-12 text-button-primary" strokeWidth={3} />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-foreground">
-                  من الفكرة إلى المحتوى في دقائق
-                </h3>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-bold">
-                  لا مزيد من قضاء ساعات في البحث والتخطيط. فقط أدخل موضوعك واحصل على
-                  محتوى احترافي جاهز للنشر في دقائق معدودة.
-                </p>
-              </div>
-            </Card>
-
-            <Card variant="glass" className="p-8 md:p-10 border-4 border-white/20">
-              <div className="flex flex-col items-end text-right space-y-6">
-                <div className="w-16 h-16 rounded border-4 border-button-secondary/30 flex items-center justify-center">
-                  <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-button-secondary" strokeWidth={3} />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-foreground">
-                  محتوى احترافي بذكاء اصطناعي
-                </h3>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-bold">
-                  استخدم قوة الذكاء الاصطناعي المتقدم لإنتاج محتوى عالي الجودة يضاهي
-                  عمل المحترفين، مع الحفاظ على أسلوبك الخاص.
-                </p>
-              </div>
-            </Card>
-
-            <Card variant="glass" className="p-8 md:p-10 border-4 border-white/20">
-              <div className="flex flex-col items-end text-right space-y-6">
-                <div className="w-16 h-16 rounded border-4 border-button-primary/30 flex items-center justify-center">
-                  <Target className="w-10 h-10 md:w-12 md:h-12 text-button-primary" strokeWidth={3} />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-foreground">
-                  كل ما تحتاجه في مكان واحد
-                </h3>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-bold">
-                  من البحث والتبسيط إلى السكريبتات والمقالات، كل أدواتك في منصة واحدة
-                  متكاملة وسهلة الاستخدام.
-                </p>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Services */}
-      <section id="services" className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-gradient-main">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
-              خدماتنا الشاملة
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-bold">
-              أدوات احترافية لكل مرحلة من مراحل إنتاج المحتوى
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {!isServicesLoaded ? <>
-                <ServiceCardSkeleton />
-                <ServiceCardSkeleton />
-                <ServiceCardSkeleton />
-                <ServiceCardSkeleton />
-                <ServiceCardSkeleton />
-                <ServiceCardSkeleton />
-              </> : <>
-                <ServiceCard icon={Search} title="بحث ذكي معمّق" description="احصل على بحث شامل ومعمّق حول أي موضوع مع مصادر موثوقة وتحليل دقيق للمعلومات." delay={1} />
-                <ServiceCard icon={Lightbulb} title="تبسيط الأفكار المعقدة" description="حوّل المواضيع المعقدة إلى محتوى سهل الفهم ومناسب لجمهورك المستهدف." delay={2} />
-                <ServiceCard icon={FileText} title="سكريبتات جاهزة للتصوير" description="احصل على سكريبتات احترافية منظمة ومكتوبة بأسلوب جذاب وجاهزة للتصوير مباشرة." delay={3} />
-                <ServiceCard icon={Video} title="خطط B-Roll احترافية" description="خطط تصوير تفصيلية مع اقتراحات للقطات B-Roll التي تثري محتواك البصري." delay={4} />
-                <ServiceCard icon={Image} title="برومبتات AI للصور" description="احصل على برومبتات جاهزة لإنشاء صور مذهلة باستخدام أدوات الذكاء الاصطناعي." delay={5} />
-                <ServiceCard icon={BookOpen} title="مقالات SEO محسّنة" description="مقالات احترافية محسّنة لمحركات البحث مع كلمات مفتاحية وبنية مثالية." delay={6} />
-              </>}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-16 md:py-24 px-4 md:px-8 lg:px-16 bg-gradient-main">
-        <div className="max-w-4xl mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
-              الأسئلة الشائعة
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground font-bold">
-              إجابات على أكثر الأسئلة تكراراً
-            </p>
-          </div>
-
-          {!isFAQLoaded ? <FAQSectionSkeleton /> : <FAQSection />}
-        </div>
-      </section>
-
-      {/* Early Access / Beta Signup - Glassmorphic + Brutalist */}
-      <section className="relative py-24 px-4 bg-gradient-accent overflow-hidden">
-        {/* Geometric Background Elements (Brutalist) */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 right-20 w-32 h-32 border-4 border-button-primary/30 rotate-12" />
-          <div className="absolute bottom-20 left-10 w-48 h-48 border-4 border-button-primary/20" />
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-button-primary/10 border-4 border-button-primary/40 -rotate-45" />
-        </div>
-        
-        <div className="max-w-5xl mx-auto relative z-10">
-          {/* Glassmorphic Container */}
-          <div className="glass-card p-12 border-4 border-white/20 text-center space-y-8">
-            {/* Title Section */}
-            <div className="space-y-6">
-              <div className="inline-block p-6 border-4 border-button-primary bg-button-primary/20 backdrop-blur-md">
-                <Film className="w-16 h-16 text-button-primary" strokeWidth={3} />
-              </div>
-              
-              <h2 className="text-4xl md:text-5xl font-black leading-tight text-amber-950">
-                انضم إلى الوصول المبكر
-              </h2>
-              
-              <p className="text-xl max-w-2xl mx-auto font-bold text-yellow-950">
-                كن من أوائل المستخدمين واحصل على ميزات حصرية وأسعار خاصة
-              </p>
-              
-              {/* Brutalist Badge */}
-              <div className="inline-block px-6 py-3 bg-button-primary border-4 border-button-primary-hover">
-                <span className="text-white font-black text-sm">
-                  🎁 خصم 50% للمشتركين الأوائل
-                </span>
-              </div>
-            </div>
-            
-            {/* Signup Form */}
-            <BetaSignupForm />
-          </div>
-        </div>
-      </section>
-
-      {/* Footer - Brutalist Redesign */}
-      <footer className="bg-gradient-footer text-background py-16 px-4 border-t-4 border-button-primary" dir="rtl">
-        <div className="max-w-7xl mx-auto">
-          {/* Top Section: Logo Only */}
-          <div className="mb-16 pb-16 border-b-4 border-white/10 flex justify-center">
-            {/* Brand Section - Centered White Logo */}
-            <div className="text-center">
-              <img src={preshootLogoNew} alt="PreShoot Studio" className="h-16 w-auto brightness-0 invert" />
-              <p className="text-lg text-white/70 max-w-md mx-auto font-bold mt-6">
-                استوديو احترافي لتجهيز محتواك من الفكرة إلى النشر
-              </p>
-            </div>
-          </div>
-          
-          {/* Middle Section: Links Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-black text-white border-r-4 border-button-primary pr-4">
-                روابط سريعة
-              </h4>
-              <ul className="space-y-3 text-right">
-                <li><a href="#services" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">خدماتنا</a></li>
-                <li><a href="#" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">الأسعار</a></li>
-                <li><a href="#faq" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">الأسئلة الشائعة</a></li>
-              </ul>
-            </div>
-            
-            {/* Resources */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-black text-white border-r-4 border-button-primary pr-4">
-                موارد
-              </h4>
-              <ul className="space-y-3 text-right">
-                <li><a href="#" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">المدونة</a></li>
-                <li><a href="#" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">دليل الاستخدام</a></li>
-                <li><a href="#" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">الدعم الفني</a></li>
-              </ul>
-            </div>
-            
-            {/* Contact */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-black text-white border-r-4 border-button-primary pr-4">
-                تواصل معنا
-              </h4>
-              <ul className="space-y-3 text-right">
-                <li><a href="mailto:info@preshoot.studio" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">البريد الإلكتروني</a></li>
-                <li><a href="#" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">Twitter / X</a></li>
-                <li><a href="#" className="text-white/70 hover:text-button-primary font-bold transition-colors border-b-2 border-transparent hover:border-button-primary pb-1">LinkedIn</a></li>
-              </ul>
-            </div>
-            
-            {/* Admin */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-black text-white border-r-4 border-button-primary pr-4">
-                للمسؤولين
-              </h4>
-              <Link to="/admin/login" className="inline-flex items-center gap-2 text-white/70 hover:text-button-primary font-bold transition-colors flex-row-reverse border-b-2 border-transparent hover:border-button-primary pb-1">
-                <span>تسجيل دخول الإدارة</span>
-                <Shield className="w-4 h-4" strokeWidth={3} />
+            <div className="flex flex-wrap gap-4 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
+              <Link to="/auth">
+                <Button className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow flex items-center gap-2">
+yes                  سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
+                </Button>
               </Link>
             </div>
           </div>
-          
-          {/* Bottom Section: Social + Copyright */}
-          <div className="flex flex-col lg:flex-row-reverse justify-between items-center gap-6 pt-8 border-t-4 border-white/10">
-            {/* Social Links (Brutalist Icons) */}
-            <div className="flex gap-4">
-              <a href="mailto:info@preshoot.studio" className="w-12 h-12 border-4 border-white/20 hover:border-button-primary flex items-center justify-center transition-colors">
-                <Mail className="w-6 h-6 text-white" strokeWidth={3} />
-              </a>
-              <a href="#" className="w-12 h-12 border-4 border-white/20 hover:border-button-primary flex items-center justify-center transition-colors">
-                <Twitter className="w-6 h-6 text-white" strokeWidth={3} />
-              </a>
-              <a href="#" className="w-12 h-12 border-4 border-white/20 hover:border-button-primary flex items-center justify-center transition-colors">
-                <Linkedin className="w-6 h-6 text-white" strokeWidth={3} />
-              </a>
-            </div>
-            
-            {/* Copyright */}
-            <p className="text-white/50 text-sm font-bold">
-              © 2024 PreShoot Studio. جميع الحقوق محفوظة.
+        </div>
+      </section>
+
+      {/* Marquee Section */}
+      <div className="py-12 border-y border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden">
+        <div className="marquee-container">
+          <div className="marquee-content text-6xl font-black text-white/10 flex gap-12 items-center">
+            <span>RESEARCH</span> <span>•</span> <span>SCRIPTING</span> <span>•</span> <span>PLANNING</span> <span>•</span> <span>B-ROLL</span> <span>•</span> <span>SEO</span> <span>•</span>
+            <span>RESEARCH</span> <span>•</span> <span>SCRIPTING</span> <span>•</span> <span>PLANNING</span> <span>•</span> <span>B-ROLL</span> <span>•</span> <span>SEO</span> <span>•</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bento Grid Features */}
+      <section className="py-32 px-6">
+        <div className="container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <h2 className="text-5xl md:text-7xl font-bold">خدماتنا</h2>
+            <p className="text-xl text-gray-400 max-w-md text-left">
+              مجموعة أدوات متكاملة مصممة لتسريع عملية الإنتاج الإبداعي لديك.
             </p>
+          </div>
+
+          <div className="bento-grid">
+            {/* Card 1: Research (Wide) */}
+            <div className="bento-card bento-card-wide group">
+              <div className="absolute top-4 right-4 p-3 bg-white/5 rounded-full">
+                <Search className="w-6 h-6 text-white" />
+              </div>
+              <div className="mt-12">
+                <h3 className="text-3xl font-bold mb-4 group-hover:text-purple-400 transition-colors">بحث ذكي معمق</h3>
+                <p className="text-gray-400 text-lg">
+                  محرك بحث مدعوم بالذكاء الاصطناعي يجمع لك المعلومات والمصادر الموثوقة في ثوانٍ.
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+
+            {/* Card 2: Scripting (Tall) */}
+            <div className="bento-card bento-card-tall group flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <h3 className="text-3xl font-bold mb-4">كتابة السكريبت</h3>
+                <p className="text-gray-400 text-lg">
+                  حول أفكارك إلى نصوص احترافية جاهزة للتصوير بأساليب متعددة.
+                </p>
+              </div>
+              <div className="mt-8 p-4 bg-black/40 rounded-xl border border-white/5 font-mono text-sm text-gray-500">
+                {`> Generating script...\n> Tone: Professional\n> Duration: 60s\n> Done.`}
+              </div>
+            </div>
+
+            {/* Card 3: B-Roll */}
+            <div className="bento-card group">
+              <Video className="w-8 h-8 mb-6 text-blue-400" />
+              <h3 className="text-2xl font-bold mb-2">خطط B-Roll</h3>
+              <p className="text-gray-400">اقتراحات بصرية دقيقة لكل مشهد.</p>
+            </div>
+
+            {/* Card 4: AI Images */}
+            <div className="bento-card group">
+              <Image className="w-8 h-8 mb-6 text-pink-400" />
+              <h3 className="text-2xl font-bold mb-2">توليد الصور</h3>
+              <p className="text-gray-400">برومبتات جاهزة لـ Midjourney و DALL-E.</p>
+            </div>
+
+            {/* Card 5: SEO (Wide) */}
+            <div className="bento-card bento-card-wide group flex items-center justify-between">
+              <div className="max-w-md">
+                <h3 className="text-3xl font-bold mb-2">تحسين SEO</h3>
+                <p className="text-gray-400 text-lg">
+                  تصدير مقالات ووصف للفيديو متوافق مع محركات البحث لزيادة الوصول.
+                </p>
+              </div>
+              <div className="hidden md:flex w-20 h-20 bg-green-500/20 rounded-full items-center justify-center">
+                <Target className="w-10 h-10 text-green-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-32 px-6 text-center relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-900/10 pointer-events-none" />
+        <div className="container mx-auto relative z-10">
+          <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter">
+            مستعد لإطلاق إبداعك؟
+          </h2>
+          <p className="text-xl text-gray-400 mb-12 max-w-xl mx-auto">
+            انضم إلى آلاف المبدعين الذين يستخدمون PreShoot لتسريع إنتاجهم.
+          </p>
+          
+          {isSuccess ? (
+            <div className="max-w-md mx-auto space-y-6 animate-fadeInUp">
+              <div className="inline-flex items-center justify-center w-20 h-20 border-4 border-white/20 rounded-full bg-white/10 mb-6">
+                <span className="text-4xl text-white">✓</span>
+              </div>
+              <h3 className="text-2xl font-black text-white">تم التسجيل بنجاح!</h3>
+              <p className="text-white/80 font-bold">سنتواصل معك عبر البريد الإلكتروني قريباً.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  type="email"
+                  placeholder="أدخل بريدك الإلكتروني"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  className="flex-1 h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-white/40 rounded-full backdrop-blur-sm"
+                  dir="ltr"
+                />
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow transition-transform hover:scale-105 whitespace-nowrap"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                      جاري التسجيل...
+                    </>
+                  ) : (
+                    "سجّل للدخول المبكر"
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-white/10 bg-black">
+        <div className="container mx-auto flex flex-col items-center justify-center gap-8">
+          <div className="flex items-center gap-2">
+            <img src={preshootLogoNew} alt="PreShoot Studio" className="h-6 w-auto brightness-0 invert opacity-50" />
+            <span className="text-gray-500 text-sm">© 2025 PreShoot Studio</span>
+          </div>
+
+          <div className="flex gap-6">
+            <a href="#" className="text-gray-500 hover:text-white transition-colors"><Twitter className="w-5 h-5" /></a>
+            <a href="#" className="text-gray-500 hover:text-white transition-colors"><Linkedin className="w-5 h-5" /></a>
+            <a href="#" className="text-gray-500 hover:text-white transition-colors"><Mail className="w-5 h-5" /></a>
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Landing;

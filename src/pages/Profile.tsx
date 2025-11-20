@@ -90,7 +90,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">الملف الشخصي</h1>
