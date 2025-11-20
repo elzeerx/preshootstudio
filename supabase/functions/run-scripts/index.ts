@@ -81,37 +81,6 @@ Deno.serve(async (req) => {
 2) سكريبت قصير لريلز (30–60 ثانية تقريبًا) - افتتاحية قوية ونقاط سريعة
 3) سكريبت لفيديو طويل على يوتيوب - مخطط تفصيلي مع أقسام منظمة
 
-الناتج يجب أن يكون بصيغة JSON فقط، وبدون أي نص زائد، وبالبنية التالية حرفيًا:
-{
-  "teleprompter": {
-    "title": "عنوان جذاب للسكريبت",
-    "tone": "friendly أو professional أو humorous أو serious",
-    "estimatedDurationSec": رقم تقديري بالثواني,
-    "lines": ["جملة قصيرة 1", "جملة قصيرة 2", ...]
-  },
-  "reel": {
-    "title": "عنوان مشوق للريلز",
-    "hook": "افتتاحية قوية تجذب الانتباه في 3-5 ثواني",
-    "bodyPoints": ["نقطة رئيسية 1", "نقطة رئيسية 2", "نقطة رئيسية 3"],
-    "outro": "خاتمة قوية مع دعوة لاتخاذ إجراء",
-    "estimatedDurationSec": رقم بين 30-60
-  },
-  "longVideo": {
-    "title": "عنوان شامل للفيديو الطويل",
-    "intro": "مقدمة تشرح الموضوع وأهميته (2-3 جمل)",
-    "sections": [
-      {
-        "title": "عنوان القسم الأول",
-        "summary": "ملخص قصير للقسم",
-        "bullets": ["نقطة فرعية 1", "نقطة فرعية 2", ...]
-      }
-    ],
-    "fullScript": "النص الكامل المفصل للفيديو من البداية للنهاية",
-    "outro": "خاتمة ملخصة مع دعوة لاتخاذ إجراء",
-    "estimatedDurationMin": رقم تقديري بالدقائق
-  }
-}
-
 التزم بالتالي:
 - اجعل الجمل قصيرة وواضحة وسهلة القراءة من Teleprompter
 - ابدأ السكريبتات بـ Hook قوي وحافظ على تسلسل منطقي
@@ -127,6 +96,65 @@ Deno.serve(async (req) => {
             content: userPrompt
           }
         ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "provide_scripts",
+            description: "Provide teleprompter, reel, and long video scripts",
+            parameters: {
+              type: "object",
+              properties: {
+                teleprompter: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    tone: { type: "string", enum: ["friendly", "professional", "humorous", "serious"] },
+                    estimatedDurationSec: { type: "number" },
+                    lines: { type: "array", items: { type: "string" } }
+                  },
+                  required: ["title", "tone", "estimatedDurationSec", "lines"]
+                },
+                reel: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    hook: { type: "string" },
+                    bodyPoints: { type: "array", items: { type: "string" } },
+                    outro: { type: "string" },
+                    estimatedDurationSec: { type: "number" }
+                  },
+                  required: ["title", "hook", "bodyPoints", "outro", "estimatedDurationSec"]
+                },
+                longVideo: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    intro: { type: "string" },
+                    sections: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          title: { type: "string" },
+                          summary: { type: "string" },
+                          bullets: { type: "array", items: { type: "string" } }
+                        },
+                        required: ["title", "summary", "bullets"]
+                      }
+                    },
+                    fullScript: { type: "string" },
+                    outro: { type: "string" },
+                    estimatedDurationMin: { type: "number" }
+                  },
+                  required: ["title", "intro", "sections", "fullScript", "outro", "estimatedDurationMin"]
+                }
+              },
+              required: ["teleprompter", "reel", "longVideo"],
+              additionalProperties: false
+            }
+          }
+        }],
+        tool_choice: { type: "function", function: { name: "provide_scripts" } }
       }),
     });
 
@@ -149,27 +177,22 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await aiResponse.json();
-    const content = aiData.choices?.[0]?.message?.content;
+    
+    console.log('AI response received, extracting structured data...');
 
-    if (!content) {
-      console.error('No content in AI response');
-      throw new Error('No content received from AI');
-    }
-
-    console.log('AI response received, parsing JSON...');
-
-    // Parse JSON response
+    // Extract scripts data from tool call response
     let scriptsData;
     try {
-      // Try to extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
+      const toolCall = aiData.choices[0].message.tool_calls?.[0];
+      if (!toolCall || !toolCall.function || !toolCall.function.arguments) {
+        throw new Error('No tool call found in AI response');
       }
-      scriptsData = JSON.parse(jsonMatch[0]);
-      console.log('JSON parsed successfully');
+      
+      scriptsData = JSON.parse(toolCall.function.arguments);
+      console.log('Scripts data extracted successfully');
     } catch (parseError) {
-      console.error('Failed to parse JSON:', parseError, 'Content:', content);
+      console.error('Failed to extract scripts data:', parseError);
+      console.error('AI response:', JSON.stringify(aiData, null, 2));
       
       await supabase
         .from('projects')
@@ -180,7 +203,7 @@ Deno.serve(async (req) => {
         .eq('id', projectId);
 
       return new Response(
-        JSON.stringify({ error: 'Failed to parse scripts data' }),
+        JSON.stringify({ error: 'Failed to parse AI response' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

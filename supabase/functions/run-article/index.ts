@@ -102,7 +102,48 @@ Deno.serve(async (req) => {
           { role: "system", content: ARTICLE_SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
-        response_format: { type: "json_object" },
+        tools: [{
+          type: "function",
+          function: {
+            name: "provide_article",
+            description: "Provide a complete article in Arabic",
+            parameters: {
+              type: "object",
+              properties: {
+                title: { type: "string", description: "العنوان الرئيسي للمقال" },
+                subtitle: { type: "string", description: "العنوان الفرعي التوضيحي" },
+                intro: { type: "string", description: "مقدمة المقال" },
+                sections: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      heading: { type: "string" },
+                      body: { type: "string" }
+                    },
+                    required: ["heading", "body"]
+                  },
+                  description: "أقسام المقال"
+                },
+                conclusion: { type: "string", description: "خاتمة المقال" },
+                readingTimeMinutes: { type: "number", description: "وقت القراءة بالدقائق" },
+                seoMeta: {
+                  type: "object",
+                  properties: {
+                    seoTitle: { type: "string" },
+                    seoDescription: { type: "string" },
+                    seoKeywords: { type: "array", items: { type: "string" } }
+                  },
+                  required: ["seoTitle", "seoDescription", "seoKeywords"]
+                },
+                format: { type: "string", enum: ["blog", "news", "tutorial", "review"] }
+              },
+              required: ["title", "subtitle", "intro", "sections", "conclusion", "readingTimeMinutes", "seoMeta", "format"],
+              additionalProperties: false
+            }
+          }
+        }],
+        tool_choice: { type: "function", function: { name: "provide_article" } }
       }),
     });
 
@@ -145,16 +186,21 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    const articleText = data.choices[0].message.content;
-
-    console.log("Received response from OpenAI, parsing JSON...");
+    
+    console.log("Received response from AI, extracting structured data...");
 
     let articleData;
     try {
-      articleData = JSON.parse(articleText);
+      const toolCall = data.choices[0].message.tool_calls?.[0];
+      if (!toolCall || !toolCall.function || !toolCall.function.arguments) {
+        throw new Error('No tool call found in AI response');
+      }
+      
+      articleData = JSON.parse(toolCall.function.arguments);
+      console.log('Article data extracted successfully');
     } catch (parseError) {
-      console.error("Failed to parse article JSON:", parseError);
-      console.error("Raw response:", articleText);
+      console.error("Failed to extract article data:", parseError);
+      console.error("AI response:", JSON.stringify(data, null, 2));
       throw new Error("Failed to parse article data from AI response");
     }
 
