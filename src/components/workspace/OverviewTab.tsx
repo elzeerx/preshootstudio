@@ -256,30 +256,60 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
                 <div className="space-y-3">
                   {regenerationTasks.map((task, index) => {
                     const TaskIcon = task.icon;
+                    const isActive = task.status === "in-progress";
+                    const isCompleted = task.status === "completed";
+                    const hasError = task.status === "error";
+                    
                     return (
                       <div
                         key={task.key}
-                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                          task.status === "in-progress" 
-                            ? "bg-primary/5 border-primary/20" 
-                            : task.status === "completed"
-                            ? "bg-green-500/5 border-green-500/20"
-                            : task.status === "error"
+                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-500 ease-out animate-fade-in ${
+                          isActive
+                            ? "bg-primary/5 border-primary/20 shadow-lg shadow-primary/10 scale-[1.02]" 
+                            : isCompleted
+                            ? "bg-green-500/5 border-green-500/20 animate-scale-in"
+                            : hasError
                             ? "bg-destructive/5 border-destructive/20"
-                            : "bg-muted/30 border-border"
+                            : "bg-muted/30 border-border opacity-70"
                         }`}
+                        style={{
+                          animationDelay: `${index * 100}ms`,
+                          animationFillMode: 'both'
+                        }}
                       >
-                        <div className="flex-shrink-0">
+                        <div className={`flex-shrink-0 transition-all duration-300 ${
+                          isActive ? 'scale-110' : isCompleted ? 'scale-110 animate-scale-in' : ''
+                        }`}>
                           {getTaskStatusIcon(task.status)}
                         </div>
                         <div className="flex items-center gap-2 flex-1">
-                          <TaskIcon className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">{task.name}</span>
+                          <TaskIcon className={`w-4 h-4 transition-colors duration-300 ${
+                            isActive ? 'text-primary' : 'text-muted-foreground'
+                          }`} />
+                          <span className={`text-sm font-medium transition-colors duration-300 ${
+                            isActive ? 'text-primary' : ''
+                          }`}>{task.name}</span>
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className={`text-xs transition-all duration-300 ${
+                          isActive 
+                            ? 'text-primary font-semibold' 
+                            : isCompleted 
+                            ? 'text-green-600 font-medium'
+                            : hasError
+                            ? 'text-destructive font-medium'
+                            : 'text-muted-foreground'
+                        }`}>
                           {task.status === "pending" && "في الانتظار"}
-                          {task.status === "in-progress" && "جاري التنفيذ"}
-                          {task.status === "completed" && "مكتمل"}
+                          {task.status === "in-progress" && (
+                            <span className="flex items-center gap-1">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                              </span>
+                              جاري التنفيذ
+                            </span>
+                          )}
+                          {task.status === "completed" && "مكتمل ✓"}
                           {task.status === "error" && "فشل"}
                         </div>
                       </div>
@@ -287,13 +317,13 @@ export const OverviewTab = ({ project, onProjectUpdate }: OverviewTabProps) => {
                   })}
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-sm animate-fade-in">
                   <span className="text-muted-foreground">
                     {regenerationTasks.filter(t => t.status === "completed").length} / {regenerationTasks.length} مكتمل
                   </span>
                   <Progress 
                     value={(regenerationTasks.filter(t => t.status === "completed").length / regenerationTasks.length) * 100} 
-                    className="h-2 flex-1 mx-4 max-w-xs"
+                    className="h-2 flex-1 mx-4 max-w-xs transition-all duration-500"
                   />
                 </div>
               </div>
