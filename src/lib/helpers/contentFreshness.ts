@@ -31,3 +31,10 @@ export const isContentOutdated = (
 export const getOutdatedBadgeText = (): string => {
   return "بحاجة للتحديث";
 };
+
+/**
+ * Gets the short badge text for outdated content (mobile/tablet)
+ */
+export const getOutdatedBadgeTextShort = (): string => {
+  return "تحديث";
+};
