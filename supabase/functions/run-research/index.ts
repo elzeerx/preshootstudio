@@ -72,15 +72,35 @@ const RESEARCH_SYSTEM_PROMPT_V2 = `أنت باحث وصحفي تقني محتر�
 
 تذكر: أنت تساعد صانع محتوى عربي في تجهيز معلومات دقيقة وموثقة بمصادر حقيقية، لا مختلقة.`;
 
-// Tavily Web Search function
-async function searchWithTavily(query: string, maxResults = 8) {
+// Tavily Web Search function with caching
+async function searchWithTavily(query: string, maxResults = 8, supabase: any) {
   const tavilyApiKey = Deno.env.get('TAVILY_API_KEY');
   
   if (!tavilyApiKey) {
     throw new Error('TAVILY_API_KEY not configured');
   }
 
-  console.log('Searching with Tavily:', query);
+  // Create query hash for caching
+  const encoder = new TextEncoder();
+  const queryData = encoder.encode(query);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', queryData);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const queryHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  // Check cache first
+  const { data: cachedResult } = await supabase
+    .from('tavily_cache')
+    .select('*')
+    .eq('query_hash', queryHash)
+    .gt('expires_at', new Date().toISOString())
+    .single();
+
+  if (cachedResult) {
+    console.log('Using cached Tavily results for:', query);
+    return cachedResult.search_results;
+  }
+
+  console.log('Searching with Tavily (no cache):', query);
 
   const response = await fetch('https://api.tavily.com/search', {
     method: 'POST',
@@ -104,10 +124,50 @@ async function searchWithTavily(query: string, maxResults = 8) {
     throw new Error(`Tavily API error: ${response.status}`);
   }
 
-  const data = await response.json();
-  console.log(`Tavily returned ${data.results?.length || 0} results`);
+  const responseData = await response.json();
+  const results = responseData.results || [];
+  console.log(`Tavily returned ${results.length} results`);
   
-  return data.results || [];
+  // Cache results for 24 hours (background task)
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24);
+
+  supabase
+    .from('tavily_cache')
+    .insert({
+      query_hash: queryHash,
+      query_text: query,
+      search_results: results,
+      expires_at: expiresAt.toISOString(),
+    })
+    .then(() => console.log('Cached Tavily results'))
+    .catch((err: Error) => console.error('Failed to cache results:', err));
+  
+  return results;
+}
+
+// Calculate research quality score
+function calculateQualityScore(researchData: any): { score: number; metrics: any } {
+  const sourceCount = researchData.sources?.length || 0;
+  const sourceTypes = new Set(researchData.sources?.map((s: any) => s.type || "other") || []);
+  const hasTrends = (researchData.trends?.length || 0) > 0;
+
+  // Scoring components
+  const sourceCountScore = Math.min(40, sourceCount * 5); // Max 40 points
+  const diversityScore = Math.min(30, sourceTypes.size * 6); // Max 30 points
+  const recencyScore = hasTrends ? 30 : 15; // Max 30 points
+
+  const overallScore = Math.round(sourceCountScore + diversityScore + recencyScore);
+
+  return {
+    score: overallScore,
+    metrics: {
+      sourceCount: sourceCountScore,
+      sourceDiversity: diversityScore,
+      recencyScore: recencyScore,
+      overallScore: overallScore,
+    },
+  };
 }
 
 Deno.serve(async (req) => {
@@ -162,11 +222,11 @@ Deno.serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Step 1: Search with Tavily
+    // Step 1: Search with Tavily (with caching)
     console.log('Searching with Tavily for:', project.topic);
     let tavilyResults;
     try {
-      tavilyResults = await searchWithTavily(project.topic, 8);
+      tavilyResults = await searchWithTavily(project.topic, 8, supabase);
     } catch (tavilyError) {
       console.error('Tavily search failed:', tavilyError);
       
@@ -323,6 +383,41 @@ ${JSON.stringify(tavilyResults, null, 2)}
       );
     }
 
+    // Calculate quality score
+    const qualityInfo = calculateQualityScore(researchData);
+    console.log('Quality score calculated:', qualityInfo.score);
+
+    // Get current version number for history
+    const { data: historyCount } = await supabase
+      .from('research_history')
+      .select('version_number', { count: 'exact' })
+      .eq('project_id', projectId)
+      .order('version_number', { ascending: false })
+      .limit(1);
+
+    const nextVersion = (historyCount && historyCount.length > 0) 
+      ? (historyCount[0].version_number + 1) 
+      : 1;
+
+    // Save to research history
+    console.log('Saving to research history (version', nextVersion, ')...');
+    const { error: historyError } = await supabase
+      .from('research_history')
+      .insert({
+        project_id: projectId,
+        version_number: nextVersion,
+        research_data: researchData,
+        research_summary: researchData.summary,
+        quality_score: qualityInfo.score,
+        quality_metrics: qualityInfo.metrics,
+        created_by: project.user_id,
+      });
+
+    if (historyError) {
+      console.error('Failed to save research history:', historyError);
+      // Continue anyway, this is not critical
+    }
+
     // Save research data to database
     console.log('Saving research data to database...');
     const { error: updateError } = await supabase
@@ -332,6 +427,8 @@ ${JSON.stringify(tavilyResults, null, 2)}
         research_last_run_at: new Date().toISOString(),
         research_summary: researchData.summary,
         research_data: researchData,
+        research_quality_score: qualityInfo.score,
+        research_quality_metrics: qualityInfo.metrics,
       })
       .eq('id', projectId);
 
@@ -348,7 +445,9 @@ ${JSON.stringify(tavilyResults, null, 2)}
     return new Response(
       JSON.stringify({ 
         success: true,
-        data: researchData 
+        data: researchData,
+        qualityScore: qualityInfo.score,
+        version: nextVersion,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

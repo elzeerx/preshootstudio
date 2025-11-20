@@ -79,6 +79,9 @@ export type Database = {
           prompts_status: string | null
           research_data: Json | null
           research_last_run_at: string | null
+          research_manual_edits: Json | null
+          research_quality_metrics: Json | null
+          research_quality_score: number | null
           research_status: string | null
           research_summary: string | null
           scripts_data: Json | null
@@ -108,6 +111,9 @@ export type Database = {
           prompts_status?: string | null
           research_data?: Json | null
           research_last_run_at?: string | null
+          research_manual_edits?: Json | null
+          research_quality_metrics?: Json | null
+          research_quality_score?: number | null
           research_status?: string | null
           research_summary?: string | null
           scripts_data?: Json | null
@@ -137,6 +143,9 @@ export type Database = {
           prompts_status?: string | null
           research_data?: Json | null
           research_last_run_at?: string | null
+          research_manual_edits?: Json | null
+          research_quality_metrics?: Json | null
+          research_quality_score?: number | null
           research_status?: string | null
           research_summary?: string | null
           scripts_data?: Json | null
@@ -149,6 +158,77 @@ export type Database = {
           topic?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      research_history: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          project_id: string
+          quality_metrics: Json | null
+          quality_score: number | null
+          research_data: Json
+          research_summary: string | null
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id: string
+          quality_metrics?: Json | null
+          quality_score?: number | null
+          research_data: Json
+          research_summary?: string | null
+          version_number: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          project_id?: string
+          quality_metrics?: Json | null
+          quality_score?: number | null
+          research_data?: Json
+          research_summary?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_history_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tavily_cache: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          query_hash: string
+          query_text: string
+          search_results: Json
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          query_hash: string
+          query_text: string
+          search_results: Json
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          query_hash?: string
+          query_text?: string
+          search_results?: Json
         }
         Relationships: []
       }
@@ -178,6 +258,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_cache: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
