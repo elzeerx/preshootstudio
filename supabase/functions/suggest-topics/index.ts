@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { userId } = await req.json();
+    const { userId, category } = await req.json();
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -43,19 +43,38 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Category-specific prompts
+    const categoryPrompts: Record<string, string> = {
+      educational: 'مواضيع تعليمية وتقنية (مثل: برمجة، علوم، تكنولوجيا، دروس تعليمية، نصائح تقنية)',
+      entertainment: 'مواضيع ترفيهية وثقافية (مثل: مراجعات أفلام، ألعاب، سفر، طعام، تجارب ممتعة)',
+      business: 'مواضيع أعمال وريادة (مثل: استثمار، تسويق، مشاريع، نصائح مالية، إدارة الأعمال)',
+      lifestyle: 'مواضيع أسلوب حياة (مثل: صحة، لياقة، تطوير ذات، عادات يومية، إنتاجية)'
+    };
+
     // Build user prompt
-    let userPrompt = 'أريد 4 اقتراحات مواضيع متنوعة ومثيرة للاهتمام لفيديوهات يمكن لصانع محتوى عربي إنشاؤها.\n\n';
+    let userPrompt = '';
+    
+    if (category && category !== 'all') {
+      userPrompt = `أريد 4 اقتراحات مواضيع في فئة: ${categoryPrompts[category] || 'متنوعة'}.\n\n`;
+    } else {
+      userPrompt = 'أريد 4 اقتراحات مواضيع متنوعة ومثيرة للاهتمام لفيديوهات يمكن لصانع محتوى عربي إنشاؤها.\n\n';
+    }
     
     if (recentTopics.length > 0) {
       userPrompt += `المواضيع السابقة للمستخدم:\n${recentTopics.join('\n')}\n\n`;
       userPrompt += 'يرجى اقتراح مواضيع جديدة ومتنوعة، مختلفة عن المواضيع السابقة.\n\n';
     }
     
-    userPrompt += 'يرجى تقديم 4 اقتراحات مواضيع متنوعة تشمل:\n';
-    userPrompt += '- مواضيع تعليمية وتقنية\n';
-    userPrompt += '- مواضيع أسلوب حياة وإنتاجية\n';
-    userPrompt += '- مواضيع ترفيهية وثقافية\n';
-    userPrompt += '- مواضيع تحفيزية ومُلهمة\n\n';
+    if (category && category !== 'all') {
+      userPrompt += `يرجى التركيز على ${categoryPrompts[category]}.\n\n`;
+    } else {
+      userPrompt += 'يرجى تقديم 4 اقتراحات مواضيع متنوعة تشمل:\n';
+      userPrompt += '- مواضيع تعليمية وتقنية\n';
+      userPrompt += '- مواضيع أسلوب حياة وإنتاجية\n';
+      userPrompt += '- مواضيع ترفيهية وثقافية\n';
+      userPrompt += '- مواضيع أعمال وريادة\n\n';
+    }
+    
     userPrompt += 'كل موضوع يجب أن يكون:\n';
     userPrompt += '- واضحاً ومحدداً\n';
     userPrompt += '- مناسباً لصانع محتوى عربي\n';
