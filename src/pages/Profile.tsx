@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
+import { TokenLimitSettings } from '@/components/profile/TokenLimitSettings';
 import { formatDate } from '@/lib/helpers/formatters';
 
 export default function Profile() {
@@ -184,6 +185,9 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Token Limits Section */}
+        <TokenLimitSettings />
         </div>
       </main>
       <AppFooter />

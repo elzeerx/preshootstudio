@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { trackTokenUsage } from "../_shared/tokenTracker.ts";
+import { checkTokenLimit } from "../_shared/tokenLimitChecker.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -194,12 +195,55 @@ Deno.serve(async (req) => {
 
     console.log('Fetching project:', projectId);
 
-    // Fetch project from database
+    // Fetch project from database first to get user_id
     const { data: project, error: fetchError } = await supabase
       .from('projects')
       .select('*')
       .eq('id', projectId)
       .single();
+
+    if (fetchError || !project) {
+      console.error('Project not found:', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Project not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Project found:', project.topic);
+
+    // Check token limits before proceeding
+    const limitCheck = await checkTokenLimit(
+      supabaseUrl,
+      supabaseKey,
+      project.user_id,
+      50000 // Estimated tokens for research
+    );
+
+    if (!limitCheck.canProceed) {
+      console.log('Token limit exceeded for user:', project.user_id);
+      
+      // Update status to error
+      await supabase
+        .from('projects')
+        .update({ research_status: 'error' })
+        .eq('id', projectId);
+
+      return new Response(
+        JSON.stringify({ 
+          error: 'تم تجاوز حد الاستخدام الشهري. يرجى الانتظار حتى بداية الشهر القادم.',
+          limit_info: {
+            current_usage: limitCheck.currentUsage,
+            limit: limitCheck.limit,
+            usage_percentage: limitCheck.usagePercentage
+          }
+        }),
+        { 
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     if (fetchError || !project) {
       console.error('Project not found:', fetchError);

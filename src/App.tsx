@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 import { LiveTokenIndicator } from "@/components/common/LiveTokenIndicator";
+import { TokenLimitAlert } from "@/components/common/TokenLimitAlert";
 import AuraLayout from "@/components/common/AuraLayout";
 import CreateProject from "./pages/CreateProject";
 import Landing from "./pages/Landing";
@@ -29,6 +30,7 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <LiveTokenIndicator />
+            <TokenLimitAlert />
             <Routes>
               <Route path="/" element={<Landing />} />
               {/* Admin Routes */}
