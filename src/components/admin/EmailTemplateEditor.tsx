@@ -10,6 +10,7 @@ import { Eye, Save, Plus, Languages } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Json } from "@/integrations/supabase/types";
+import DOMPurify from "dompurify";
 
 interface EmailTemplate {
   id: string;
@@ -155,9 +156,15 @@ export const EmailTemplateEditor = () => {
     if (!currentTemplate) return "";
     
     const sampleName = currentTemplate.language === 'ar' ? "أحمد محمد" : "John Doe";
-    return currentTemplate.html_content
+    const htmlContent = currentTemplate.html_content
       .replace(/\{\{name\}\}/g, sampleName)
       .replace(/\{\{inviteLink\}\}/g, "https://example.com/accept-invite?token=sample-token");
+    
+    // Sanitize HTML to prevent XSS attacks
+    return DOMPurify.sanitize(htmlContent, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'div', 'span', 'table', 'tr', 'td', 'th', 'tbody', 'thead'],
+      ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'style', 'target', 'rel']
+    });
   };
 
   if (isLoading) {
