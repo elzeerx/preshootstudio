@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, AlertCircle, Calendar, FileText, Search, Lightbulb, Video, Image, BookOpen, Package, Film } from "lucide-react";
+import { ArrowLeft, AlertCircle, Calendar, FileText, Search, Lightbulb, Video, Image, BookOpen, Package, Film, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { OverviewTab } from "@/components/workspace/OverviewTab";
@@ -189,6 +189,21 @@ const ProjectDetail = () => {
                     <Calendar className="w-4 h-4" />
                   </div>
                 </div>
+              </div>
+              
+              {/* Refresh Button */}
+              <div className="flex items-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetch?.()}
+                  disabled={isRefetching}
+                  className="gap-2"
+                  title="تحديث البيانات"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">تحديث</span>
+                </Button>
               </div>
             </div>
           </CardHeader>
