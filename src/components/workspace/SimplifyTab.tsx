@@ -20,10 +20,10 @@ interface Project {
 
 interface SimplifyTabProps {
   project: Project;
+  onProjectUpdate?: () => void;
 }
 
-export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
-  const [project, setProject] = useState<Project>(initialProject);
+export const SimplifyTab = ({ project, onProjectUpdate }: SimplifyTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const copyAllSimplified = async () => {
@@ -73,10 +73,6 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
     }
   };
 
-  useEffect(() => {
-    setProject(initialProject);
-  }, [initialProject]);
-
   const simplifyStatus = project.simplify_status || 'idle';
   const simplifyData = project.simplify_data as SimplifyData | null;
   const hasResearch = hasValidResearch(project.research_data);
@@ -107,20 +103,12 @@ export const SimplifyTab = ({ project: initialProject }: SimplifyTabProps) => {
 
       if (functionError) throw functionError;
 
-      const { data: updatedProject } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', project.id)
-        .single();
-
-      if (updatedProject) {
-        setProject(updatedProject);
-      }
-
       toast({
         title: "تم التبسيط بنجاح",
         description: "تم تبسيط الموضوع بنجاح",
       });
+      
+      onProjectUpdate?.();
     } catch (error) {
       console.error('Error running simplify:', error);
       

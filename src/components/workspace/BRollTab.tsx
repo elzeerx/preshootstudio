@@ -22,7 +22,7 @@ interface Project {
 
 interface BRollTabProps {
   project: Project;
-  onRefresh?: () => void;
+  onProjectUpdate?: () => void;
 }
 
 const SHOT_TYPE_LABELS: Record<string, string> = {
@@ -46,7 +46,7 @@ const CAMERA_MOVEMENT_LABELS: Record<string, string> = {
   'orbit': 'دوران حول العنصر'
 };
 
-export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
+export const BRollTab = ({ project, onProjectUpdate }: BRollTabProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -123,7 +123,7 @@ export const BRollTab = ({ project, onRefresh }: BRollTabProps) => {
         description: "يمكنك الآن الاطلاع على اللقطات المقترحة"
       });
 
-      onRefresh?.();
+      onProjectUpdate?.();
     } catch (error) {
       console.error('Error generating B-Roll:', error);
       toast({

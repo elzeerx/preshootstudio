@@ -22,11 +22,10 @@ interface Project {
 
 interface PromptsTabProps {
   project: Project;
-  onRefresh?: () => void;
+  onProjectUpdate?: () => void;
 }
 
-export const PromptsTab = ({ project: initialProject, onRefresh }: PromptsTabProps) => {
-  const [project, setProject] = useState(initialProject);
+export const PromptsTab = ({ project, onProjectUpdate }: PromptsTabProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const copyAllPrompts = async () => {
@@ -97,21 +96,8 @@ export const PromptsTab = ({ project: initialProject, onRefresh }: PromptsTabPro
 
       if (error) throw error;
 
-      // Refresh project data
-      const { data: updatedProject, error: fetchError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', project.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-      
-      setProject({
-        ...updatedProject,
-        prompts_data: updatedProject.prompts_data as any
-      } as Project);
       toast.success('تم تجهيز حزمة البرومبتات بنجاح!');
-      onRefresh?.();
+      onProjectUpdate?.();
     } catch (error) {
       console.error('Error generating prompts:', error);
       toast.error('حدث خطأ أثناء تجهيز البرومبتات');
