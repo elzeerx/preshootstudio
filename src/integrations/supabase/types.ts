@@ -93,24 +93,33 @@ export type Database = {
       }
       profiles: {
         Row: {
+          alert_threshold_percentage: number | null
           created_at: string
           email: string
           full_name: string | null
           id: string
+          limit_notifications_enabled: boolean | null
+          monthly_token_limit: number | null
           updated_at: string
         }
         Insert: {
+          alert_threshold_percentage?: number | null
           created_at?: string
           email: string
           full_name?: string | null
           id: string
+          limit_notifications_enabled?: boolean | null
+          monthly_token_limit?: number | null
           updated_at?: string
         }
         Update: {
+          alert_threshold_percentage?: number | null
           created_at?: string
           email?: string
           full_name?: string | null
           id?: string
+          limit_notifications_enabled?: boolean | null
+          monthly_token_limit?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -285,6 +294,36 @@ export type Database = {
         }
         Relationships: []
       }
+      token_limit_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          token_limit: number
+          token_usage: number
+          usage_percentage: number
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          token_limit: number
+          token_usage: number
+          usage_percentage: number
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          token_limit?: number
+          token_usage?: number
+          usage_percentage?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -328,6 +367,17 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_cache: { Args: never; Returns: undefined }
+      get_user_monthly_token_usage: {
+        Args: { user_id_param: string }
+        Returns: {
+          alert_threshold: number
+          limit_amount: number
+          notifications_enabled: boolean
+          request_count: number
+          total_cost: number
+          total_tokens: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
