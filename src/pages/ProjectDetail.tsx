@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,9 +66,26 @@ const TabTriggerWithBadge = ({ value, icon: Icon, label, isOutdated = false }: T
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { project, isLoading, isRefetching, notFound, refetch } = useProjectDetail(id);
+  const { toast } = useToast();
   const tabsListRef = useRef<HTMLDivElement>(null);
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(false);
+
+  const handleRefresh = async () => {
+    try {
+      await refetch?.();
+      toast({
+        title: "تم التحديث بنجاح",
+        description: "تم تحديث بيانات المشروع بنجاح",
+      });
+    } catch (error) {
+      toast({
+        title: "فشل التحديث",
+        description: "حدث خطأ أثناء تحديث البيانات",
+        variant: "destructive",
+      });
+    }
+  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -196,7 +214,7 @@ const ProjectDetail = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => refetch?.()}
+                  onClick={handleRefresh}
                   disabled={isRefetching}
                   className="gap-2"
                   title="تحديث البيانات"
