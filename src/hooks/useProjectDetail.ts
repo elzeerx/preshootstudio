@@ -48,12 +48,17 @@ export interface ProjectDetail {
 export const useProjectDetail = (projectId: string | undefined) => {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [notFound, setNotFound] = useState(false);
 
-  const loadProject = async (id: string) => {
+  const loadProject = async (id: string, isRefetch = false) => {
     try {
-      setIsLoading(true);
+      if (isRefetch) {
+        setIsRefetching(true);
+      } else {
+        setIsLoading(true);
+      }
       setError(null);
       setNotFound(false);
 
@@ -61,7 +66,11 @@ export const useProjectDetail = (projectId: string | undefined) => {
       
       if (!user) {
         setNotFound(true);
-        setIsLoading(false);
+        if (isRefetch) {
+          setIsRefetching(false);
+        } else {
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -97,7 +106,11 @@ export const useProjectDetail = (projectId: string | undefined) => {
       setError(err instanceof Error ? err : new Error("حدث خطأ غير متوقع"));
       setNotFound(true);
     } finally {
-      setIsLoading(false);
+      if (isRefetch) {
+        setIsRefetching(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -113,9 +126,10 @@ export const useProjectDetail = (projectId: string | undefined) => {
   return {
     project,
     isLoading,
+    isRefetching,
     error,
     notFound,
-    refetch: projectId ? () => loadProject(projectId) : undefined,
+    refetch: projectId ? () => loadProject(projectId, true) : undefined,
   };
 };
 

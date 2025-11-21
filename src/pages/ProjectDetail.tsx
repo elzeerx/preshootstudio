@@ -64,7 +64,7 @@ const TabTriggerWithBadge = ({ value, icon: Icon, label, isOutdated = false }: T
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { project, isLoading, notFound, refetch } = useProjectDetail(id);
+  const { project, isLoading, isRefetching, notFound, refetch } = useProjectDetail(id);
   const tabsListRef = useRef<HTMLDivElement>(null);
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(false);
@@ -250,7 +250,17 @@ const ProjectDetail = () => {
             </div>
           </div>
 
-          <div>
+          <div className="relative">
+            {/* Refetching overlay */}
+            {isRefetching && (
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg animate-fade-in">
+                <div className="flex flex-col items-center gap-3 p-6 rounded-lg bg-card/50 border border-border shadow-lg">
+                  <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                  <p className="text-sm text-muted-foreground font-medium">جاري تحديث البيانات...</p>
+                </div>
+              </div>
+            )}
+            
             <TabsContent value="overview" className="mt-0">
               <OverviewTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
