@@ -14,10 +14,10 @@ import { EditableResearchField } from "@/components/workspace/research/EditableR
 
 interface ResearchTabProps {
   project: ProjectDetail;
+  onProjectUpdate?: () => void;
 }
 
-export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
-  const [project, setProject] = useState(initialProject);
+export const ResearchTab = ({ project, onProjectUpdate }: ResearchTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
@@ -101,8 +101,6 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
     setIsLoading(true);
     
     try {
-      setProject(prev => ({ ...prev, research_status: 'loading' }));
-
       const { data, error } = await supabase.functions.invoke('run-research', {
         body: { projectId: project.id }
       });
@@ -110,70 +108,27 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
       if (error) {
         console.error('Error running research:', error);
         toast.error('حدث خطأ أثناء تجهيز البحث');
-        setProject(prev => ({ ...prev, research_status: 'error' }));
         return;
       }
 
       if (data.error) {
         toast.error(data.error);
-        setProject(prev => ({ ...prev, research_status: 'error' }));
         return;
       }
 
-      const { data: updatedProject, error: fetchError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', project.id)
-        .single();
-
-      if (!fetchError && updatedProject) {
-        setProject({
-          ...updatedProject,
-          research_data: updatedProject.research_data as unknown as ResearchData | undefined,
-          research_quality_metrics: updatedProject.research_quality_metrics as unknown as QualityMetrics | null | undefined,
-          research_manual_edits: updatedProject.research_manual_edits as unknown as Record<string, boolean> | null | undefined,
-          scripts_data: updatedProject.scripts_data as any,
-          broll_data: updatedProject.broll_data as any,
-          prompts_data: updatedProject.prompts_data as any,
-          article_data: updatedProject.article_data as any,
-          simplify_data: updatedProject.simplify_data as any,
-        });
-        toast.success('تم تجهيز البحث بنجاح!');
-      }
+      toast.success('تم تجهيز البحث بنجاح!');
+      onProjectUpdate?.();
     } catch (err) {
       console.error('Unexpected error:', err);
       toast.error('حدث خطأ غير متوقع');
-      setProject(prev => ({ ...prev, research_status: 'error' }));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const refetchProject = async () => {
-    const { data: updatedProject } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', project.id)
-      .single();
-
-    if (updatedProject) {
-      setProject({
-        ...updatedProject,
-        research_data: updatedProject.research_data as unknown as ResearchData | undefined,
-        research_quality_metrics: updatedProject.research_quality_metrics as unknown as QualityMetrics | null | undefined,
-        research_manual_edits: updatedProject.research_manual_edits as unknown as Record<string, boolean> | null | undefined,
-        scripts_data: updatedProject.scripts_data as any,
-        broll_data: updatedProject.broll_data as any,
-        prompts_data: updatedProject.prompts_data as any,
-        article_data: updatedProject.article_data as any,
-        simplify_data: updatedProject.simplify_data as any,
-      });
-    }
-  };
-
   const handleFieldSave = (field: string, value: string) => {
-    // Update local state after successful save
-    refetchProject();
+    // Notify parent to refetch after field save
+    onProjectUpdate?.();
   };
 
   const researchStatus = project.research_status || 'idle';
@@ -263,7 +218,7 @@ export const ResearchTab = ({ project: initialProject }: ResearchTabProps) => {
         <div className="flex gap-2 flex-wrap">
           <ResearchHistoryDialog 
             projectId={project.id}
-            onRestore={refetchProject}
+            onRestore={onProjectUpdate}
           />
           <Button
             variant="outline"

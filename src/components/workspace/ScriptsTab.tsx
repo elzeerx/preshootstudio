@@ -19,10 +19,10 @@ interface Project {
 
 interface ScriptsTabProps {
   project: Project;
-  onRefresh: () => void;
+  onProjectUpdate?: () => void;
 }
 
-export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
+export const ScriptsTab = ({ project, onProjectUpdate }: ScriptsTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const { toast } = useToast();
@@ -100,7 +100,7 @@ export const ScriptsTab = ({ project, onRefresh }: ScriptsTabProps) => {
         description: "السكريبتات جاهزة للاستخدام الآن",
       });
 
-      onRefresh();
+      onProjectUpdate?.();
     } catch (error) {
       console.error('Error running scripts:', error);
       toast({

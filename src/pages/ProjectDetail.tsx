@@ -256,23 +256,23 @@ const ProjectDetail = () => {
             </TabsContent>
 
             <TabsContent value="research" className="mt-0">
-              <ResearchTab project={project} />
+              <ResearchTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
 
             <TabsContent value="simplify" className="mt-0">
-              <SimplifyTab project={project} />
+              <SimplifyTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
 
             <TabsContent value="scripts" className="mt-0">
-              <ScriptsTab project={project} onRefresh={() => refetch?.()} />
+              <ScriptsTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
 
             <TabsContent value="broll" className="mt-0">
-              <BRollTab project={project} onRefresh={() => refetch?.()} />
+              <BRollTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
 
             <TabsContent value="prompts" className="mt-0">
-              <PromptsTab project={project} onRefresh={() => refetch?.()} />
+              <PromptsTab project={project} onProjectUpdate={refetch} />
             </TabsContent>
 
             <TabsContent value="article" className="mt-0">
