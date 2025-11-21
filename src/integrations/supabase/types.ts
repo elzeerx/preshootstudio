@@ -113,6 +113,7 @@ export type Database = {
           invited_at: string | null
           name: string
           notes: string | null
+          preferred_language: string | null
           status: string | null
           tags: string[] | null
           user_id: string | null
@@ -127,6 +128,7 @@ export type Database = {
           invited_at?: string | null
           name: string
           notes?: string | null
+          preferred_language?: string | null
           status?: string | null
           tags?: string[] | null
           user_id?: string | null
@@ -141,6 +143,7 @@ export type Database = {
           invited_at?: string | null
           name?: string
           notes?: string | null
+          preferred_language?: string | null
           status?: string | null
           tags?: string[] | null
           user_id?: string | null
@@ -152,6 +155,7 @@ export type Database = {
           created_at: string | null
           html_content: string
           id: string
+          language: string
           subject: string
           template_name: string
           updated_at: string | null
@@ -161,6 +165,7 @@ export type Database = {
           created_at?: string | null
           html_content: string
           id?: string
+          language?: string
           subject: string
           template_name: string
           updated_at?: string | null
@@ -170,6 +175,7 @@ export type Database = {
           created_at?: string | null
           html_content?: string
           id?: string
+          language?: string
           subject?: string
           template_name?: string
           updated_at?: string | null

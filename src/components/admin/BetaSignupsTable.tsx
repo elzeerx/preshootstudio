@@ -14,6 +14,7 @@ interface BetaSignup {
   email: string;
   status: string;
   created_at: string;
+  preferred_language?: string;
 }
 
 interface BetaSignupsTableProps {
@@ -43,6 +44,7 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
           signupId: signup.id,
           name: signup.name,
           email: signup.email,
+          language: signup.preferred_language || 'en',
         },
       });
 

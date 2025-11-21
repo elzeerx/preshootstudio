@@ -13,6 +13,7 @@ interface InvitationRequest {
   signupId: string;
   name: string;
   email: string;
+  language?: string;
 }
 
 // Generate a secure random token
@@ -34,14 +35,15 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { signupId, name, email }: InvitationRequest = await req.json();
-    console.log("Processing invitation for:", { signupId, email });
+    const { signupId, name, email, language = 'en' }: InvitationRequest = await req.json();
+    console.log("Processing invitation for:", { signupId, email, language });
 
-    // Fetch email template from database
+    // Fetch email template from database based on language
     const { data: templateData, error: templateError } = await supabase
       .from('email_templates')
       .select('subject, html_content')
       .eq('template_name', 'beta_invitation')
+      .eq('language', language)
       .single();
 
     if (templateError) {

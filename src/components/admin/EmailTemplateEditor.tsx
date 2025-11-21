@@ -6,63 +6,79 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, Save } from "lucide-react";
+import { Eye, Save, Plus, Languages } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Json } from "@/integrations/supabase/types";
 
 interface EmailTemplate {
   id: string;
   template_name: string;
+  language: string;
   subject: string;
   html_content: string;
   variables: string[];
 }
 
+const SUPPORTED_LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'ar', name: 'العربية' },
+];
+
 export const EmailTemplateEditor = () => {
-  const [template, setTemplate] = useState<EmailTemplate | null>(null);
+  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+  const [currentTemplate, setCurrentTemplate] = useState<EmailTemplate | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    loadTemplate();
+    loadTemplates();
   }, []);
 
-  const loadTemplate = async () => {
+  useEffect(() => {
+    const template = templates.find(t => t.language === selectedLanguage);
+    setCurrentTemplate(template || null);
+  }, [selectedLanguage, templates]);
+
+  const loadTemplates = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from("email_templates")
         .select("*")
-        .eq("template_name", "beta_invitation")
-        .single();
+        .eq("template_name", "beta_invitation");
 
       if (error) throw error;
       
-      // Parse variables safely
-      let parsedVariables: string[] = [];
-      if (data.variables) {
-        if (Array.isArray(data.variables)) {
-          parsedVariables = data.variables.filter((v): v is string => typeof v === 'string');
-        } else if (typeof data.variables === 'string') {
-          try {
-            const parsed = JSON.parse(data.variables);
-            parsedVariables = Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
-          } catch {
-            parsedVariables = [];
+      const parsedTemplates = data.map(template => {
+        let parsedVariables: string[] = [];
+        if (template.variables) {
+          if (Array.isArray(template.variables)) {
+            parsedVariables = template.variables.filter((v): v is string => typeof v === 'string');
+          } else if (typeof template.variables === 'string') {
+            try {
+              const parsed = JSON.parse(template.variables);
+              parsedVariables = Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
+            } catch {
+              parsedVariables = [];
+            }
           }
         }
-      }
-      
-      setTemplate({
-        ...data,
-        variables: parsedVariables,
+        
+        return {
+          ...template,
+          variables: parsedVariables,
+        };
       });
+      
+      setTemplates(parsedTemplates);
     } catch (error: any) {
       toast({
         title: "خطأ",
-        description: "فشل تحميل القالب: " + error.message,
+        description: "فشل تحميل القوالب: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -71,17 +87,17 @@ export const EmailTemplateEditor = () => {
   };
 
   const handleSave = async () => {
-    if (!template) return;
+    if (!currentTemplate) return;
 
     setIsSaving(true);
     try {
       const { error } = await supabase
         .from("email_templates")
         .update({
-          subject: template.subject,
-          html_content: template.html_content,
+          subject: currentTemplate.subject,
+          html_content: currentTemplate.html_content,
         })
-        .eq("id", template.id);
+        .eq("id", currentTemplate.id);
 
       if (error) throw error;
 
@@ -89,6 +105,8 @@ export const EmailTemplateEditor = () => {
         title: "تم الحفظ",
         description: "تم حفظ القالب بنجاح",
       });
+      
+      await loadTemplates();
     } catch (error: any) {
       toast({
         title: "خطأ",
@@ -100,12 +118,45 @@ export const EmailTemplateEditor = () => {
     }
   };
 
+  const handleCreateTemplate = async (language: string) => {
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("email_templates")
+        .insert({
+          template_name: "beta_invitation",
+          language,
+          subject: "",
+          html_content: "",
+          variables: ["name", "inviteLink"],
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "تم الإنشاء",
+        description: "تم إنشاء القالب الجديد بنجاح",
+      });
+      
+      await loadTemplates();
+      setSelectedLanguage(language);
+    } catch (error: any) {
+      toast({
+        title: "خطأ",
+        description: "فشل إنشاء القالب: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getPreviewHtml = () => {
-    if (!template) return "";
+    if (!currentTemplate) return "";
     
-    // Replace variables with sample data for preview
-    return template.html_content
-      .replace(/\{\{name\}\}/g, "أحمد محمد")
+    const sampleName = currentTemplate.language === 'ar' ? "أحمد محمد" : "John Doe";
+    return currentTemplate.html_content
+      .replace(/\{\{name\}\}/g, sampleName)
       .replace(/\{\{inviteLink\}\}/g, "https://example.com/accept-invite?token=sample-token");
   };
 
@@ -119,58 +170,109 @@ export const EmailTemplateEditor = () => {
     );
   }
 
-  if (!template) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">لم يتم العثور على القالب</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const availableLanguages = SUPPORTED_LANGUAGES.filter(
+    lang => !templates.find(t => t.language === lang.code)
+  );
 
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>تخصيص قالب البريد الإلكتروني</CardTitle>
-          <CardDescription>
-            قم بتعديل قالب دعوة البيتا. المتغيرات المتاحة: {template.variables.map(v => `{{${v}}}`).join(", ")}
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Languages className="h-5 w-5" />
+                تخصيص قالب البريد الإلكتروني
+              </CardTitle>
+              <CardDescription>
+                قم بتعديل قوالب دعوة البيتا بلغات مختلفة
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="subject">عنوان البريد</Label>
-            <Input
-              id="subject"
-              value={template.subject}
-              onChange={(e) => setTemplate({ ...template, subject: e.target.value })}
-              placeholder="عنوان البريد الإلكتروني"
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="language">اللغة</Label>
+              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                <SelectTrigger id="language">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {availableLanguages.length > 0 && (
+              <div className="pt-6">
+                <Select onValueChange={handleCreateTemplate}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="إضافة لغة جديدة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableLanguages.map((lang) => (
+                      <SelectItem key={lang.code} value={lang.code}>
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="html-content">محتوى HTML</Label>
-            <Textarea
-              id="html-content"
-              value={template.html_content}
-              onChange={(e) => setTemplate({ ...template, html_content: e.target.value })}
-              placeholder="محتوى البريد الإلكتروني بصيغة HTML"
-              className="min-h-[400px] font-mono text-sm"
-              dir="ltr"
-            />
-          </div>
+          {currentTemplate ? (
+            <>
+              <div className="space-y-2">
+                <Label>المتغيرات المتاحة</Label>
+                <p className="text-sm text-muted-foreground">
+                  {currentTemplate.variables.map(v => `{{${v}}}`).join(", ")}
+                </p>
+              </div>
 
-          <div className="flex gap-2">
-            <Button onClick={handleSave} disabled={isSaving}>
-              <Save className="ml-2 h-4 w-4" />
-              {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
-            </Button>
-            <Button variant="outline" onClick={() => setShowPreview(true)}>
-              <Eye className="ml-2 h-4 w-4" />
-              معاينة
-            </Button>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="subject">عنوان البريد</Label>
+                <Input
+                  id="subject"
+                  value={currentTemplate.subject}
+                  onChange={(e) => setCurrentTemplate({ ...currentTemplate, subject: e.target.value })}
+                  placeholder="عنوان البريد الإلكتروني"
+                  dir={currentTemplate.language === 'ar' ? 'rtl' : 'ltr'}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="html-content">محتوى HTML</Label>
+                <Textarea
+                  id="html-content"
+                  value={currentTemplate.html_content}
+                  onChange={(e) => setCurrentTemplate({ ...currentTemplate, html_content: e.target.value })}
+                  placeholder="محتوى البريد الإلكتروني بصيغة HTML"
+                  className="min-h-[400px] font-mono text-sm"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button onClick={handleSave} disabled={isSaving}>
+                  <Save className="ml-2 h-4 w-4" />
+                  {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+                </Button>
+                <Button variant="outline" onClick={() => setShowPreview(true)}>
+                  <Eye className="ml-2 h-4 w-4" />
+                  معاينة
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              لا يوجد قالب لهذه اللغة. استخدم القائمة أعلاه لإنشاء قالب جديد.
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -179,16 +281,20 @@ export const EmailTemplateEditor = () => {
           <DialogHeader>
             <DialogTitle>معاينة البريد الإلكتروني</DialogTitle>
           </DialogHeader>
-          <div className="border rounded-lg p-4 bg-background">
-            <div className="mb-4 pb-4 border-b">
-              <p className="text-sm text-muted-foreground">الموضوع:</p>
-              <p className="font-medium">{template.subject}</p>
+          {currentTemplate && (
+            <div className="border rounded-lg p-4 bg-background">
+              <div className="mb-4 pb-4 border-b">
+                <p className="text-sm text-muted-foreground">الموضوع:</p>
+                <p className="font-medium" dir={currentTemplate.language === 'ar' ? 'rtl' : 'ltr'}>
+                  {currentTemplate.subject}
+                </p>
+              </div>
+              <div 
+                className="prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: getPreviewHtml() }}
+              />
             </div>
-            <div 
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: getPreviewHtml() }}
-            />
-          </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
