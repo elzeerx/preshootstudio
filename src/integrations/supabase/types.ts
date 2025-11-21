@@ -67,27 +67,83 @@ export type Database = {
           },
         ]
       }
+      beta_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          signup_id: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          signup_id: string
+          token: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          signup_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beta_invitations_signup_id_fkey"
+            columns: ["signup_id"]
+            isOneToOne: false
+            referencedRelation: "beta_signups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beta_signups: {
         Row: {
+          account_created_at: string | null
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           email: string
           id: string
+          invited_at: string | null
           name: string
+          notes: string | null
           status: string | null
+          tags: string[] | null
+          user_id: string | null
         }
         Insert: {
+          account_created_at?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           email: string
           id?: string
+          invited_at?: string | null
           name: string
+          notes?: string | null
           status?: string | null
+          tags?: string[] | null
+          user_id?: string | null
         }
         Update: {
+          account_created_at?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           email?: string
           id?: string
+          invited_at?: string | null
           name?: string
+          notes?: string | null
           status?: string | null
+          tags?: string[] | null
+          user_id?: string | null
         }
         Relationships: []
       }

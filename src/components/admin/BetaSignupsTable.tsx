@@ -2,9 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Mail, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Mail, Trash2, CheckCircle, XCircle, Send } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface BetaSignup {
   id: string;
@@ -32,6 +34,37 @@ const getStatusBadge = (status: string) => {
 };
 
 export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSignupsTableProps) => {
+  const { toast } = useToast();
+
+  const handleSendInvitation = async (signup: BetaSignup) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('send-invitation-email', {
+        body: {
+          signupId: signup.id,
+          name: signup.name,
+          email: signup.email,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "تم إرسال الدعوة بنجاح",
+        description: `تم إرسال دعوة إلى ${signup.email}`,
+      });
+
+      // Trigger a refresh or update the status locally
+      window.location.reload();
+    } catch (error: any) {
+      console.error("Error sending invitation:", error);
+      toast({
+        title: "فشل إرسال الدعوة",
+        description: error.message || "حدث خطأ أثناء إرسال الدعوة",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card variant="editorial">
       <CardHeader>
@@ -70,7 +103,7 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">
-                        {signup.status !== 'approved' && (
+                        {signup.status === 'pending' && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -81,7 +114,23 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
                             موافقة
                           </Button>
                         )}
-                        {signup.status !== 'pending' && (
+                        {signup.status === 'approved' && (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleSendInvitation(signup)}
+                            className="gap-2 bg-accent hover:bg-accent/90"
+                          >
+                            <Send className="w-4 h-4" strokeWidth={1.5} />
+                            إرسال الدعوة
+                          </Button>
+                        )}
+                        {signup.status === 'notified' && (
+                          <Badge className="bg-secondary text-secondary-foreground">
+                            تم الإرسال
+                          </Badge>
+                        )}
+                        {signup.status !== 'pending' && signup.status !== 'notified' && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -89,7 +138,7 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
                             className="gap-2"
                           >
                             <XCircle className="w-4 h-4" strokeWidth={1.5} />
-                            إلغاء
+                            إلغاء الموافقة
                           </Button>
                         )}
                         <Button
