@@ -17,7 +17,8 @@ import { TokenUsageChart } from '@/components/admin/TokenUsageChart';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
-import { 
+import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor';
+import {
   Loader2, 
   Users, 
   Mail, 
@@ -661,6 +662,11 @@ export default function Admin() {
             </CardContent>
           </Card>
         )}
+
+        {/* Email Template Editor */}
+        <div className="mt-8">
+          <EmailTemplateEditor />
+        </div>
 
         {/* Beta Signups Table */}
         <BetaSignupsTable
