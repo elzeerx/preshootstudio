@@ -2,11 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Mail, Trash2, CheckCircle, XCircle, Send } from "lucide-react";
+import { Mail, Trash2, CheckCircle, XCircle, Send, RefreshCw, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface BetaSignup {
   id: string;
@@ -36,8 +37,11 @@ const getStatusBadge = (status: string) => {
 
 export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSignupsTableProps) => {
   const { toast } = useToast();
+  const [sendingInvite, setSendingInvite] = useState<string | null>(null);
 
   const handleSendInvitation = async (signup: BetaSignup) => {
+    const isResend = signup.status === 'notified';
+    setSendingInvite(signup.id);
     try {
       const { data, error } = await supabase.functions.invoke('send-invitation-email', {
         body: {
@@ -51,8 +55,8 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
       if (error) throw error;
 
       toast({
-        title: "تم إرسال الدعوة بنجاح",
-        description: `تم إرسال دعوة إلى ${signup.email}`,
+        title: isResend ? "تم إعادة إرسال الدعوة بنجاح" : "تم إرسال الدعوة بنجاح",
+        description: `تم ${isResend ? 'إعادة ' : ''}إرسال دعوة إلى ${signup.email}`,
       });
 
       // Trigger a refresh or update the status locally
@@ -64,6 +68,8 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
         description: error.message || "حدث خطأ أثناء إرسال الدعوة",
         variant: "destructive",
       });
+    } finally {
+      setSendingInvite(null);
     }
   };
 
@@ -121,16 +127,32 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
                             size="sm"
                             variant="default"
                             onClick={() => handleSendInvitation(signup)}
+                            disabled={sendingInvite === signup.id}
                             className="gap-2 bg-accent hover:bg-accent/90"
                           >
-                            <Send className="w-4 h-4" strokeWidth={1.5} />
+                            {sendingInvite === signup.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" strokeWidth={1.5} />
+                            ) : (
+                              <Send className="w-4 h-4" strokeWidth={1.5} />
+                            )}
                             إرسال الدعوة
                           </Button>
                         )}
                         {signup.status === 'notified' && (
-                          <Badge className="bg-secondary text-secondary-foreground">
-                            تم الإرسال
-                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleSendInvitation(signup)}
+                            disabled={sendingInvite === signup.id}
+                            className="gap-2 border-accent text-accent hover:bg-accent/10"
+                          >
+                            {sendingInvite === signup.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" strokeWidth={1.5} />
+                            ) : (
+                              <RefreshCw className="w-4 h-4" strokeWidth={1.5} />
+                            )}
+                            إعادة إرسال الدعوة
+                          </Button>
                         )}
                         {signup.status !== 'pending' && signup.status !== 'notified' && (
                           <Button
