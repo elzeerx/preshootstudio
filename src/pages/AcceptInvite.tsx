@@ -48,7 +48,7 @@ export default function AcceptInvite() {
         `)
         .eq("token", token)
         .is("accepted_at", null)
-        .single();
+        .maybeSingle();
 
       if (invitationError || !invitation) {
         console.error("Invalid token:", invitationError);
