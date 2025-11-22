@@ -52,8 +52,20 @@ export default function AcceptInvite() {
 
       if (invitationError || !invitation) {
         console.error("Invalid token:", invitationError);
+        
+        // Check if this is a localhost URL issue
+        const isLocalhostLink = token?.includes('localhost') || 
+                               window.location.href.includes('from=localhost') ||
+                               document.referrer.includes('localhost');
+        
         setValidToken(false);
         setLoading(false);
+        
+        // Store localhost detection for error message
+        if (isLocalhostLink) {
+          sessionStorage.setItem('inviteError', 'localhost');
+        }
+        
         return;
       }
 
@@ -199,6 +211,11 @@ export default function AcceptInvite() {
   }
 
   if (!token || (!validToken && !tokenExpired)) {
+    const isLocalhostError = sessionStorage.getItem('inviteError') === 'localhost';
+    
+    // Clear the error flag
+    sessionStorage.removeItem('inviteError');
+    
     return (
       <AuraLayout>
         <div className="flex items-center justify-center min-h-screen p-4">
@@ -207,12 +224,33 @@ export default function AcceptInvite() {
               <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
                 <XCircle className="w-8 h-8 text-destructive" />
               </div>
-              <CardTitle className="text-2xl">دعوة غير صالحة</CardTitle>
+              <CardTitle className="text-2xl">
+                {isLocalhostError ? "رابط دعوة قديم" : "دعوة غير صالحة"}
+              </CardTitle>
               <CardDescription>
-                رابط الدعوة الذي استخدمته غير صحيح أو تم استخدامه مسبقاً.
+                {isLocalhostError ? (
+                  <span className="block space-y-2">
+                    <span className="block">
+                      يبدو أنك تستخدم رابط دعوة قديم يحتوي على عنوان localhost.
+                    </span>
+                    <span className="block font-semibold text-foreground">
+                      يرجى طلب إعادة إرسال دعوة جديدة من المسؤول.
+                    </span>
+                  </span>
+                ) : (
+                  "رابط الدعوة الذي استخدمته غير صحيح أو تم استخدامه مسبقاً."
+                )}
               </CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
+            <CardContent className="text-center space-y-4">
+              {isLocalhostError && (
+                <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
+                  <p className="text-sm text-foreground">
+                    <strong className="block mb-2">💡 كيفية الحصول على دعوة جديدة:</strong>
+                    تواصل مع المسؤول وأخبره بإعادة إرسال الدعوة. ستصلك رسالة بريد إلكتروني جديدة تحتوي على رابط محدث.
+                  </p>
+                </div>
+              )}
               <Button onClick={() => navigate("/")} className="gap-2">
                 العودة إلى الصفحة الرئيسية
               </Button>
