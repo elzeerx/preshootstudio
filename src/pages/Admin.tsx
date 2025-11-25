@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { BetaSignupsTable } from '@/components/admin/BetaSignupsTable';
 import { TokenUsageStats } from '@/components/admin/TokenUsageStats';
@@ -149,6 +151,7 @@ export default function Admin() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     if (user && !roleLoading && isAdmin) {
@@ -553,39 +556,52 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
-      <AppHeader />
-      <main className="flex-1">
-        <div className="container max-w-7xl mx-auto px-4 py-8">
-          <Breadcrumbs />
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <Activity className="w-8 h-8 text-accent" strokeWidth={1.5} />
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                لوحة التحكم
-              </h1>
-            </div>
-            <p className="text-muted-foreground text-lg">
-              إحصائيات وبيانات شاملة عن المنصة
-            </p>
+    <SidebarProvider>
+      <div className="min-h-screen bg-background flex flex-col w-full" dir="rtl">
+        <AppHeader />
+        <div className="flex flex-1 w-full">
+          {/* Mobile Sidebar */}
+          <div className="md:hidden">
+            <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
+          
+          <main className="flex-1 w-full">
+            <div className="container max-w-7xl mx-auto px-4 py-8">
+              {/* Mobile Sidebar Trigger */}
+              <div className="md:hidden mb-4">
+                <SidebarTrigger className="h-10 w-10" />
+              </div>
+              
+              <Breadcrumbs />
+              {/* Header */}
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Activity className="w-8 h-8 text-accent" strokeWidth={1.5} />
+                  <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                    لوحة التحكم
+                  </h1>
+                </div>
+                <p className="text-muted-foreground text-lg">
+                  إحصائيات وبيانات شاملة عن المنصة
+                </p>
+              </div>
 
-        {/* Stats Cards */}
-        <AdminStats stats={stats} />
+              {/* Stats Cards */}
+              <AdminStats stats={stats} />
 
-        {/* Tabbed Content */}
-        <Tabs defaultValue="overview" className="mt-8">
-          <TabsList className="flex flex-wrap w-full gap-1 md:grid md:grid-cols-8">
-            <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
-            <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
-            <TabsTrigger value="signups">طلبات Beta</TabsTrigger>
-            <TabsTrigger value="tokens">استخدام الرموز</TabsTrigger>
-            <TabsTrigger value="projects">مراقبة المشاريع</TabsTrigger>
-            <TabsTrigger value="training">تصدير التدريب</TabsTrigger>
-            <TabsTrigger value="audit">سجل المراجعة</TabsTrigger>
-            <TabsTrigger value="email">قوالب البريد</TabsTrigger>
-          </TabsList>
+              {/* Tabbed Content */}
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
+                {/* Desktop Tabs - Hidden on Mobile */}
+                <TabsList className="hidden md:flex flex-wrap w-full gap-1 md:grid md:grid-cols-8">
+                  <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
+                  <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
+                  <TabsTrigger value="signups">طلبات Beta</TabsTrigger>
+                  <TabsTrigger value="tokens">استخدام الرموز</TabsTrigger>
+                  <TabsTrigger value="projects">مراقبة المشاريع</TabsTrigger>
+                  <TabsTrigger value="training">تصدير التدريب</TabsTrigger>
+                  <TabsTrigger value="audit">سجل المراجعة</TabsTrigger>
+                  <TabsTrigger value="email">قوالب البريد</TabsTrigger>
+                </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-6">
             {/* Token Usage Section */}
@@ -837,13 +853,15 @@ export default function Admin() {
             <AdminAuditLog />
           </TabsContent>
 
-          <TabsContent value="email" className="mt-6">
-            <EmailTemplateEditor />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="email" className="mt-6">
+                <EmailTemplateEditor />
+              </TabsContent>
+            </Tabs>
+            </div>
+          </main>
         </div>
-      </main>
-      <AppFooter />
-    </div>
+        <AppFooter />
+      </div>
+    </SidebarProvider>
   );
 }
