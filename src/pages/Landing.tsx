@@ -108,11 +108,12 @@ const Landing = () => {
             </p>
 
             <div className="flex flex-wrap gap-4 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
-              <Link to="/auth">
-                <Button className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow flex items-center gap-2">
-سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => document.getElementById('beta-signup')?.scrollIntoView({ behavior: 'smooth' })}
+                className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow flex items-center gap-2"
+              >
+                سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
+              </Button>
             </div>
           </div>
         </div>
@@ -200,7 +201,7 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-6 text-center relative">
+      <section id="beta-signup" className="py-32 px-6 text-center relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-900/10 pointer-events-none" />
         <div className="container mx-auto relative z-10">
           <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter">
