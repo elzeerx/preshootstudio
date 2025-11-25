@@ -34,63 +34,49 @@ export default function AcceptInvite() {
     }
 
     try {
-      // Validate invitation token
-      const { data: invitation, error: invitationError } = await supabase
-        .from("beta_invitations")
-        .select(`
-          *,
-          beta_signups (
-            id,
-            name,
-            email,
-            user_id
-          )
-        `)
-        .eq("token", token)
-        .is("accepted_at", null)
-        .maybeSingle();
+      setLoading(true);
+      console.log("Validating token via edge function:", token);
 
-      if (invitationError || !invitation) {
-        console.error("Invalid token:", invitationError);
-        
-        // Check if this is a localhost URL issue
-        const isLocalhostLink = token?.includes('localhost') || 
-                               window.location.href.includes('from=localhost') ||
-                               document.referrer.includes('localhost');
-        
+      // Call the validation edge function (bypasses RLS)
+      const { data, error } = await supabase.functions.invoke('validate-invitation', {
+        body: { token }
+      });
+
+      if (error) {
+        console.error("Edge function error:", error);
         setValidToken(false);
         setLoading(false);
-        
-        // Store localhost detection for error message
-        if (isLocalhostLink) {
-          sessionStorage.setItem('inviteError', 'localhost');
+        return;
+      }
+
+      console.log("Validation response:", data);
+
+      // Handle different validation states
+      if (!data.valid) {
+        if (data.tokenExpired || data.expired) {
+          console.log("Token expired");
+          setTokenExpired(true);
+          setValidToken(false);
+        } else if (data.alreadyUsed) {
+          console.log("Token already used");
+          toast({
+            title: "الحساب موجود بالفعل",
+            description: "تم إنشاء حساب لهذه الدعوة مسبقاً. يرجى تسجيل الدخول.",
+          });
+          setValidToken(false);
+          setTimeout(() => navigate("/auth"), 1500);
+        } else {
+          console.log("Invalid token:", data.error);
+          setValidToken(false);
         }
-        
-        return;
-      }
-
-      // Check if token is expired
-      const expiresAt = new Date(invitation.expires_at);
-      if (expiresAt < new Date()) {
-        setTokenExpired(true);
-        setValidToken(false);
         setLoading(false);
         return;
       }
 
-      // Check if user already has an account
-      if (invitation.beta_signups?.user_id) {
-        toast({
-          title: "الحساب موجود بالفعل",
-          description: "تم إنشاء حساب لهذه الدعوة مسبقاً. يرجى تسجيل الدخول.",
-        });
-        navigate("/auth");
-        return;
-      }
-
+      // Token is valid - set signup data
       setSignupData({
-        name: invitation.beta_signups?.name || "",
-        email: invitation.beta_signups?.email || "",
+        name: data.signup.name,
+        email: data.signup.email,
       });
       setValidToken(true);
     } catch (error) {
