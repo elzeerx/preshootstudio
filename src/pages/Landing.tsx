@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, ArrowUpRight, Loader2 } from "lucide-react";
+import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, ArrowUpRight } from "lucide-react";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,50 +14,6 @@ const Landing = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.trim()) {
-      toast.error("يرجى إدخال البريد الإلكتروني");
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error("البريد الإلكتروني غير صحيح");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const { error } = await supabase
-        .from("beta_signups")
-        .insert([{
-          name: email, // Using email as name since name is required
-          email: email.trim().toLowerCase()
-        }]);
-
-      if (error) {
-        if (error.code === "23505") {
-          toast.error("هذا البريد الإلكتروني مسجل مسبقاً");
-        } else {
-          toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
-        }
-        return;
-      }
-
-      setIsSuccess(true);
-      toast.success("تم التسجيل بنجاح! سنتواصل معك قريباً");
-      setEmail("");
-    } catch (err) {
-      toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="text-white font-sans selection:bg-white/20">
@@ -108,12 +58,11 @@ const Landing = () => {
             </p>
 
             <div className="flex flex-wrap gap-4 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
-              <Button 
-                onClick={() => document.getElementById('beta-signup')?.scrollIntoView({ behavior: 'smooth' })}
-                className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow flex items-center gap-2"
-              >
-                سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
-              </Button>
+              <Link to="/request-access">
+                <Button className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow flex items-center gap-2">
+                  سجّل للدخول المبكر <ArrowUpRight className="w-5 h-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -201,7 +150,7 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section id="beta-signup" className="py-32 px-6 text-center relative">
+      <section className="py-32 px-6 text-center relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-900/10 pointer-events-none" />
         <div className="container mx-auto relative z-10">
           <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter">
@@ -211,43 +160,12 @@ const Landing = () => {
             انضم إلى آلاف المبدعين الذين يستخدمون PreShoot لتسريع إنتاجهم.
           </p>
           
-          {isSuccess ? (
-            <div className="max-w-md mx-auto space-y-6 animate-fadeInUp">
-              <div className="inline-flex items-center justify-center w-20 h-20 border-4 border-white/20 rounded-full bg-white/10 mb-6">
-                <span className="text-4xl text-white">✓</span>
-              </div>
-              <h3 className="text-2xl font-black text-white">تم التسجيل بنجاح!</h3>
-              <p className="text-white/80 font-bold">سنتواصل معك عبر البريد الإلكتروني قريباً.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto space-y-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Input
-                  type="email"
-                  placeholder="أدخل بريدك الإلكتروني"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isSubmitting}
-                  className="flex-1 h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-white/40 rounded-full backdrop-blur-sm"
-                  dir="ltr"
-                />
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow transition-transform hover:scale-105 whitespace-nowrap"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                      جاري التسجيل...
-                    </>
-                  ) : (
-                    "سجّل للدخول المبكر"
-                  )}
-                </Button>
-              </div>
-            </form>
-          )}
+          <Link to="/request-access">
+            <Button className="h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 text-lg font-bold neon-glow transition-transform hover:scale-105 flex items-center gap-2 mx-auto">
+              طلب الوصول المبكر
+              <ArrowUpRight className="w-5 h-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 
