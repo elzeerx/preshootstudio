@@ -9,6 +9,7 @@ import {
   Database,
   Shield,
   Mail,
+  ChevronLeft,
 } from "lucide-react";
 import {
   Sidebar,
@@ -21,6 +22,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -40,6 +42,7 @@ const menuItems = [
 
 export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   const { open, setOpen, isMobile } = useSidebar();
+  const currentItem = menuItems.find((item) => item.value === activeTab);
 
   const handleItemClick = (value: string) => {
     onTabChange(value);
@@ -55,9 +58,29 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       collapsible="offcanvas"
     >
       <SidebarContent>
+        {/* Breadcrumb Section */}
+        <div className="px-4 py-4 space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <LayoutDashboard className="h-4 w-4" />
+            <span>إدارة النظام</span>
+          </div>
+          <Separator />
+          {currentItem && (
+            <div className="flex items-center gap-2 mt-2">
+              <ChevronLeft className="h-4 w-4 text-accent" />
+              <div className="flex items-center gap-2 text-foreground font-bold">
+                {currentItem.icon && <currentItem.icon className="h-4 w-4" />}
+                <span>{currentItem.label}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <Separator className="mb-2" />
+        
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg font-bold px-4 py-3">
-            لوحة التحكم
+          <SidebarGroupLabel className="text-base font-bold px-4 py-2">
+            الأقسام
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
