@@ -19,6 +19,8 @@ import { UserTokenManagement } from '@/components/admin/UserTokenManagement';
 import { TokenUsageAnalytics } from '@/components/admin/TokenUsageAnalytics';
 import { AdminProjectsMonitor } from '@/components/admin/AdminProjectsMonitor';
 import { TrainingDataExporter } from '@/components/admin/TrainingDataExporter';
+import { AdminUserManagement } from '@/components/admin/AdminUserManagement';
+import { AdminAuditLog } from '@/components/admin/AdminAuditLog';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
@@ -574,12 +576,14 @@ export default function Admin() {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="mt-8">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
+            <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
             <TabsTrigger value="signups">طلبات Beta</TabsTrigger>
             <TabsTrigger value="tokens">استخدام الرموز</TabsTrigger>
             <TabsTrigger value="projects">مراقبة المشاريع</TabsTrigger>
             <TabsTrigger value="training">تصدير التدريب</TabsTrigger>
+            <TabsTrigger value="audit">سجل المراجعة</TabsTrigger>
             <TabsTrigger value="email">قوالب البريد</TabsTrigger>
           </TabsList>
 
@@ -823,6 +827,14 @@ export default function Admin() {
 
           <TabsContent value="training" className="mt-6">
             <TrainingDataExporter />
+          </TabsContent>
+
+          <TabsContent value="users" className="mt-6">
+            <AdminUserManagement />
+          </TabsContent>
+
+          <TabsContent value="audit" className="mt-6">
+            <AdminAuditLog />
           </TabsContent>
 
           <TabsContent value="email" className="mt-6">
