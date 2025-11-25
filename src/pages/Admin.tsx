@@ -576,7 +576,7 @@ export default function Admin() {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="mt-8">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="flex flex-wrap w-full gap-1 md:grid md:grid-cols-8">
             <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
             <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
             <TabsTrigger value="signups">طلبات Beta</TabsTrigger>
