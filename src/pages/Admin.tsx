@@ -14,6 +14,7 @@ import { BetaSignupsTable } from '@/components/admin/BetaSignupsTable';
 import { TokenUsageStats } from '@/components/admin/TokenUsageStats';
 import { FunctionUsageTable } from '@/components/admin/FunctionUsageTable';
 import { TokenUsageChart } from '@/components/admin/TokenUsageChart';
+import { UserTokenManagement } from '@/components/admin/UserTokenManagement';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
@@ -102,6 +103,18 @@ interface TokenUsage {
   }>;
 }
 
+interface UserTokenData {
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  monthly_token_limit: number;
+  alert_threshold_percentage: number;
+  limit_notifications_enabled: boolean;
+  total_tokens: number;
+  total_cost: number;
+  request_count: number;
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const { user, signIn } = useAuth();
@@ -125,6 +138,7 @@ export default function Admin() {
     byFunction: [],
     overTime: [],
   });
+  const [userTokenData, setUserTokenData] = useState<UserTokenData[]>([]);
   const [loading, setLoading] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -296,6 +310,12 @@ export default function Admin() {
           byFunction,
           overTime,
         });
+      }
+
+      // Fetch user token data
+      const { data: userTokenUsage } = await supabase.rpc('get_all_users_token_usage');
+      if (userTokenUsage) {
+        setUserTokenData(userTokenUsage);
       }
 
     } catch (error) {
@@ -675,6 +695,14 @@ export default function Admin() {
             </CardContent>
           </Card>
         )}
+
+        {/* User Token Management */}
+        <div className="mt-8">
+          <UserTokenManagement 
+            users={userTokenData}
+            onUpdate={fetchAllData}
+          />
+        </div>
 
         {/* Email Template Editor */}
         <div className="mt-8">

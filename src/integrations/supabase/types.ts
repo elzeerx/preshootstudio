@@ -471,6 +471,20 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_cache: { Args: never; Returns: undefined }
+      get_all_users_token_usage: {
+        Args: never
+        Returns: {
+          alert_threshold_percentage: number
+          email: string
+          full_name: string
+          limit_notifications_enabled: boolean
+          monthly_token_limit: number
+          request_count: number
+          total_cost: number
+          total_tokens: number
+          user_id: string
+        }[]
+      }
       get_user_monthly_token_usage: {
         Args: { user_id_param: string }
         Returns: {
