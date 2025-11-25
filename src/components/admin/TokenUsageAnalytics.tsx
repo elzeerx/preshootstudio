@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { forecastTokenUsage, detectTrend } from '@/lib/helpers/usageForecasting';
 import {
   Table,
   TableBody,
@@ -23,7 +25,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { TrendingUp, DollarSign, Users, Search, ArrowUpDown } from 'lucide-react';
+import { TrendingUp, DollarSign, Users, Search, ArrowUpDown, TrendingDown, Minus } from 'lucide-react';
 
 interface UserAnalytics {
   user_id: string;
@@ -57,6 +59,14 @@ export const TokenUsageAnalytics = ({ users }: TokenUsageAnalyticsProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('total_tokens');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [forecastData, setForecastData] = useState<Array<{
+    date: string;
+    actual: number | null;
+    forecast: number;
+    lowerBound: number;
+    upperBound: number;
+  }>>([]);
+  const [isLoadingForecast, setIsLoadingForecast] = useState(true);
 
   // Calculate analytics data
   const analyticsData = useMemo(() => {
@@ -152,6 +162,83 @@ export const TokenUsageAnalytics = ({ users }: TokenUsageAnalyticsProps) => {
   const totalProjectedCost = analyticsData.reduce((sum, user) => sum + user.projected_monthly_cost, 0);
   const totalCurrentCost = analyticsData.reduce((sum, user) => sum + user.total_cost, 0);
 
+  // Fetch historical data and generate ML forecast
+  useEffect(() => {
+    const generateForecast = async () => {
+      setIsLoadingForecast(true);
+      try {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const { data: historicalData, error } = await supabase
+          .from('ai_token_usage')
+          .select('created_at, total_tokens')
+          .gte('created_at', thirtyDaysAgo.toISOString())
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        // Aggregate by day
+        const dailyUsage = new Map<string, number>();
+        historicalData?.forEach(record => {
+          const date = new Date(record.created_at).toISOString().split('T')[0];
+          dailyUsage.set(date, (dailyUsage.get(date) || 0) + record.total_tokens);
+        });
+
+        const sortedDates = Array.from(dailyUsage.keys()).sort();
+        const usageValues = sortedDates.map(date => dailyUsage.get(date) || 0);
+
+        // Generate 30-day forecast using ML
+        const forecasts = forecastTokenUsage(usageValues, 30);
+
+        // Prepare chart data
+        const chartData = [];
+        
+        // Historical data
+        sortedDates.forEach((date, index) => {
+          chartData.push({
+            date,
+            actual: usageValues[index],
+            forecast: null,
+            lowerBound: null,
+            upperBound: null,
+          });
+        });
+
+        // Forecast data
+        const lastDate = new Date(sortedDates[sortedDates.length - 1]);
+        forecasts.forEach((forecast, index) => {
+          const forecastDate = new Date(lastDate);
+          forecastDate.setDate(forecastDate.getDate() + index + 1);
+          chartData.push({
+            date: forecastDate.toISOString().split('T')[0],
+            actual: null,
+            forecast: Math.round(forecast.predicted),
+            lowerBound: Math.round(forecast.confidence.lower),
+            upperBound: Math.round(forecast.confidence.upper),
+          });
+        });
+
+        setForecastData(chartData);
+      } catch (error) {
+        console.error('Error generating forecast:', error);
+      } finally {
+        setIsLoadingForecast(false);
+      }
+    };
+
+    generateForecast();
+  }, []);
+
+  // Calculate trend for display
+  const usageTrend = useMemo(() => {
+    const recentActual = forecastData
+      .filter(d => d.actual !== null)
+      .slice(-7)
+      .map(d => d.actual!);
+    return detectTrend(recentActual);
+  }, [forecastData]);
+
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -201,6 +288,120 @@ export const TokenUsageAnalytics = ({ users }: TokenUsageAnalyticsProps) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* ML Forecast Chart */}
+      <Card className="md:col-span-2">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>توقعات الاستخدام بالذكاء الاصطناعي (30 يوم)</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                تحليل الاتجاهات باستخدام نماذج التعلم الآلي
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant={
+                usageTrend === 'increasing' ? 'destructive' :
+                usageTrend === 'decreasing' ? 'default' : 'secondary'
+              }>
+                {usageTrend === 'increasing' && <TrendingUp className="w-3 h-3 mr-1" />}
+                {usageTrend === 'decreasing' && <TrendingDown className="w-3 h-3 mr-1" />}
+                {usageTrend === 'stable' && <Minus className="w-3 h-3 mr-1" />}
+                {usageTrend === 'increasing' ? 'متزايد' : usageTrend === 'decreasing' ? 'متناقص' : 'مستقر'}
+              </Badge>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingForecast ? (
+            <div className="flex items-center justify-center h-[400px]">
+              <div className="text-muted-foreground">جاري تحليل البيانات...</div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={forecastData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="hsl(var(--foreground))"
+                  style={{ fontSize: '10px' }}
+                  tickFormatter={(date) => new Date(date).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}
+                />
+                <YAxis 
+                  stroke="hsl(var(--foreground))"
+                  style={{ fontSize: '12px' }}
+                  tickFormatter={formatNumber}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '2px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                  labelFormatter={(date) => new Date(date).toLocaleDateString('ar-SA')}
+                  formatter={(value: number) => [formatNumber(value), '']}
+                />
+                <Legend />
+                
+                {/* Confidence interval area */}
+                <defs>
+                  <linearGradient id="confidenceGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                
+                {/* Upper confidence bound */}
+                <Line
+                  type="monotone"
+                  dataKey="upperBound"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={0}
+                  fill="url(#confidenceGradient)"
+                  dot={false}
+                  name="الحد الأعلى"
+                  strokeOpacity={0.3}
+                />
+                
+                {/* Lower confidence bound */}
+                <Line
+                  type="monotone"
+                  dataKey="lowerBound"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={0}
+                  fill="url(#confidenceGradient)"
+                  dot={false}
+                  name="الحد الأدنى"
+                  strokeOpacity={0.3}
+                />
+                
+                {/* Actual usage */}
+                <Line 
+                  type="monotone" 
+                  dataKey="actual" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
+                  name="الاستخدام الفعلي"
+                  dot={{ fill: 'hsl(var(--primary))', r: 3 }}
+                  connectNulls={false}
+                />
+                
+                {/* Forecast */}
+                <Line 
+                  type="monotone" 
+                  dataKey="forecast" 
+                  stroke="hsl(var(--accent))" 
+                  strokeWidth={3}
+                  strokeDasharray="5 5"
+                  name="التوقع"
+                  dot={{ fill: 'hsl(var(--accent))', r: 3 }}
+                  connectNulls={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Charts Row */}
       <div className="grid gap-6 md:grid-cols-2">
