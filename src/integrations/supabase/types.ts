@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          notes: string | null
+          old_values: Json | null
+          target_entity_id: string | null
+          target_entity_type: string | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          target_entity_id?: string | null
+          target_entity_type?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       ai_token_usage: {
         Row: {
           completion_tokens: number
@@ -197,6 +242,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string | null
           alert_threshold_percentage: number | null
           created_at: string
           email: string
@@ -204,9 +250,13 @@ export type Database = {
           id: string
           limit_notifications_enabled: boolean | null
           monthly_token_limit: number | null
+          suspended_at: string | null
+          suspended_by: string | null
+          suspension_reason: string | null
           updated_at: string
         }
         Insert: {
+          account_status?: string | null
           alert_threshold_percentage?: number | null
           created_at?: string
           email: string
@@ -214,9 +264,13 @@ export type Database = {
           id: string
           limit_notifications_enabled?: boolean | null
           monthly_token_limit?: number | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           updated_at?: string
         }
         Update: {
+          account_status?: string | null
           alert_threshold_percentage?: number | null
           created_at?: string
           email?: string
@@ -224,6 +278,9 @@ export type Database = {
           id?: string
           limit_notifications_enabled?: boolean | null
           monthly_token_limit?: number | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           updated_at?: string
         }
         Relationships: []
