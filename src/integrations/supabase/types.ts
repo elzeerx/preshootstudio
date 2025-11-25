@@ -70,25 +70,37 @@ export type Database = {
       beta_invitations: {
         Row: {
           accepted_at: string | null
+          clicked_count: number | null
           created_at: string
+          email_opened_at: string | null
           expires_at: string
           id: string
+          link_clicked_at: string | null
+          opened_count: number | null
           signup_id: string
           token: string
         }
         Insert: {
           accepted_at?: string | null
+          clicked_count?: number | null
           created_at?: string
+          email_opened_at?: string | null
           expires_at: string
           id?: string
+          link_clicked_at?: string | null
+          opened_count?: number | null
           signup_id: string
           token: string
         }
         Update: {
           accepted_at?: string | null
+          clicked_count?: number | null
           created_at?: string
+          email_opened_at?: string | null
           expires_at?: string
           id?: string
+          link_clicked_at?: string | null
+          opened_count?: number | null
           signup_id?: string
           token?: string
         }

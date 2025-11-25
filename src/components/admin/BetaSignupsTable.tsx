@@ -19,8 +19,15 @@ interface BetaSignup {
   preferred_language?: string;
 }
 
+interface BetaInvitation {
+  email_opened_at?: string | null;
+  link_clicked_at?: string | null;
+  opened_count?: number;
+  clicked_count?: number;
+}
+
 interface BetaSignupsTableProps {
-  signups: BetaSignup[];
+  signups: (BetaSignup & { invitation?: BetaInvitation })[];
   onUpdateStatus: (id: string, newStatus: string) => void;
   onDelete: (id: string) => void;
 }
@@ -114,7 +121,32 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
                   <TableRow key={signup.id} className="hover:bg-muted/20">
                     <TableCell className="font-medium">{signup.name}</TableCell>
                     <TableCell className="font-mono text-sm">{signup.email}</TableCell>
-                    <TableCell>{getStatusBadge(signup.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(signup.status)}
+                        {/* Email tracking indicators */}
+                        {signup.invitation && signup.status === 'notified' && (
+                          <div className="flex items-center gap-1">
+                            {signup.invitation.email_opened_at && (
+                              <span 
+                                className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-1 rounded-md border border-green-500/20" 
+                                title={`تم الفتح ${signup.invitation.opened_count} مرة - آخر فتح: ${format(new Date(signup.invitation.email_opened_at), 'dd/MM/yyyy HH:mm', { locale: ar })}`}
+                              >
+                                📬 {signup.invitation.opened_count}
+                              </span>
+                            )}
+                            {signup.invitation.link_clicked_at && (
+                              <span 
+                                className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-md border border-blue-500/20"
+                                title={`تم النقر ${signup.invitation.clicked_count} مرة - أول نقرة: ${format(new Date(signup.invitation.link_clicked_at), 'dd/MM/yyyy HH:mm', { locale: ar })}`}
+                              >
+                                🔗 {signup.invitation.clicked_count}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-sm">
                       {format(new Date(signup.created_at), 'dd MMMM yyyy', { locale: ar })}
                     </TableCell>
