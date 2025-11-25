@@ -23,3 +23,9 @@ verify_jwt = true
 
 [functions.suggest-topics]
 verify_jwt = true
+
+[functions.validate-invitation]
+verify_jwt = false
+
+[functions.send-invitation-email]
+verify_jwt = false
