@@ -7,7 +7,14 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 import { LiveTokenIndicator } from "@/components/common/LiveTokenIndicator";
 import { TokenLimitAlert } from "@/components/common/TokenLimitAlert";
+import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import AuraLayout from "@/components/common/AuraLayout";
+
+// Component to use the admin notifications hook
+function AdminNotificationsProvider() {
+  useAdminNotifications();
+  return null;
+}
 import CreateProject from "./pages/CreateProject";
 import Landing from "./pages/Landing";
 import Admin from "./pages/Admin";
@@ -31,6 +38,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <AdminNotificationsProvider />
             <LiveTokenIndicator />
             <TokenLimitAlert />
             <Routes>
