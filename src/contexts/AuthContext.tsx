@@ -69,6 +69,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { error };
   };
 
+  // Note: signUp should only be called from the AcceptInvite flow
+  // Direct registration is disabled - users must receive invitations from admins
   const signUp = async (email: string, password: string, fullName?: string) => {
     const redirectUrl = `${window.location.origin}/projects`;
 

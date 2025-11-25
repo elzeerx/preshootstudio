@@ -5,21 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 
 export default function Auth() {
-  const { user, loading, signIn, signUp } = useAuth();
+  const { user, loading, signIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-
-  // Signup form state
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupFullName, setSignupFullName] = useState('');
 
   if (loading) {
     return (
@@ -40,13 +34,6 @@ export default function Auth() {
     setIsSubmitting(false);
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    await signUp(signupEmail, signupPassword, signupFullName);
-    setIsSubmitting(false);
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -63,114 +50,65 @@ export default function Auth() {
           <CardHeader>
             <CardTitle className="text-2xl text-center">مرحباً بك</CardTitle>
             <CardDescription className="text-center">
-              سجل الدخول أو أنشئ حساب جديد للبدء
+              سجل الدخول إلى حسابك
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" dir="rtl">
-              <TabsList className="grid w-full grid-cols-2" dir="rtl">
-                <TabsTrigger value="signup">حساب جديد</TabsTrigger>
-                <TabsTrigger value="login">تسجيل الدخول</TabsTrigger>
-              </TabsList>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="login-email">البريد الإلكتروني</Label>
+                <Input
+                  id="login-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="login-password">كلمة المرور</Label>
+                <Input
+                  id="login-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="ms-2 h-4 w-4 animate-spin" />
+                    جاري تسجيل الدخول...
+                  </>
+                ) : (
+                  'تسجيل الدخول'
+                )}
+              </Button>
+              <div className="text-center mt-4">
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  نسيت كلمة المرور؟
+                </Link>
+              </div>
+            </form>
 
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">البريد الإلكتروني</Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">كلمة المرور</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="ms-2 h-4 w-4 animate-spin" />
-                        جاري تسجيل الدخول...
-                      </>
-                    ) : (
-                      'تسجيل الدخول'
-                    )}
-                  </Button>
-                  <div className="text-center mt-4">
-                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                      نسيت كلمة المرور؟
-                    </Link>
-                  </div>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">الاسم الكامل</Label>
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="أحمد محمد"
-                      value={signupFullName}
-                      onChange={(e) => setSignupFullName(e.target.value)}
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">البريد الإلكتروني</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">كلمة المرور</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      required
-                      disabled={isSubmitting}
-                      minLength={6}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      يجب أن تكون كلمة المرور 6 أحرف على الأقل
-                    </p>
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="ms-2 h-4 w-4 animate-spin" />
-                        جاري إنشاء الحساب...
-                      </>
-                    ) : (
-                      'إنشاء حساب'
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+            <div className="mt-6 p-4 bg-muted rounded-lg text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                التسجيل متاح بدعوة فقط
+              </p>
+              <p className="text-xs text-muted-foreground">
+                لطلب الوصول، يرجى التسجيل في قائمة الانتظار من الصفحة الرئيسية
+              </p>
+              <Link to="/">
+                <Button variant="outline" className="mt-2">
+                  العودة للصفحة الرئيسية
+                </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
