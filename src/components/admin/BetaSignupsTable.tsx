@@ -2,12 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Mail, Trash2, CheckCircle, XCircle, Send, RefreshCw, Loader2 } from "lucide-react";
+import { Mail, Trash2, CheckCircle, XCircle, Send, RefreshCw, Loader2, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { EmailPreviewDialog } from "./EmailPreviewDialog";
 
 interface BetaSignup {
   id: string;
@@ -38,6 +39,8 @@ const getStatusBadge = (status: string) => {
 export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSignupsTableProps) => {
   const { toast } = useToast();
   const [sendingInvite, setSendingInvite] = useState<string | null>(null);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [previewSignup, setPreviewSignup] = useState<BetaSignup | null>(null);
 
   const handleSendInvitation = async (signup: BetaSignup) => {
     const isResend = signup.status === 'notified';
@@ -73,15 +76,21 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
     }
   };
 
+  const handlePreviewEmail = (signup: BetaSignup) => {
+    setPreviewSignup(signup);
+    setPreviewDialogOpen(true);
+  };
+
   return (
-    <Card variant="editorial">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-          <Mail className="w-6 h-6 text-accent" strokeWidth={1.5} />
-          طلبات الانضمام للنسخة التجريبية
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <>
+      <Card variant="editorial">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+            <Mail className="w-6 h-6 text-accent" strokeWidth={1.5} />
+            طلبات الانضمام للنسخة التجريبية
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
         <div className="rounded-lg border-2 border-foreground overflow-hidden">
           <Table>
             <TableHeader>
@@ -111,6 +120,20 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">
+                        {/* Preview Button - Available for approved and notified signups */}
+                        {(signup.status === 'approved' || signup.status === 'notified') && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handlePreviewEmail(signup)}
+                            className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+                            title="معاينة البريد الإلكتروني"
+                          >
+                            <Eye className="w-4 h-4" strokeWidth={1.5} />
+                            معاينة
+                          </Button>
+                        )}
+                        
                         {signup.status === 'pending' && (
                           <Button
                             size="sm"
@@ -184,6 +207,18 @@ export const BetaSignupsTable = ({ signups, onUpdateStatus, onDelete }: BetaSign
         </div>
       </CardContent>
     </Card>
+
+    {/* Email Preview Dialog */}
+    {previewSignup && (
+      <EmailPreviewDialog
+        open={previewDialogOpen}
+        onOpenChange={setPreviewDialogOpen}
+        signupName={previewSignup.name}
+        signupEmail={previewSignup.email}
+        language={previewSignup.preferred_language || 'ar'}
+      />
+    )}
+    </>
   );
 };
 
