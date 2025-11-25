@@ -45,14 +45,16 @@ export default function RequestAccess() {
 
   const onSubmit = async (data: RequestAccessForm) => {
     try {
-      const { error } = await supabase
+      const { data: signupData, error } = await supabase
         .from("beta_signups")
         .insert([{
           name: data.name.trim(),
           email: data.email.trim().toLowerCase(),
           notes: data.reason.trim(),
           status: 'pending',
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) {
         if (error.code === "23505") {
@@ -63,6 +65,25 @@ export default function RequestAccess() {
         }
         return;
       }
+
+      // Notify admins via edge function (fire and forget)
+      supabase.functions
+        .invoke("notify-admins-new-signup", {
+          body: {
+            signupId: signupData.id,
+            signupName: data.name.trim(),
+            signupEmail: data.email.trim().toLowerCase(),
+            signupReason: data.reason.trim(),
+          },
+        })
+        .then(({ error: notifyError }) => {
+          if (notifyError) {
+            console.error("Error notifying admins:", notifyError);
+            // Don't show error to user - notification failure shouldn't block signup
+          } else {
+            console.log("Admins notified successfully");
+          }
+        });
 
       setIsSuccess(true);
       toast.success("تم إرسال طلبك بنجاح!");
