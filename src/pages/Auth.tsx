@@ -101,11 +101,11 @@ export default function Auth() {
                 التسجيل متاح بدعوة فقط
               </p>
               <p className="text-xs text-muted-foreground">
-                لطلب الوصول، يرجى التسجيل في قائمة الانتظار من الصفحة الرئيسية
+                لطلب الوصول، يرجى تعبئة نموذج طلب الوصول
               </p>
-              <Link to="/">
-                <Button variant="outline" className="mt-2">
-                  العودة للصفحة الرئيسية
+              <Link to="/request-access">
+                <Button variant="outline" className="mt-2 w-full">
+                  طلب الوصول المبكر
                 </Button>
               </Link>
             </div>

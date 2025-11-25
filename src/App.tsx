@@ -19,6 +19,7 @@ import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import NotFound from "./pages/NotFound";
 import AcceptInvite from "./pages/AcceptInvite";
+import RequestAccess from "./pages/RequestAccess";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <TokenLimitAlert />
             <Routes>
               <Route path="/" element={<Landing />} />
+              <Route path="/request-access" element={<RequestAccess />} />
               {/* Admin Routes */}
               <Route path="/admin" element={<Admin />} />
         <Route path="/auth" element={<Auth />} />
