@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { BetaSignupsTable } from '@/components/admin/BetaSignupsTable';
 import { TokenUsageStats } from '@/components/admin/TokenUsageStats';
@@ -16,6 +17,8 @@ import { FunctionUsageTable } from '@/components/admin/FunctionUsageTable';
 import { TokenUsageChart } from '@/components/admin/TokenUsageChart';
 import { UserTokenManagement } from '@/components/admin/UserTokenManagement';
 import { TokenUsageAnalytics } from '@/components/admin/TokenUsageAnalytics';
+import { AdminProjectsMonitor } from '@/components/admin/AdminProjectsMonitor';
+import { TrainingDataExporter } from '@/components/admin/TrainingDataExporter';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
@@ -569,250 +572,263 @@ export default function Admin() {
         {/* Stats Cards */}
         <AdminStats stats={stats} />
 
-        {/* Token Usage Section */}
-        <div className="space-y-6 mb-8">
-          <div className="flex items-center gap-3">
-            <Activity className="w-6 h-6 text-primary" />
-            <h2 className="text-2xl font-bold">استخدام الـ AI و Tokens</h2>
-          </div>
-          
-          <TokenUsageStats 
-            totalTokens={tokenUsage.totalTokens}
-            totalCost={tokenUsage.totalCost}
-            requestCount={tokenUsage.requestCount}
-            successRate={tokenUsage.successRate}
-          />
-          
-          <div className="grid gap-6 md:grid-cols-2">
-            <FunctionUsageTable data={tokenUsage.byFunction} />
-            <TokenUsageChart data={tokenUsage.overTime} />
-          </div>
-        </div>
+        {/* Tabbed Content */}
+        <Tabs defaultValue="overview" className="mt-8">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
+            <TabsTrigger value="signups">طلبات Beta</TabsTrigger>
+            <TabsTrigger value="tokens">استخدام الرموز</TabsTrigger>
+            <TabsTrigger value="projects">مراقبة المشاريع</TabsTrigger>
+            <TabsTrigger value="training">تصدير التدريب</TabsTrigger>
+            <TabsTrigger value="email">قوالب البريد</TabsTrigger>
+          </TabsList>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Signup Status Chart */}
-          <Card variant="subtle">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground">
-                حالة طلبات Beta
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={signupStatusData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={(entry) => `${entry.name}: ${entry.value}`}
-                    outerRadius={100}
-                    fill="hsl(var(--accent))"
-                    dataKey="value"
-                  >
-                    {signupStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* User Growth Chart */}
-          <Card variant="subtle">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground">
-                نمو المستخدمين (آخر 7 أيام)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={userGrowthData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="hsl(var(--foreground))"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--foreground))"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '2px solid hsl(var(--foreground))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="users" 
-                    stroke="hsl(var(--accent))" 
-                    strokeWidth={2}
-                    name="مستخدمين جدد"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Project Status Chart */}
-        {projectStatusData.length > 0 && (
-          <Card variant="subtle" className="mb-8">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground">
-                توزيع المشاريع حسب الحالة
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={projectStatusData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="status" 
-                    stroke="hsl(var(--foreground))"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--foreground))"
-                    style={{ fontSize: '12px' }}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '2px solid hsl(var(--foreground))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Bar dataKey="count" fill="hsl(var(--secondary))" name="عدد المشاريع" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Token Usage Analytics Dashboard */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <Activity className="w-6 h-6 text-accent" />
-            تحليلات استخدام الـ Tokens
-          </h2>
-          <TokenUsageAnalytics users={userTokenData} />
-        </div>
-
-        {/* User Token Management */}
-        <div className="mt-8">
-          <UserTokenManagement 
-            users={userTokenData}
-            onUpdate={fetchAllData}
-          />
-        </div>
-
-        {/* Email Template Editor */}
-        <div className="mt-8">
-          <EmailTemplateEditor />
-        </div>
-
-        {/* Beta Signups Table */}
-        <BetaSignupsTable
-          signups={signups}
-          onUpdateStatus={updateStatus}
-          onDelete={deleteSignup}
-        />
-
-        {/* Recent Users Table */}
-        <Card variant="editorial" className="mt-8">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <Users className="w-6 h-6 text-accent" strokeWidth={1.5} />
-              المستخدمون الجدد
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border-2 border-foreground overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="text-right font-bold">الاسم الكامل</TableHead>
-                    <TableHead className="text-right font-bold">البريد الإلكتروني</TableHead>
-                    <TableHead className="text-right font-bold">تاريخ التسجيل</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                        لا يوجد مستخدمون بعد
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    users.slice(0, 10).map((user) => (
-                      <TableRow key={user.id} className="hover:bg-muted/20">
-                        <TableCell className="font-medium">
-                          {user.full_name || 'غير محدد'}
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">{user.email}</TableCell>
-                        <TableCell className="text-sm">
-                          {format(new Date(user.created_at), 'dd MMMM yyyy', { locale: ar })}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            {/* Token Usage Section */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Activity className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-bold">استخدام الـ AI و Tokens</h2>
+              </div>
+              
+              <TokenUsageStats 
+                totalTokens={tokenUsage.totalTokens}
+                totalCost={tokenUsage.totalCost}
+                requestCount={tokenUsage.requestCount}
+                successRate={tokenUsage.successRate}
+              />
+              
+              <div className="grid gap-6 md:grid-cols-2">
+                <FunctionUsageTable data={tokenUsage.byFunction} />
+                <TokenUsageChart data={tokenUsage.overTime} />
+              </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Recent Projects Table */}
-        <Card variant="editorial" className="mt-8">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <FolderOpen className="w-6 h-6 text-secondary" strokeWidth={1.5} />
-              المشاريع الحديثة
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border-2 border-foreground overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="text-right font-bold">الموضوع</TableHead>
-                    <TableHead className="text-right font-bold">الحالة</TableHead>
-                    <TableHead className="text-right font-bold">تاريخ الإنشاء</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {projects.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                        لا توجد مشاريع بعد
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    projects.slice(0, 10).map((project) => (
-                      <TableRow key={project.id} className="hover:bg-muted/20">
-                        <TableCell className="font-medium">{project.topic}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{project.status}</Badge>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {format(new Date(project.created_at), 'dd MMMM yyyy', { locale: ar })}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Signup Status Chart */}
+              <Card variant="subtle">
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-foreground">
+                    حالة طلبات Beta
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={signupStatusData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={(entry) => `${entry.name}: ${entry.value}`}
+                        outerRadius={100}
+                        fill="hsl(var(--accent))"
+                        dataKey="value"
+                      >
+                        {signupStatusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* User Growth Chart */}
+              <Card variant="subtle">
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-foreground">
+                    نمو المستخدمين (آخر 7 أيام)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={userGrowthData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="date" 
+                        stroke="hsl(var(--foreground))"
+                        style={{ fontSize: '12px' }}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--foreground))"
+                        style={{ fontSize: '12px' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '2px solid hsl(var(--foreground))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="users" 
+                        stroke="hsl(var(--accent))" 
+                        strokeWidth={2}
+                        name="مستخدمين جدد"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Project Status Chart */}
+            {projectStatusData.length > 0 && (
+              <Card variant="subtle">
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-foreground">
+                    توزيع المشاريع حسب الحالة
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={projectStatusData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis 
+                        dataKey="status" 
+                        stroke="hsl(var(--foreground))"
+                        style={{ fontSize: '12px' }}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--foreground))"
+                        style={{ fontSize: '12px' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '2px solid hsl(var(--foreground))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Bar dataKey="count" fill="hsl(var(--secondary))" name="عدد المشاريع" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Recent Users Table */}
+            <Card variant="editorial">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+                  <Users className="w-6 h-6 text-accent" strokeWidth={1.5} />
+                  المستخدمون الجدد
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border-2 border-foreground overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="text-right font-bold">الاسم الكامل</TableHead>
+                        <TableHead className="text-right font-bold">البريد الإلكتروني</TableHead>
+                        <TableHead className="text-right font-bold">تاريخ التسجيل</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                            لا يوجد مستخدمون بعد
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        users.slice(0, 10).map((user) => (
+                          <TableRow key={user.id} className="hover:bg-muted/20">
+                            <TableCell className="font-medium">
+                              {user.full_name || 'غير محدد'}
+                            </TableCell>
+                            <TableCell className="font-mono text-sm">{user.email}</TableCell>
+                            <TableCell className="text-sm">
+                              {format(new Date(user.created_at), 'dd MMMM yyyy', { locale: ar })}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Projects Table */}
+            <Card variant="editorial">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+                  <FolderOpen className="w-6 h-6 text-secondary" strokeWidth={1.5} />
+                  المشاريع الحديثة
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border-2 border-foreground overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="text-right font-bold">الموضوع</TableHead>
+                        <TableHead className="text-right font-bold">الحالة</TableHead>
+                        <TableHead className="text-right font-bold">تاريخ الإنشاء</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {projects.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                            لا توجد مشاريع بعد
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        projects.slice(0, 10).map((project) => (
+                          <TableRow key={project.id} className="hover:bg-muted/20">
+                            <TableCell className="font-medium">{project.topic}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{project.status}</Badge>
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {format(new Date(project.created_at), 'dd MMMM yyyy', { locale: ar })}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="signups" className="mt-6">
+            <BetaSignupsTable
+              signups={signups}
+              onUpdateStatus={updateStatus}
+              onDelete={deleteSignup}
+            />
+          </TabsContent>
+
+          <TabsContent value="tokens" className="space-y-6 mt-6">
+            <TokenUsageAnalytics users={userTokenData} />
+            <UserTokenManagement 
+              users={userTokenData}
+              onUpdate={fetchAllData}
+            />
+          </TabsContent>
+
+          <TabsContent value="projects" className="mt-6">
+            <AdminProjectsMonitor />
+          </TabsContent>
+
+          <TabsContent value="training" className="mt-6">
+            <TrainingDataExporter />
+          </TabsContent>
+
+          <TabsContent value="email" className="mt-6">
+            <EmailTemplateEditor />
+          </TabsContent>
+        </Tabs>
         </div>
       </main>
       <AppFooter />

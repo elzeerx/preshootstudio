@@ -228,6 +228,59 @@ export type Database = {
         }
         Relationships: []
       }
+      project_moderation: {
+        Row: {
+          content_flags: string[] | null
+          created_at: string | null
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: string | null
+          notes: string | null
+          project_id: string
+          quality_rating: number | null
+          training_eligible: boolean | null
+          training_tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_flags?: string[] | null
+          created_at?: string | null
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string | null
+          notes?: string | null
+          project_id: string
+          quality_rating?: number | null
+          training_eligible?: boolean | null
+          training_tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_flags?: string[] | null
+          created_at?: string | null
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string | null
+          notes?: string | null
+          project_id?: string
+          quality_rating?: number | null
+          training_eligible?: boolean | null
+          training_tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_moderation_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           article_data: Json | null
@@ -425,6 +478,42 @@ export type Database = {
           token_usage?: number
           usage_percentage?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      training_data_exports: {
+        Row: {
+          created_at: string | null
+          export_type: string
+          exported_by: string
+          file_format: string | null
+          filters_applied: Json | null
+          id: string
+          project_count: number | null
+          storage_path: string | null
+          total_tokens: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          export_type: string
+          exported_by: string
+          file_format?: string | null
+          filters_applied?: Json | null
+          id?: string
+          project_count?: number | null
+          storage_path?: string | null
+          total_tokens?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          export_type?: string
+          exported_by?: string
+          file_format?: string | null
+          filters_applied?: Json | null
+          id?: string
+          project_count?: number | null
+          storage_path?: string | null
+          total_tokens?: number | null
         }
         Relationships: []
       }
