@@ -76,12 +76,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Get the app URL from environment or use a default
     const appUrl = Deno.env.get("VITE_APP_URL") || "http://localhost:5173";
-    const inviteLink = `${appUrl}/accept-invite?token=${token}`;
+    
+    // Create tracking URLs using the existing supabaseUrl variable
+    const trackingPixelUrl = `${supabaseUrl}/functions/v1/track-email-open?token=${token}`;
+    const trackedInviteLink = `${supabaseUrl}/functions/v1/track-link-click?token=${token}`;
 
-    // Replace template variables
+    // Replace template variables with tracking URLs
     const emailHtml = templateData.html_content
       .replace(/\{\{name\}\}/g, name)
-      .replace(/\{\{inviteLink\}\}/g, inviteLink);
+      .replace(/\{\{inviteLink\}\}/g, trackedInviteLink)
+      // Add tracking pixel at the end of the email
+      + `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;" alt="" />`;
 
     // Send invitation email via Resend API
     const emailResponse = await fetch("https://api.resend.com/emails", {

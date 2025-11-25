@@ -185,10 +185,18 @@ export default function Admin() {
     try {
       setLoading(true);
       
-      // Fetch beta signups
+      // Fetch beta signups with invitation tracking data
       const { data: signupsData, error: signupsError } = await supabase
         .from('beta_signups')
-        .select('*')
+        .select(`
+          *,
+          beta_invitations (
+            email_opened_at,
+            link_clicked_at,
+            opened_count,
+            clicked_count
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (signupsError) throw signupsError;
@@ -209,7 +217,12 @@ export default function Admin() {
 
       if (projectsError) throw projectsError;
 
-      setSignups(signupsData || []);
+      setSignups(signupsData?.map(signup => ({
+        ...signup,
+        invitation: Array.isArray(signup.beta_invitations) 
+          ? signup.beta_invitations[0] 
+          : signup.beta_invitations
+      })) || []);
       setUsers(usersData || []);
       setProjects(projectsData || []);
 
