@@ -15,6 +15,7 @@ import { TokenUsageStats } from '@/components/admin/TokenUsageStats';
 import { FunctionUsageTable } from '@/components/admin/FunctionUsageTable';
 import { TokenUsageChart } from '@/components/admin/TokenUsageChart';
 import { UserTokenManagement } from '@/components/admin/UserTokenManagement';
+import { TokenUsageAnalytics } from '@/components/admin/TokenUsageAnalytics';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
@@ -695,6 +696,15 @@ export default function Admin() {
             </CardContent>
           </Card>
         )}
+
+        {/* Token Usage Analytics Dashboard */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Activity className="w-6 h-6 text-accent" />
+            تحليلات استخدام الـ Tokens
+          </h2>
+          <TokenUsageAnalytics users={userTokenData} />
+        </div>
 
         {/* User Token Management */}
         <div className="mt-8">
