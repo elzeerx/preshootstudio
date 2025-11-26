@@ -157,6 +157,21 @@ Deno.serve(async (req) => {
         raw_payload: revisionData,
       });
 
+    // Send notification email (don't await to avoid blocking)
+    supabaseAdmin.functions.invoke('send-subscription-notification', {
+      body: {
+        type: 'plan_changed',
+        user_id: user.id,
+        data: {
+          old_plan_name: currentSub.plan.name_ar,
+          new_plan_name: newPlan.name_ar,
+          billing_period: billing_period,
+          amount: billing_period === 'yearly' ? newPlan.price_yearly_usd : newPlan.price_monthly_usd,
+          currency: 'USD',
+        },
+      },
+    }).catch(err => console.error('Failed to send email:', err));
+
     return new Response(
       JSON.stringify({
         success: true,
