@@ -211,6 +211,35 @@ Deno.serve(async (req) => {
     }
 
     console.log('Project found:', project.topic);
+    
+    // Route based on content_type
+    const contentType = project.content_type || 'factual';
+    console.log('Content type:', contentType);
+
+    // For non-factual content, delegate to run-creative-research
+    if (contentType === 'creative' || contentType === 'personal' || contentType === 'opinion') {
+      console.log('Delegating to run-creative-research for', contentType, 'content');
+      
+      const creativeResponse = await supabase.functions.invoke('run-creative-research', {
+        body: { projectId }
+      });
+
+      if (creativeResponse.error) {
+        console.error('Creative research function error:', creativeResponse.error);
+        return new Response(
+          JSON.stringify({ error: creativeResponse.error.message || 'Failed to generate creative research' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify(creativeResponse.data),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Continue with factual research flow for factual content
+    console.log('Processing factual research with Tavily search');
 
     // Check token limits before proceeding
     const limitCheck = await checkTokenLimit(
@@ -244,16 +273,6 @@ Deno.serve(async (req) => {
         }
       );
     }
-
-    if (fetchError || !project) {
-      console.error('Project not found:', fetchError);
-      return new Response(
-        JSON.stringify({ error: 'Project not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log('Project found:', project.topic);
 
     // Update status to loading
     await supabase
