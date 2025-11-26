@@ -29,28 +29,36 @@ const CreateProject = () => {
     { 
       id: "factual" as const, 
       label: "أبحاث ومعلومات", 
-      description: "محتوى علمي، تقني، أعمال",
+      description: "للمحتوى العلمي والتقني والأكاديمي",
+      details: "يستخدم بحث ويب متقدم لجمع مصادر موثوقة، بيانات، إحصائيات، ودراسات علمية",
+      examples: "شروحات تقنية، مواضيع علمية، تحليلات بيانات، محتوى تعليمي",
       icon: BookOpen,
       color: "text-blue-500"
     },
     { 
       id: "creative" as const, 
       label: "ترفيه وإبداع", 
-      description: "فلوجات، ألعاب، مراجعات",
+      description: "للمحتوى الترفيهي والإبداعي",
+      details: "يولد أفكار إبداعية، زوايا جذابة، هوكس قوية، ونقاط عاطفية للمحتوى الترفيهي",
+      examples: "فلوجات، تحديات، مراجعات، ألعاب، محتوى ترفيهي",
       icon: Sparkles,
       color: "text-purple-500"
     },
     { 
       id: "personal" as const, 
       label: "تجارب شخصية", 
-      description: "قصص، أسلوب حياة",
+      description: "لقصص حياتية وتجارب شخصية",
+      details: "يركز على بناء القصة، النقاط العاطفية، والهيكل السردي للتجارب الشخصية",
+      examples: "قصص شخصية، رحلات، تجارب حياة، يوميات، أسلوب حياة",
       icon: Heart,
       color: "text-pink-500"
     },
     { 
       id: "opinion" as const, 
       label: "رأي وتحليل", 
-      description: "تعليقات، آراء، نقاشات",
+      description: "للآراء والتحليلات والنقاشات",
+      details: "يقدم وجهات نظر متوازنة، حجج مقابلة، ونقاط نقاش للمواضيع الرأيية",
+      examples: "تعليقات على أحداث، تحليلات، نقاشات، مراجعات رأيية",
       icon: MessageSquare,
       color: "text-orange-500"
     },
@@ -184,11 +192,16 @@ const CreateProject = () => {
             <CardContent className="pt-2">
               <form onSubmit={handleCreateProject} className="space-y-6">
                 {/* Content Type Selection */}
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">
-                    نوع المحتوى
-                  </Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-base font-semibold">
+                      نوع المحتوى
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      اختر نوع المحتوى المناسب لتحصل على أفضل نتائج بحث وأفكار
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
                     {contentTypes.map((type) => {
                       const Icon = type.icon;
                       const isSelected = contentType === type.id;
@@ -199,25 +212,31 @@ const CreateProject = () => {
                           onClick={() => setContentType(type.id)}
                           disabled={isCreating}
                           className={`
-                            relative p-4 rounded-lg border-2 text-right transition-all
+                            relative p-5 rounded-lg border-2 text-right transition-all
                             ${isSelected 
-                              ? 'border-primary bg-primary/5 shadow-sm' 
+                              ? 'border-primary bg-primary/5 shadow-md' 
                               : 'border-border hover:border-primary/50 hover:bg-accent/50'
                             }
                             ${isCreating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                           `}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary/10' : 'bg-muted'}`}>
-                              <Icon className={`w-5 h-5 ${isSelected ? 'text-primary' : type.color}`} />
+                          <div className="flex items-start gap-4">
+                            <div className={`p-3 rounded-xl ${isSelected ? 'bg-primary/10' : 'bg-muted'} shrink-0`}>
+                              <Icon className={`w-6 h-6 ${isSelected ? 'text-primary' : type.color}`} />
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="font-semibold text-sm mb-1">{type.label}</div>
-                              <div className="text-xs text-muted-foreground">{type.description}</div>
+                            <div className="flex-1 min-w-0 space-y-2">
+                              <div className="font-bold text-base">{type.label}</div>
+                              <div className="text-sm text-foreground/80">{type.description}</div>
+                              <div className="text-xs text-muted-foreground leading-relaxed pt-1 border-t border-border/50">
+                                <span className="font-medium">كيف يعمل:</span> {type.details}
+                              </div>
+                              <div className="text-xs text-muted-foreground/70 italic">
+                                <span className="font-medium">أمثلة:</span> {type.examples}
+                              </div>
                             </div>
                             {isSelected && (
-                              <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-primary-foreground" />
+                              <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                                <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground" />
                               </div>
                             )}
                           </div>
