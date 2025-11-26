@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FolderOpen, Plus, User, Shield, LogOut, Menu, X, Receipt } from "lucide-react";
+import { FolderOpen, Plus, User, Shield, LogOut, Menu, X, Receipt, CreditCard } from "lucide-react";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 import { APP_ROUTES } from "@/lib/constants";
 import { useState } from "react";
@@ -125,6 +125,12 @@ export const AppHeader = () => {
                     الملف الشخصي
                   </DropdownMenuItem>
                 </Link>
+                <Link to={APP_ROUTES.SUBSCRIPTION}>
+                  <DropdownMenuItem className="flex-row-reverse cursor-pointer">
+                    <CreditCard className="ml-2 h-4 w-4" />
+                    إدارة الاشتراك
+                  </DropdownMenuItem>
+                </Link>
                 <Link to={APP_ROUTES.PAYMENT_HISTORY}>
                   <DropdownMenuItem className="flex-row-reverse cursor-pointer">
                     <Receipt className="ml-2 h-4 w-4" />
@@ -193,6 +199,20 @@ export const AppHeader = () => {
                     </Link>
                   );
                 })}
+                <Link
+                  to={APP_ROUTES.SUBSCRIPTION}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <DropdownMenuItem
+                    className={cn(
+                      "flex-row-reverse cursor-pointer",
+                      isActive(APP_ROUTES.SUBSCRIPTION) && "bg-primary/10"
+                    )}
+                  >
+                    <CreditCard className="ml-2 h-4 w-4" />
+                    إدارة الاشتراك
+                  </DropdownMenuItem>
+                </Link>
                 <Link
                   to={APP_ROUTES.PAYMENT_HISTORY}
                   onClick={() => setMobileMenuOpen(false)}
