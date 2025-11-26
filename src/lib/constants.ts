@@ -13,6 +13,7 @@ export const APP_ROUTES = {
   ADMIN: '/admin',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
+  REQUEST_ACCESS: '/request-access',
 } as const;
 
 /**
