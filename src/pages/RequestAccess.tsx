@@ -12,50 +12,49 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
-
 const requestAccessSchema = z.object({
-  name: z.string()
-    .trim()
-    .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
-    .max(100, { message: "الاسم يجب أن يكون أقل من 100 حرف" }),
-  email: z.string()
-    .trim()
-    .email({ message: "البريد الإلكتروني غير صحيح" })
-    .max(255, { message: "البريد الإلكتروني يجب أن يكون أقل من 255 حرف" }),
-  reason: z.string()
-    .trim()
-    .min(10, { message: "يرجى كتابة سبب الطلب (10 أحرف على الأقل)" })
-    .max(1000, { message: "السبب يجب أن يكون أقل من 1000 حرف" }),
+  name: z.string().trim().min(2, {
+    message: "الاسم يجب أن يكون حرفين على الأقل"
+  }).max(100, {
+    message: "الاسم يجب أن يكون أقل من 100 حرف"
+  }),
+  email: z.string().trim().email({
+    message: "البريد الإلكتروني غير صحيح"
+  }).max(255, {
+    message: "البريد الإلكتروني يجب أن يكون أقل من 255 حرف"
+  }),
+  reason: z.string().trim().min(10, {
+    message: "يرجى كتابة سبب الطلب (10 أحرف على الأقل)"
+  }).max(1000, {
+    message: "السبب يجب أن يكون أقل من 1000 حرف"
+  })
 });
-
 type RequestAccessForm = z.infer<typeof requestAccessSchema>;
-
 export default function RequestAccess() {
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
+    formState: {
+      errors,
+      isSubmitting
+    },
+    reset
   } = useForm<RequestAccessForm>({
-    resolver: zodResolver(requestAccessSchema),
+    resolver: zodResolver(requestAccessSchema)
   });
-
   const onSubmit = async (data: RequestAccessForm) => {
     try {
-      const { data: signupData, error } = await supabase
-        .from("beta_signups")
-        .insert([{
-          name: data.name.trim(),
-          email: data.email.trim().toLowerCase(),
-          notes: data.reason.trim(),
-          status: 'pending',
-        }])
-        .select()
-        .single();
-
+      const {
+        data: signupData,
+        error
+      } = await supabase.from("beta_signups").insert([{
+        name: data.name.trim(),
+        email: data.email.trim().toLowerCase(),
+        notes: data.reason.trim(),
+        status: 'pending'
+      }]).select().single();
       if (error) {
         if (error.code === "23505") {
           toast.error("هذا البريد الإلكتروني مسجل مسبقاً");
@@ -67,24 +66,23 @@ export default function RequestAccess() {
       }
 
       // Notify admins via edge function (fire and forget)
-      supabase.functions
-        .invoke("notify-admins-new-signup", {
-          body: {
-            signupId: signupData.id,
-            signupName: data.name.trim(),
-            signupEmail: data.email.trim().toLowerCase(),
-            signupReason: data.reason.trim(),
-          },
-        })
-        .then(({ error: notifyError }) => {
-          if (notifyError) {
-            console.error("Error notifying admins:", notifyError);
-            // Don't show error to user - notification failure shouldn't block signup
-          } else {
-            console.log("Admins notified successfully");
-          }
-        });
-
+      supabase.functions.invoke("notify-admins-new-signup", {
+        body: {
+          signupId: signupData.id,
+          signupName: data.name.trim(),
+          signupEmail: data.email.trim().toLowerCase(),
+          signupReason: data.reason.trim()
+        }
+      }).then(({
+        error: notifyError
+      }) => {
+        if (notifyError) {
+          console.error("Error notifying admins:", notifyError);
+          // Don't show error to user - notification failure shouldn't block signup
+        } else {
+          console.log("Admins notified successfully");
+        }
+      });
       setIsSuccess(true);
       toast.success("تم إرسال طلبك بنجاح!");
       reset();
@@ -93,9 +91,7 @@ export default function RequestAccess() {
       toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
     }
   };
-
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
+  return <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b border-border">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -118,15 +114,14 @@ export default function RequestAccess() {
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
-          {isSuccess ? (
-            <Card variant="editorial" className="text-center">
+          {isSuccess ? <Card variant="editorial" className="text-center">
               <CardContent className="pt-12 pb-12">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
                   <CheckCircle2 className="w-10 h-10 text-primary" />
                 </div>
                 <h2 className="text-3xl font-bold mb-4">تم إرسال طلبك بنجاح!</h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  شكراً لاهتمامك بـ PreShoot AI. سنقوم بمراجعة طلبك وسنتواصل معك قريباً عبر البريد الإلكتروني.
+                  شكراً لاهتمامك بـ PreShoot Studio. سنقوم بمراجعة طلبك وسنتواصل معك قريباً عبر البريد الإلكتروني.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button onClick={() => navigate("/")} variant="outline">
@@ -137,9 +132,7 @@ export default function RequestAccess() {
                   </Button>
                 </div>
               </CardContent>
-            </Card>
-          ) : (
-            <Card variant="editorial">
+            </Card> : <Card variant="editorial">
               <CardHeader>
                 <CardTitle className="text-3xl">طلب الوصول المبكر</CardTitle>
                 <CardDescription className="text-base">
@@ -153,17 +146,8 @@ export default function RequestAccess() {
                     <Label htmlFor="name" className="text-base">
                       الاسم الكامل <span className="text-destructive">*</span>
                     </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="أحمد محمد"
-                      disabled={isSubmitting}
-                      {...register("name")}
-                      className={errors.name ? "border-destructive" : ""}
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-destructive">{errors.name.message}</p>
-                    )}
+                    <Input id="name" type="text" placeholder="أحمد محمد" disabled={isSubmitting} {...register("name")} className={errors.name ? "border-destructive" : ""} />
+                    {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
                   </div>
 
                   {/* Email Field */}
@@ -171,18 +155,8 @@ export default function RequestAccess() {
                     <Label htmlFor="email" className="text-base">
                       البريد الإلكتروني <span className="text-destructive">*</span>
                     </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="ahmad@example.com"
-                      disabled={isSubmitting}
-                      {...register("email")}
-                      className={errors.email ? "border-destructive" : ""}
-                      dir="ltr"
-                    />
-                    {errors.email && (
-                      <p className="text-sm text-destructive">{errors.email.message}</p>
-                    )}
+                    <Input id="email" type="email" placeholder="ahmad@example.com" disabled={isSubmitting} {...register("email")} className={errors.email ? "border-destructive" : ""} dir="ltr" />
+                    {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
                   </div>
 
                   {/* Reason Field */}
@@ -190,39 +164,22 @@ export default function RequestAccess() {
                     <Label htmlFor="reason" className="text-base">
                       لماذا تريد الانضمام إلى PreShoot AI؟ <span className="text-destructive">*</span>
                     </Label>
-                    <Textarea
-                      id="reason"
-                      placeholder="أخبرنا عن نفسك وكيف تخطط لاستخدام PreShoot AI في عملك..."
-                      disabled={isSubmitting}
-                      {...register("reason")}
-                      className={`min-h-[120px] ${errors.reason ? "border-destructive" : ""}`}
-                      rows={5}
-                    />
-                    {errors.reason && (
-                      <p className="text-sm text-destructive">{errors.reason.message}</p>
-                    )}
+                    <Textarea id="reason" placeholder="أخبرنا عن نفسك وكيف تخطط لاستخدام PreShoot AI في عملك..." disabled={isSubmitting} {...register("reason")} className={`min-h-[120px] ${errors.reason ? "border-destructive" : ""}`} rows={5} />
+                    {errors.reason && <p className="text-sm text-destructive">{errors.reason.message}</p>}
                     <p className="text-xs text-muted-foreground">
                       يرجى تقديم معلومات مفصلة لمساعدتنا في فهم احتياجاتك (10-1000 حرف)
                     </p>
                   </div>
 
                   {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-base"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
+                  <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
+                    {isSubmitting ? <>
                         <Loader2 className="ms-2 h-5 w-5 animate-spin" />
                         جاري الإرسال...
-                      </>
-                    ) : (
-                      <>
+                      </> : <>
                         إرسال الطلب
                         <ArrowRight className="me-2 h-5 w-5" />
-                      </>
-                    )}
+                      </>}
                   </Button>
 
                   <div className="text-center pt-4">
@@ -235,8 +192,7 @@ export default function RequestAccess() {
                   </div>
                 </form>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
         </div>
       </main>
 
@@ -246,6 +202,5 @@ export default function RequestAccess() {
           <p>© 2025 PreShoot Studio. جميع الحقوق محفوظة.</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
