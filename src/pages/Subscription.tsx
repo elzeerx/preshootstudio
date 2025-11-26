@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useSubscription } from '@/hooks/useSubscription';
-import { formatTokens } from '@/lib/helpers/formatters';
+import { formatTokens, formatDateGregorian } from '@/lib/helpers/formatters';
 import { Link, useSearchParams } from 'react-router-dom';
 import { APP_ROUTES } from '@/lib/constants';
 import { useEffect } from 'react';
@@ -131,7 +131,7 @@ export default function Subscription() {
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
                         <span className="font-medium">
-                          {new Date(subscription.current_period_end).toLocaleDateString('ar-SA', { calendar: 'gregory' })}
+                          {formatDateGregorian(subscription.current_period_end)}
                         </span>
                       </div>
                     </div>
@@ -280,7 +280,7 @@ export default function Subscription() {
                       <AlertDialogDescription>
                         سيتم إلغاء اشتراكك في نهاية الفترة الحالية (
                         {subscription.current_period_end && 
-                          new Date(subscription.current_period_end).toLocaleDateString('ar-SA', { calendar: 'gregory' })
+                          formatDateGregorian(subscription.current_period_end)
                         }). يمكنك الاستمرار في استخدام الميزات المدفوعة حتى ذلك الحين.
                       </AlertDialogDescription>
                     </AlertDialogHeader>

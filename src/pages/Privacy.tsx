@@ -1,6 +1,7 @@
 import { AppHeader } from "@/components/common/AppHeader";
 import { AppFooter } from "@/components/common/AppFooter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDateLong } from "@/lib/helpers/formatters";
 
 const Privacy = () => {
   return (
@@ -10,7 +11,7 @@ const Privacy = () => {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-8 text-center">سياسة الخصوصية</h1>
           <p className="text-muted-foreground text-center mb-8">
-            آخر تحديث: {new Date().toLocaleDateString('ar-SA', { calendar: 'gregory', year: 'numeric', month: 'long', day: 'numeric' })}
+            آخر تحديث: {formatDateLong(new Date())}
           </p>
 
           <div className="space-y-6">
