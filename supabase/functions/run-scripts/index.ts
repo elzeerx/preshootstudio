@@ -39,20 +39,89 @@ Deno.serve(async (req) => {
 
     console.log('Project found:', project.topic);
 
+    // Determine content type
+    const contentType = project.content_type || 'factual';
+    const isCreativeContent = contentType === 'creative' || contentType === 'personal' || contentType === 'opinion';
+    console.log('Content type:', contentType);
+
     // Update status to loading
     await supabase
       .from('projects')
       .update({ scripts_status: 'loading' })
       .eq('id', projectId);
 
-    // Build user prompt with context from research if available
+    // Build user prompt based on content type
     let userPrompt = `الموضوع هو: ${project.topic}`;
     
-    if (project.research_summary) {
+    if (isCreativeContent && project.creative_data) {
+      // Use creative research data
+      const creativeData = project.creative_data as any;
+      
+      if (creativeData.uniqueValueProp) {
+        userPrompt += `\n\nما يميز هذا المحتوى: ${creativeData.uniqueValueProp}`;
+      }
+      
+      if (creativeData.contentAngles && creativeData.contentAngles.length > 0) {
+        userPrompt += `\n\nزوايا المحتوى المقترحة:\n${creativeData.contentAngles.slice(0, 3).map((angle: string, i: number) => `${i + 1}. ${angle}`).join('\n')}`;
+      }
+      
+      if (creativeData.hooks && creativeData.hooks.length > 0) {
+        userPrompt += `\n\nافتتاحيات جذابة:\n${creativeData.hooks.slice(0, 2).map((hook: string) => `• ${hook}`).join('\n')}`;
+      }
+      
+      if (creativeData.storyBeats && creativeData.storyBeats.length > 0) {
+        userPrompt += `\n\nهيكل القصة المقترح:\n${creativeData.storyBeats.map((beat: string, i: number) => `${i + 1}. ${beat}`).join('\n')}`;
+      }
+      
+      if (creativeData.emotionalTriggers && creativeData.emotionalTriggers.length > 0) {
+        userPrompt += `\n\nالمحفزات العاطفية: ${creativeData.emotionalTriggers.slice(0, 3).join('، ')}`;
+      }
+    } else if (project.research_summary) {
+      // Use factual research data
       userPrompt += `\n\nملخص عن الموضوع لمساعدتك في الفهم (لا تنسخه حرفيًا، استخدمه فقط كمرجع):\n${project.research_summary}`;
     }
 
     userPrompt += '\n\nالرجاء توليد السكريبتات الثلاثة حسب البنية المحددة في تعليمات النظام.';
+
+    // System prompt adapts based on content type
+    const systemPrompt = isCreativeContent 
+      ? `أنت كاتب محتوى فيديو محترف متخصص في المحتوى الترفيهي والإبداعي.
+
+مهمتك كتابة سكريبتات لفيديوهات ترفيهية أو شخصية أو رأي لجمهور عام، بلغة عربية فصحى مبسّطة وقريبة من حديث الناس، قابلة للقراءة بصوت عالٍ في فيديو.
+
+مطلوب منك أن تنتج ٣ سكريبتات مختلفة لنفس الموضوع:
+1) سكريبت كامل لقراءة تلقين (Teleprompter) - نص متدفق سهل القراءة، محادثة مباشرة مع الجمهور
+2) سكريبت قصير لريلز (30–60 ثانية تقريبًا) - افتتاحية قوية ونقاط سريعة جذابة
+3) سكريبت لفيديو طويل على يوتيوب - مخطط تفصيلي مع أقسام منظمة
+
+التزم بالتالي:
+- اجعل النبرة شخصية ومباشرة كأنك تتحدث مع صديق
+- استخدم أسلوب storytelling وربط القصص الشخصية
+- ركز على المشاعر والتجارب الإنسانية
+- ابدأ السكريبتات بـ Hook قوي يجذب الانتباه فورًا
+- في سكريبت التلقين: اجعل كل line جملة واحدة كاملة محادثية
+- في سكريبت الريلز: ركز على السرعة والإثارة والمحتوى المكثف
+- في الفيديو الطويل: اجعل fullScript تفصيلي وشامل (500+ كلمة) مع قصص وأمثلة
+- استخدم لغة محادثية قريبة من الجمهور العربي
+- اجعل المحتوى relatable وممتع ومسلي`
+      : `أنت كاتب محتوى فيديو محترف تعمل مع صنّاع محتوى عرب.
+
+مهمتك كتابة سكريبتات لفيديوهات تشرح موضوع معيّن لجمهور عام غير متخصص، بلغة عربية فصحى مبسّطة وقريبة من حديث الناس، قابلة للقراءة بصوت عالٍ في فيديو.
+
+مطلوب منك أن تنتج ٣ سكريبتات مختلفة لنفس الموضوع:
+1) سكريبت كامل لقراءة تلقين (Teleprompter) - نص متدفق سهل القراءة
+2) سكريبت قصير لريلز (30–60 ثانية تقريبًا) - افتتاحية قوية ونقاط سريعة
+3) سكريبت لفيديو طويل على يوتيوب - مخطط تفصيلي مع أقسام منظمة
+
+التزم بالتالي:
+- اجعل الجمل قصيرة وواضحة وسهلة القراءة من Teleprompter
+- ابدأ السكريبتات بـ Hook قوي وحافظ على تسلسل منطقي
+- في سكريبت التلقين: اجعل كل line جملة واحدة كاملة (لا تقطع الجملة)
+- في سكريبت الريلز: ركز على السرعة والإثارة والمحتوى المكثف
+- في الفيديو الطويل: اجعل fullScript تفصيلي وشامل (500+ كلمة)
+- اعتمد على أي ملخص بحث أو نقاط رئيسية تُعطى لك كمرجع، لكن لا تنسخها حرفيًا
+- استخدم لغة محادثية قريبة من الجمهور العربي
+- تجنب المصطلحات المعقدة أو اشرحها بطريقة مبسطة`;
 
     console.log('Calling Lovable AI for scripts...');
 
@@ -73,24 +142,7 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `أنت كاتب محتوى فيديو محترف تعمل مع صنّاع محتوى عرب.
-
-مهمتك كتابة سكريبتات لفيديوهات تشرح موضوع معيّن لجمهور عام غير متخصص، بلغة عربية فصحى مبسّطة وقريبة من حديث الناس، قابلة للقراءة بصوت عالٍ في فيديو.
-
-مطلوب منك أن تنتج ٣ سكريبتات مختلفة لنفس الموضوع:
-1) سكريبت كامل لقراءة تلقين (Teleprompter) - نص متدفق سهل القراءة
-2) سكريبت قصير لريلز (30–60 ثانية تقريبًا) - افتتاحية قوية ونقاط سريعة
-3) سكريبت لفيديو طويل على يوتيوب - مخطط تفصيلي مع أقسام منظمة
-
-التزم بالتالي:
-- اجعل الجمل قصيرة وواضحة وسهلة القراءة من Teleprompter
-- ابدأ السكريبتات بـ Hook قوي وحافظ على تسلسل منطقي
-- في سكريبت التلقين: اجعل كل line جملة واحدة كاملة (لا تقطع الجملة)
-- في سكريبت الريلز: ركز على السرعة والإثارة والمحتوى المكثف
-- في الفيديو الطويل: اجعل fullScript تفصيلي وشامل (500+ كلمة)
-- اعتمد على أي ملخص بحث أو نقاط رئيسية تُعطى لك كمرجع، لكن لا تنسخها حرفيًا
-- استخدم لغة محادثية قريبة من الجمهور العربي
-- تجنب المصطلحات المعقدة أو اشرحها بطريقة مبسطة`
+            content: systemPrompt
           },
           {
             role: 'user',

@@ -57,10 +57,31 @@ Deno.serve(async (req) => {
       .update({ broll_status: 'loading' })
       .eq('id', projectId);
 
-    // Build user prompt
+    // Determine content type
+    const contentType = project.content_type || 'factual';
+    const isCreativeContent = contentType === 'creative' || contentType === 'personal' || contentType === 'opinion';
+    console.log('Content type:', contentType);
+
+    // Build user prompt based on content type
     let userPrompt = `الموضوع هو: ${project.topic}`;
     
-    if (project.research_summary) {
+    if (isCreativeContent && project.creative_data) {
+      // Use creative research data
+      const creativeData = project.creative_data as any;
+      
+      if (creativeData.uniqueValueProp) {
+        userPrompt += `\n\nما يميز هذا المحتوى: ${creativeData.uniqueValueProp}`;
+      }
+      
+      if (creativeData.storyBeats && creativeData.storyBeats.length > 0) {
+        userPrompt += `\n\nهيكل القصة: ${creativeData.storyBeats.join('، ')}`;
+      }
+      
+      if (creativeData.emotionalTriggers && creativeData.emotionalTriggers.length > 0) {
+        userPrompt += `\n\nالمحفزات العاطفية: ${creativeData.emotionalTriggers.join('، ')}`;
+      }
+    } else if (project.research_summary) {
+      // Use factual research data
       userPrompt += `\n\nملخص عن الموضوع لمساعدتك في فهم المحتوى (لا تنسخه حرفيًا، استخدمه فقط كمرجع):\n${project.research_summary}`;
     }
 
@@ -73,8 +94,47 @@ Deno.serve(async (req) => {
       }
     }
 
-    // System prompt for B-Roll
-    const systemPrompt = `أنت مخرج فيديو وخبير تصوير محتوى تعمل مع صنّاع محتوى عرب.
+    // System prompt adapts based on content type
+    const systemPrompt = isCreativeContent
+      ? `أنت مخرج فيديو وخبير تصوير متخصص في المحتوى الترفيهي والشخصي.
+
+مهمتك اقتراح لقطات B-Roll لمقطع فيديو ترفيهي أو شخصي، بحيث:
+- تكون اللقطات متنوعة وطبيعية (lifestyle، vlog، behind-the-scenes)
+- تركز على اللحظات الإنسانية والعفوية
+- تراعي إمكانيات تصوير بسيطة (هاتف، كاميرا شخصية)
+- يمكن تنفيذها بسهولة من صانع محتوى فردي
+- تركز على الشخصية والعاطفة أكثر من التقنية
+
+كما يجب أن تقترح لكل لقطة برومبت نصي باللغة الإنجليزية يمكن استخدامه مع مولدات الصور بأسلوب lifestyle أو portrait.
+
+أعد الاستجابة بصيغة JSON فقط، وبدون أي نص زائد، وبالبنية التالية حرفيًا:
+{
+  "shots": [
+    {
+      "id": "shot-1",
+      "title": "عنوان اللقطة",
+      "description": "وصف تفصيلي للقطة",
+      "shotType": "close-up" | "medium" | "wide" | "macro" | "screen-record" | "product" | "b-roll",
+      "cameraMovement": "static" | "pan" | "tilt" | "slide" | "handheld" | "zoom-in" | "zoom-out" | "orbit",
+      "durationSec": 5,
+      "locationOrContext": "المكان أو السياق",
+      "notes": "ملاحظات إضافية",
+      "aiImagePrompt": "Professional cinematic shot of..."
+    }
+  ],
+  "generalTips": ["نصيحة 1", "نصيحة 2", "نصيحة 3"]
+}
+
+التزم بالتالي:
+- اجعل الوصف العربي واضحًا ومباشرًا
+- اربط اللقطات فعلاً بمحتوى الموضوع الشخصي أو الترفيهي
+- اجعل aiImagePrompt بالإنجليزية، بأسلوب تصوير lifestyle أو vlog
+- اقترح 5-10 لقطات متنوعة حسب طبيعة الموضوع
+- في generalTips، أضف 3-5 نصائح عملية للتصوير الشخصي
+- ركز على natural lighting و candid moments
+
+تذكر: أنت تساعد صانع محتوى عربي في تجهيز لقطات داعمة احترافية لفيديوهاته.`
+      : `أنت مخرج فيديو وخبير تصوير محتوى تعمل مع صنّاع محتوى عرب.
 
 مهمتك اقتراح لقطات B-Roll لمقطع فيديو يشرح موضوعًا معيّنًا، بحيث:
 - تكون اللقطات متنوعة (قريبة، متوسطة، واسعة، ماكرو، تسجيل شاشة، إلخ).
@@ -104,7 +164,7 @@ Deno.serve(async (req) => {
 
 التزم بالتالي:
 - اجعل الوصف العربي واضحًا ومباشرًا
-- اربط اللقطات فعلًا بمحتوى الموضوع، وليس لقطات عشوائية
+- اربط اللقطات فعلاً بمحتوى الموضوع، وليس لقطات عشوائية
 - اجعل aiImagePrompt بالإنجليزية، بأسلوب برومبت تصوير سينمائي أو فوتوغرافي
 - اقترح 5-10 لقطات متنوعة حسب طبيعة الموضوع
 - في generalTips، أضف 3-5 نصائح عملية للتصوير
