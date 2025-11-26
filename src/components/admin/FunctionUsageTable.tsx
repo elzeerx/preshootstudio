@@ -57,9 +57,9 @@ export const FunctionUsageTable = ({ data }: { data: FunctionUsage[] }) => {
                   <TableCell>
                     {functionLabels[item.functionName] || item.functionName}
                   </TableCell>
-                  <TableCell>{item.requestCount.toLocaleString('ar-SA')}</TableCell>
-                  <TableCell>{item.totalTokens.toLocaleString('ar-SA')}</TableCell>
-                  <TableCell>{Math.round(item.avgTokensPerRequest).toLocaleString('ar-SA')}</TableCell>
+                  <TableCell>{item.requestCount.toLocaleString('en-US')}</TableCell>
+                  <TableCell>{item.totalTokens.toLocaleString('en-US')}</TableCell>
+                  <TableCell>{Math.round(item.avgTokensPerRequest).toLocaleString('en-US')}</TableCell>
                   <TableCell>${item.totalCost.toFixed(4)}</TableCell>
                 </TableRow>
               ))

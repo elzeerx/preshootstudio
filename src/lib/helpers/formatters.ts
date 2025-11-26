@@ -26,7 +26,7 @@ export const formatDateGregorian = (
 ): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA', {
+    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
       calendar: 'gregory',
       year: 'numeric',
       month: 'long',
@@ -46,7 +46,7 @@ export const formatDateGregorian = (
 export const formatDateShort = (date: string | Date): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA', {
+    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
       calendar: 'gregory',
       year: 'numeric',
       month: '2-digit',
@@ -78,7 +78,7 @@ export const formatDateLong = (date: string | Date): string => {
 export const formatDateTime = (date: string | Date): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA', {
+    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
       calendar: 'gregory',
       year: 'numeric',
       month: 'long',
@@ -99,7 +99,7 @@ export const formatDateTime = (date: string | Date): string => {
 export const formatDateWithWeekday = (date: string | Date): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA', {
+    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
       calendar: 'gregory',
       weekday: 'long',
       year: 'numeric',
@@ -181,6 +181,15 @@ export const getStatusVariant = (status: string): "default" | "secondary" | "out
     ready: "outline",
   };
   return variantMap[status] || "default";
+};
+
+/**
+ * Format a number using English numerals
+ * @param num - Number to format
+ * @returns Formatted number string with commas
+ */
+export const formatNumber = (num: number): string => {
+  return num.toLocaleString('en-US');
 };
 
 /**

@@ -145,7 +145,7 @@ export const EditUserTokenLimitDialog = ({
                 min="1"
               />
               <p className="text-xs text-muted-foreground">
-                الحد الحالي: {parseInt(customLimit).toLocaleString() || 0} token
+                الحد الحالي: {parseInt(customLimit).toLocaleString('en-US') || 0} token
               </p>
             </div>
           )}

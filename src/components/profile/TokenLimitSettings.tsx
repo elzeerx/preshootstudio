@@ -125,7 +125,7 @@ export const TokenLimitSettings = () => {
         <CardHeader>
           <CardTitle>الاستخدام الحالي هذا الشهر</CardTitle>
           <CardDescription>
-            {usage?.total_tokens.toLocaleString() || 0} / {tokenLimit.toLocaleString()} tokens
+            {usage?.total_tokens.toLocaleString('en-US') || 0} / {tokenLimit.toLocaleString('en-US')} tokens
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -165,7 +165,7 @@ export const TokenLimitSettings = () => {
             <div>
               <p className="text-xs text-muted-foreground">عدد الطلبات</p>
               <p className="text-lg font-bold">
-                {usage?.request_count?.toLocaleString() || 0}
+                {usage?.request_count?.toLocaleString('en-US') || 0}
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export const TokenLimitSettings = () => {
             <Input
               id="monthly-limit"
               type="text"
-              value={tokenLimit.toLocaleString()}
+              value={tokenLimit.toLocaleString('en-US')}
               disabled
               className="bg-muted cursor-not-allowed"
             />

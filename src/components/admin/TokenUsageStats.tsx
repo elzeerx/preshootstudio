@@ -23,7 +23,7 @@ export const TokenUsageStats = ({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {totalTokens.toLocaleString('ar-SA')}
+            {totalTokens.toLocaleString('en-US')}
           </div>
           <p className="text-xs text-muted-foreground">
             جميع الاستخدامات
@@ -53,7 +53,7 @@ export const TokenUsageStats = ({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {requestCount.toLocaleString('ar-SA')}
+            {requestCount.toLocaleString('en-US')}
           </div>
           <p className="text-xs text-muted-foreground">
             إجمالي الطلبات
@@ -71,7 +71,7 @@ export const TokenUsageStats = ({
             {successRate.toFixed(1)}%
           </div>
           <p className="text-xs text-muted-foreground">
-            نجح من {requestCount.toLocaleString('ar-SA')}
+            نجح من {requestCount.toLocaleString('en-US')}
           </p>
         </CardContent>
       </Card>

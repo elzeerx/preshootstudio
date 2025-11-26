@@ -41,7 +41,7 @@ export const LiveTokenIndicator = () => {
         <CardContent className="p-4 flex items-center gap-2">
           <Activity className="h-4 w-4 animate-pulse text-primary" />
           <span className="text-sm font-medium">
-            جاري استخدام AI... ({currentTokens.toLocaleString('ar-SA')} tokens)
+            جاري استخدام AI... ({currentTokens.toLocaleString('en-US')} tokens)
           </span>
         </CardContent>
       </Card>
