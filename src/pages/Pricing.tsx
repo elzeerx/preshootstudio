@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { AppHeader } from '@/components/common/AppHeader';
 import { AppFooter } from '@/components/common/AppFooter';
+import AuraLayout from '@/components/common/AuraLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Check, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -72,7 +74,7 @@ export default function Pricing() {
   const getFeatures = (plan: Plan) => {
     const features = [
       `${plan.project_limit_monthly || 'غير محدود'} مشروع شهرياً`,
-      `${(plan.token_limit_monthly / 1000).toLocaleString('ar-SA')}K رمز شهرياً`,
+      `${(plan.token_limit_monthly / 1000).toLocaleString('en-US')}K رمز شهرياً`,
       `إعادة توليد ${plan.redo_limit_per_tab === 99 ? 'غير محدودة' : plan.redo_limit_per_tab + ' مرات'} لكل تبويب`,
     ];
 
@@ -84,13 +86,13 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <AuraLayout>
       <AppHeader />
       
       <main className="flex-1 container mx-auto px-4 py-12">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
             الأسعار
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -99,23 +101,19 @@ export default function Pricing() {
         </div>
 
         {/* Billing Toggle */}
-        <div className="flex justify-center items-center gap-4 mb-12">
-          <span className={billingPeriod === 'monthly' ? 'font-semibold' : 'text-muted-foreground'}>
+        <div className="flex justify-center items-center gap-4 mb-12 p-4 rounded-xl bg-background/40 backdrop-blur-sm border border-border/50 w-fit mx-auto">
+          <span className={billingPeriod === 'monthly' ? 'font-semibold text-foreground' : 'text-muted-foreground'}>
             شهري
           </span>
-          <button
-            onClick={() => setBillingPeriod(prev => prev === 'monthly' ? 'yearly' : 'monthly')}
-            className="relative w-14 h-8 bg-muted rounded-full transition-colors hover:bg-muted/80"
-          >
-            <div className={`absolute top-1 w-6 h-6 bg-primary rounded-full transition-transform ${
-              billingPeriod === 'yearly' ? 'translate-x-1' : 'translate-x-7'
-            }`} />
-          </button>
-          <span className={billingPeriod === 'yearly' ? 'font-semibold' : 'text-muted-foreground'}>
+          <Switch 
+            checked={billingPeriod === 'yearly'}
+            onCheckedChange={(checked) => setBillingPeriod(checked ? 'yearly' : 'monthly')}
+          />
+          <span className={billingPeriod === 'yearly' ? 'font-semibold text-foreground' : 'text-muted-foreground'}>
             سنوي
           </span>
           {billingPeriod === 'yearly' && (
-            <Badge variant="secondary" className="mr-2">
+            <Badge variant="secondary" className="mr-2 bg-primary/20 text-primary border-primary/30">
               وفّر شهرين
             </Badge>
           )}
@@ -135,10 +133,12 @@ export default function Pricing() {
               return (
                 <Card
                   key={plan.id}
-                  className={`p-6 relative ${isPopular ? 'border-primary shadow-lg scale-105' : ''}`}
+                  className={`p-6 relative backdrop-blur-md bg-background/40 border-border/50 transition-all duration-300 hover:bg-background/60 hover:scale-105 ${
+                    isPopular ? 'border-primary shadow-lg shadow-primary/20 scale-105' : ''
+                  }`}
                 >
                   {isPopular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="absolute -top-3 right-1/2 translate-x-1/2 bg-primary text-primary-foreground border-0">
                       الأكثر شعبية
                     </Badge>
                   )}
@@ -146,7 +146,7 @@ export default function Pricing() {
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold mb-2">{plan.name_ar}</h3>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold">${price}</span>
+                      <span className="text-4xl font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">${price}</span>
                       <span className="text-muted-foreground">
                         /{billingPeriod === 'yearly' ? 'سنة' : 'شهر'}
                       </span>
@@ -177,18 +177,18 @@ export default function Pricing() {
         )}
 
         {/* Payment Methods */}
-        <div className="text-center py-8 border-t">
+        <div className="text-center py-8 mt-12 border-t border-border/50">
           <p className="text-sm text-muted-foreground mb-4">
             مدفوعات آمنة بواسطة PayPal
           </p>
-          <div className="flex justify-center items-center gap-4 opacity-60">
-            <Zap className="w-6 h-6" />
+          <div className="flex justify-center items-center gap-3 p-3 rounded-lg bg-background/40 backdrop-blur-sm border border-border/50 w-fit mx-auto">
+            <Zap className="w-5 h-5 text-primary" />
             <span className="text-sm font-medium">PayPal</span>
           </div>
         </div>
       </main>
 
       <AppFooter />
-    </div>
+    </AuraLayout>
   );
 }
