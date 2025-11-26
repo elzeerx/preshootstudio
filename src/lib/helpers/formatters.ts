@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { LOCALE, DATE_FORMAT_OPTIONS, createDateFormatOptions } from "@/lib/config/locale";
 
 /**
  * Format a date string to Arabic format with Gregorian calendar
@@ -26,13 +27,12 @@ export const formatDateGregorian = (
 ): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
-      calendar: 'gregory',
+    return dateObj.toLocaleDateString(LOCALE.DATE, createDateFormatOptions({
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       ...options,
-    });
+    }));
   } catch {
     return typeof date === 'string' ? date : date.toISOString();
   }
@@ -46,12 +46,7 @@ export const formatDateGregorian = (
 export const formatDateShort = (date: string | Date): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
-      calendar: 'gregory',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
+    return dateObj.toLocaleDateString(LOCALE.DATE, DATE_FORMAT_OPTIONS.SHORT);
   } catch {
     return typeof date === 'string' ? date : date.toISOString();
   }
@@ -63,11 +58,12 @@ export const formatDateShort = (date: string | Date): string => {
  * @returns Long formatted date string
  */
 export const formatDateLong = (date: string | Date): string => {
-  return formatDateGregorian(date, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString(LOCALE.DATE, DATE_FORMAT_OPTIONS.LONG);
+  } catch {
+    return typeof date === 'string' ? date : date.toISOString();
+  }
 };
 
 /**
@@ -78,14 +74,7 @@ export const formatDateLong = (date: string | Date): string => {
 export const formatDateTime = (date: string | Date): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
-      calendar: 'gregory',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return dateObj.toLocaleDateString(LOCALE.DATE, DATE_FORMAT_OPTIONS.WITH_TIME);
   } catch {
     return typeof date === 'string' ? date : date.toISOString();
   }
@@ -99,13 +88,7 @@ export const formatDateTime = (date: string | Date): string => {
 export const formatDateWithWeekday = (date: string | Date): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('ar-SA-u-nu-latn', {
-      calendar: 'gregory',
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    return dateObj.toLocaleDateString(LOCALE.DATE, DATE_FORMAT_OPTIONS.WITH_WEEKDAY);
   } catch {
     return typeof date === 'string' ? date : date.toISOString();
   }
@@ -189,7 +172,7 @@ export const getStatusVariant = (status: string): "default" | "secondary" | "out
  * @returns Formatted number string with commas
  */
 export const formatNumber = (num: number): string => {
-  return num.toLocaleString('en-US');
+  return num.toLocaleString(LOCALE.NUMBER);
 };
 
 /**
@@ -199,11 +182,11 @@ export const formatNumber = (num: number): string => {
  */
 export const formatTokens = (tokens: number): string => {
   if (tokens >= 1000000) {
-    return `${(tokens / 1000000).toLocaleString('en-US')}M`;
+    return `${(tokens / 1000000).toLocaleString(LOCALE.NUMBER)}M`;
   }
   if (tokens >= 1000) {
-    return `${(tokens / 1000).toLocaleString('en-US')}K`;
+    return `${(tokens / 1000).toLocaleString(LOCALE.NUMBER)}K`;
   }
-  return tokens.toLocaleString('en-US');
+  return tokens.toLocaleString(LOCALE.NUMBER);
 };
 

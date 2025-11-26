@@ -43,3 +43,9 @@ export const WORKSPACE_TABS = {
   EXPORT: 'export',
 } as const;
 
+/**
+ * Re-export locale configuration for easy access
+ * For detailed locale settings, see src/lib/config/locale.ts
+ */
+export { LOCALE, CALENDAR, CURRENCY, DATE_FORMAT_OPTIONS } from './config/locale';
+
