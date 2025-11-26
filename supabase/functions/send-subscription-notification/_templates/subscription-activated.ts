@@ -9,6 +9,7 @@ interface SubscriptionActivatedData {
 
 export function getSubscriptionActivatedTemplate(data: SubscriptionActivatedData): string {
   const renewalDate = new Date(data.next_billing_date).toLocaleDateString('ar-SA', {
+    calendar: 'gregory',
     year: 'numeric',
     month: 'long',
     day: 'numeric',

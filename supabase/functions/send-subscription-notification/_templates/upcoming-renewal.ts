@@ -9,6 +9,7 @@ interface UpcomingRenewalData {
 
 export function getUpcomingRenewalTemplate(data: UpcomingRenewalData): string {
   const renewalDate = new Date(data.renewal_date).toLocaleDateString('ar-SA', {
+    calendar: 'gregory',
     year: 'numeric',
     month: 'long',
     day: 'numeric',

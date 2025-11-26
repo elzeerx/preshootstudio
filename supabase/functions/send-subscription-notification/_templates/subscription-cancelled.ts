@@ -6,6 +6,7 @@ interface SubscriptionCancelledData {
 
 export function getSubscriptionCancelledTemplate(data: SubscriptionCancelledData): string {
   const endDate = new Date(data.end_date).toLocaleDateString('ar-SA', {
+    calendar: 'gregory',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
