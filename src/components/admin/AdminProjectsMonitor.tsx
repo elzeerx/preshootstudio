@@ -68,6 +68,8 @@ export function AdminProjectsMonitor() {
         const moderation = moderationData?.find(m => m.project_id === project.id);
         return {
           ...project,
+          content_type: project.content_type,
+          creative_data: project.creative_data as any,
           research_manual_edits: project.research_manual_edits as any,
           research_data: project.research_data as any,
           research_quality_metrics: project.research_quality_metrics as any,
