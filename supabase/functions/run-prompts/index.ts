@@ -57,10 +57,31 @@ Deno.serve(async (req) => {
       .update({ prompts_status: 'loading' })
       .eq('id', projectId);
 
-    // Build user prompt
+    // Determine content type
+    const contentType = project.content_type || 'factual';
+    const isCreativeContent = contentType === 'creative' || contentType === 'personal' || contentType === 'opinion';
+    console.log('Content type:', contentType);
+
+    // Build user prompt based on content type
     let userPrompt = `الموضوع هو: ${project.topic}`;
     
-    if (project.research_summary) {
+    if (isCreativeContent && project.creative_data) {
+      // Use creative research data
+      const creativeData = project.creative_data as any;
+      
+      if (creativeData.uniqueValueProp) {
+        userPrompt += `\n\nما يميز هذا المحتوى: ${creativeData.uniqueValueProp}`;
+      }
+      
+      if (creativeData.contentAngles && creativeData.contentAngles.length > 0) {
+        userPrompt += `\n\nزوايا المحتوى: ${creativeData.contentAngles.slice(0, 2).join('، ')}`;
+      }
+      
+      if (creativeData.trendingFormats && creativeData.trendingFormats.length > 0) {
+        userPrompt += `\n\nصيغ الفيديو الرائجة: ${creativeData.trendingFormats.slice(0, 2).join('، ')}`;
+      }
+    } else if (project.research_summary) {
+      // Use factual research data
       userPrompt += `\n\nملخص عن الموضوع لمساعدتك في فهم المحتوى (لا تنسخه حرفيًا، استخدمه فقط كمرجع):\n${project.research_summary}`;
     }
 
@@ -89,60 +110,39 @@ Deno.serve(async (req) => {
 
     userPrompt += '\n\nالرجاء توليد حزمة البرومبتات حسب البنية المحددة في تعليمات النظام.';
 
-    // System prompt for Prompts
-    const systemPrompt = `أنت مبدع برومبتات (Prompt Engineer) محترف تعمل مع صنّاع محتوى عرب.
+    // System prompt adapts based on content type
+    const systemPrompt = isCreativeContent
+      ? `أنت مبدع برومبتات (Prompt Engineer) محترف متخصص في المحتوى الترفيهي والإبداعي.
+
+مهمتك إنشاء حزمة برومبتات جاهزة لمحتوى ترفيهي أو شخصي يمكن استخدامها في:
+- مولدات الصور مثل Midjourney و Gemini.
+- مولدات الفيديو مثل Sora و Veo وغيرها.
+- إنشاء صور Thumbnails جذابة لفيديوهات يوتيوب وريلز.
+
+التزم بالتالي:
+- البرومبتات نفسها (داخل الحقل prompt) تكون باللغة الإنجليزية بصياغة احترافية
+- ركز على أسلوب lifestyle و vlog و entertainment
+- اجعل الصور personal و relatable
+- استخدم أساليب تصوير حديثة (portrait mode، natural lighting، candid shots)
+- اربط البرومبتات بأجواء المحتوى الشخصي أو الترفيهي
+- احترم الـ aspect ratio (16:9 للفيديو، 9:16 للريلز، 4:5 أو 1:1 للصور الاجتماعية)
+- اقترح 5-8 برومبتات للصور، 2-4 برومبتات للفيديو، و 2-3 برومبتات للـ Thumbnails
+- في notes، أضف 3-5 نصائح عملية لاستخدام البرومبتات بفعالية في المحتوى الشخصي`
+      : `أنت مبدع برومبتات (Prompt Engineer) محترف تعمل مع صنّاع محتوى عرب.
 
 مهمتك إنشاء حزمة برومبتات جاهزة يمكن استخدامها في:
 - مولدات الصور مثل Midjourney و Gemini.
 - مولدات الفيديو مثل Sora و Veo وغيرها.
 - إنشاء صور Thumbnails جذابة لفيديوهات يوتيوب وريلز.
 
-الموضوع يُعطى لك كعنوان عام، وقد تُعطى لك:
-- ملخص بحثي عن الموضوع.
-- عنوان سكريبت أو فكرة الفيديو.
-- سياق عن لقطات B-Roll المقترحة.
-
-مطلوب منك إنتاج JSON فقط، وبدون أي نص زائد، وبالبنية التالية حرفيًا:
-{
-  "imagePrompts": [
-    {
-      "id": "img-1",
-      "label": "وصف قصير بالعربية",
-      "model": "midjourney" | "gemini" | "generic",
-      "aspectRatio": "16:9",
-      "style": "cinematic",
-      "prompt": "Professional English prompt text here..."
-    }
-  ],
-  "videoPrompts": [
-    {
-      "id": "vid-1",
-      "label": "وصف المشهد بالعربية",
-      "durationSec": 30,
-      "style": "cinematic trailer",
-      "prompt": "Video prompt in English..."
-    }
-  ],
-  "thumbnailPrompts": [
-    {
-      "id": "thumb-1",
-      "label": "وصف الـ Thumbnail بالعربية",
-      "prompt": "Thumbnail prompt in English..."
-    }
-  ],
-  "notes": ["نصيحة 1 بالعربية", "نصيحة 2 بالعربية"]
-}
-
 التزم بالتالي:
-- البرومبتات نفسها (داخل الحقل prompt) تكون باللغة الإنجليزية بصياغة احترافية مناسبة لنماذج الصور أو الفيديو.
-- الحقول label و notes بالعربية، تشرح لصانع المحتوى متى ولماذا يستخدم كل برومبت.
-- اربط البرومبتات فعلاً بالموضوع، وبأجواء الفيديو (تعليمي، تقني، ترفيهي…).
-- اجعل أسلوب الصور يميل للطابع السينمائي أو التحريري (editorial) عندما يكون مناسبًا.
-- احترم الـ aspect ratio (مثل 16:9 للفيديو، 9:16 للريلز، 4:5 أو 1:1 للصور الاجتماعية).
-- اقترح 5-8 برومبتات للصور، 2-4 برومبتات للفيديو، و 2-3 برومبتات للـ Thumbnails حسب طبيعة الموضوع.
-- في notes، أضف 3-5 نصائح عملية لاستخدام البرومبتات بفعالية.
-
-تذكر: أنت تساعد صانع محتوى عربي في تجهيز برومبتات احترافية جاهزة للاستخدام.`;
+- البرومبتات نفسها (داخل الحقل prompt) تكون باللغة الإنجليزية بصياغة احترافية مناسبة لنماذج الصور أو الفيديو
+- الحقول label و notes بالعربية، تشرح لصانع المحتوى متى ولماذا يستخدم كل برومبت
+- اربط البرومبتات فعلاً بالموضوع، وبأجواء الفيديو (تعليمي، تقني، ترفيهي…)
+- اجعل أسلوب الصور يميل للطابع السينمائي أو التحريري (editorial) عندما يكون مناسبًا
+- احترم الـ aspect ratio (مثل 16:9 للفيديو، 9:16 للريلز، 4:5 أو 1:1 للصور الاجتماعية)
+- اقترح 5-8 برومبتات للصور، 2-4 برومبتات للفيديو، و 2-3 برومبتات للـ Thumbnails حسب طبيعة الموضوع
+- في notes، أضف 3-5 نصائح عملية لاستخدام البرومبتات بفعالية`;
 
     console.log('Calling Lovable AI Gateway for Prompts generation...');
 
