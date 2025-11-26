@@ -142,7 +142,7 @@ export default function Landing() {
               <img
                 src="/src/assets/preshoot-logo-new.png"
                 alt="PreShoot Logo"
-                className="h-8 w-auto group-hover:scale-110 transition-transform duration-300"
+                className="h-8 w-auto brightness-0 invert group-hover:scale-110 transition-transform duration-300"
               />
             </Link>
 
