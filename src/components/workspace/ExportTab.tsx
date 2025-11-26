@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Download, Copy, FileText, FileJson, Loader2, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/useSubscription";
+import { LockedFeature } from "@/components/subscription/LockedFeature";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { PreShootExportPack } from "@/lib/types/export";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +31,8 @@ export const ExportTab = ({ project }: ExportTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { limits } = useSubscription();
+  const navigate = useNavigate();
 
   const getStatusIcon = (status: string | null) => {
     switch (status) {
@@ -148,8 +154,17 @@ export const ExportTab = ({ project }: ExportTabProps) => {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {/* Header */}
-      <Card className="p-6">
+      {/* Check if export is locked */}
+      {!limits.canExport ? (
+        <LockedFeature
+          title="تصدير الملفات"
+          description="تصدير حزمة PreShoot الكاملة متاح فقط في الخطط المدفوعة. قم بالترقية للحصول على إمكانية تصدير جميع مشاريعك."
+          onUpgrade={() => navigate('/pricing')}
+        />
+      ) : (
+        <>
+          {/* Header */}
+          <Card className="p-6">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
             <Download className="w-6 h-6 text-primary" />

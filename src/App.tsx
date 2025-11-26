@@ -25,6 +25,7 @@ import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import NotFound from "./pages/NotFound";
+import Pricing from "./pages/Pricing";
 import AcceptInvite from "./pages/AcceptInvite";
 import RequestAccess from "./pages/RequestAccess";
 
@@ -82,6 +83,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route path="/pricing" element={<Pricing />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
