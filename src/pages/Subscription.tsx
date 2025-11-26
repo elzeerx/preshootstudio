@@ -7,8 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useSubscription } from '@/hooks/useSubscription';
 import { formatTokens } from '@/lib/helpers/formatters';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { APP_ROUTES } from '@/lib/constants';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { 
   CreditCard, 
   TrendingUp, 
@@ -32,6 +34,21 @@ import {
 
 export default function Subscription() {
   const { subscription, plan, isLoading, limits, cancel } = useSubscription();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle success/canceled query parameters
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+
+    if (success === 'true') {
+      toast.success('تم تغيير الخطة بنجاح!');
+      setSearchParams({}); // Clear query params
+    } else if (canceled === 'true') {
+      toast.error('تم إلغاء تغيير الخطة');
+      setSearchParams({}); // Clear query params
+    }
+  }, [searchParams, setSearchParams]);
 
   if (isLoading) {
     return (

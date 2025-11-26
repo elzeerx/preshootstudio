@@ -36,7 +36,7 @@ export default function Pricing() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const { checkout, plan: currentPlan } = useSubscription();
+  const { checkout, plan: currentPlan, subscription, changePlan } = useSubscription();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -66,7 +66,38 @@ export default function Pricing() {
       toast.info('أنت بالفعل على الخطة المجانية');
       return;
     }
-    await checkout(planSlug, billingPeriod);
+
+    // Check if user has an active subscription
+    if (subscription && subscription.status === 'active') {
+      // Changing plan
+      await changePlan(planSlug, billingPeriod);
+    } else {
+      // New subscription
+      await checkout(planSlug, billingPeriod);
+    }
+  };
+
+  const getButtonText = (plan: Plan) => {
+    const isCurrent = currentPlan?.slug === plan.slug;
+    const hasActiveSubscription = subscription && subscription.status === 'active';
+
+    if (isCurrent) return 'الخطة الحالية';
+    if (!user) return 'سجل دخول للاشتراك';
+    if (plan.slug === 'free') return 'البدء مجاناً';
+    
+    if (hasActiveSubscription && currentPlan) {
+      // Determine if it's an upgrade or downgrade
+      const currentPrice = currentPlan.price_monthly_usd;
+      const newPrice = plan.price_monthly_usd;
+      
+      if (newPrice > currentPrice) {
+        return 'ترقية الخطة';
+      } else if (newPrice < currentPrice) {
+        return 'تخفيض الخطة';
+      }
+    }
+    
+    return 'اشترك الآن';
   };
 
   const getPrice = (plan: Plan) => {
@@ -105,7 +136,7 @@ export default function Pricing() {
         </div>
 
         {/* Billing Toggle */}
-        <div className="flex justify-center items-center gap-4 mb-12 p-4 rounded-xl bg-background/40 backdrop-blur-sm border border-border/50 w-fit mx-auto">
+        <div className="flex justify-center items-center gap-4 mb-6 p-4 rounded-xl bg-background/40 backdrop-blur-sm border border-border/50 w-fit mx-auto">
           <span className={billingPeriod === 'monthly' ? 'font-semibold text-foreground' : 'text-muted-foreground'}>
             شهري
           </span>
@@ -122,6 +153,23 @@ export default function Pricing() {
             </Badge>
           )}
         </div>
+
+        {/* Proration Notice for Existing Subscribers */}
+        {subscription && subscription.status === 'active' && (
+          <div className="max-w-3xl mx-auto mb-8">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/10 border border-primary/20">
+              <Zap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-foreground mb-1">
+                  تغيير الخطة مع حساب نسبي
+                </p>
+                <p className="text-muted-foreground">
+                  عند تغيير خطتك، سيتم حساب الفرق بشكل نسبي. عند الترقية، ستدفع الفرق للفترة المتبقية. عند التخفيض، سيتم تطبيق التغيير في بداية الفترة القادمة.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pricing Cards */}
         {isLoading ? (
@@ -172,13 +220,7 @@ export default function Pricing() {
                     variant={isPopular ? 'default' : 'outline'}
                     disabled={isCurrent}
                   >
-                    {isCurrent 
-                      ? 'الخطة الحالية' 
-                      : !user 
-                        ? 'سجل دخول للاشتراك'
-                        : plan.slug === 'free' 
-                          ? 'البدء مجاناً' 
-                          : 'اشترك الآن'}
+                    {getButtonText(plan)}
                   </Button>
                 </Card>
               );

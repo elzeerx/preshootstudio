@@ -158,6 +158,33 @@ export const useSubscription = () => {
     }
   };
 
+  const changePlan = async (newPlanSlug: string, billingPeriod: 'monthly' | 'yearly') => {
+    if (!user) {
+      toast.error('يجب تسجيل الدخول أولاً');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('change-subscription-plan', {
+        body: { newPlanSlug, billingPeriod },
+      });
+
+      if (error) throw error;
+
+      // Check if approval is required
+      if (data.requiresApproval && data.approvalUrl) {
+        window.location.href = data.approvalUrl;
+        return;
+      }
+
+      toast.success('تم تغيير الخطة بنجاح');
+      fetchSubscription();
+    } catch (error: any) {
+      console.error('Error changing plan:', error);
+      toast.error('فشل في تغيير الخطة: ' + error.message);
+    }
+  };
+
   return {
     subscription,
     plan,
@@ -166,6 +193,7 @@ export const useSubscription = () => {
     limits,
     checkout,
     cancel,
+    changePlan,
     refetch: fetchSubscription,
   };
 };
