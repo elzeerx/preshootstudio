@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw, GraduationCap, Briefcase, Heart, Tv, BookOpen, User, MessageSquare } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw, GraduationCap, Briefcase, Heart, Tv, BookOpen, User, MessageSquare, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,8 @@ import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { AppFooter } from "@/components/common/AppFooter";
 import { useAuth } from "@/contexts/AuthContext";
 import { AISuggestionsSkeleton } from "@/components/projects/AISuggestionsSkeleton";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradeModal } from "@/components/subscription/UpgradeModal";
 
 const CreateProject = () => {
   const navigate = useNavigate();
@@ -24,6 +27,8 @@ const CreateProject = () => {
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { limits } = useSubscription();
 
   const contentTypes = [
     { 
@@ -122,6 +127,12 @@ const CreateProject = () => {
       return;
     }
 
+    // Check project limit
+    if (limits.projectsUsed >= limits.projectLimit) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setIsCreating(true);
 
     try {
@@ -179,6 +190,26 @@ const CreateProject = () => {
             <p className="body-text-secondary max-w-2xl mx-auto">
               ابدأ مشروعك الجديد بكتابة الموضوع، والباقي على PreShoot AI
             </p>
+            
+            {/* Usage Alert */}
+            <div className="mt-6 max-w-md mx-auto">
+              <Alert variant={limits.projectsUsed >= limits.projectLimit ? "destructive" : "default"}>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-sm">
+                  المشاريع المستخدمة: <strong>{limits.projectsUsed}</strong> من <strong>{limits.projectLimit}</strong> هذا الشهر
+                  {limits.projectsUsed >= limits.projectLimit * 0.8 && limits.projectsUsed < limits.projectLimit && (
+                    <span className="block mt-1 text-orange-600 dark:text-orange-400">
+                      اقتربت من حد المشاريع الشهري
+                    </span>
+                  )}
+                  {limits.projectsUsed >= limits.projectLimit && (
+                    <span className="block mt-1 font-medium">
+                      وصلت إلى الحد الشهري. قم بالترقية لإنشاء المزيد من المشاريع.
+                    </span>
+                  )}
+                </AlertDescription>
+              </Alert>
+            </div>
           </div>
 
           {/* Create Project Form */}
@@ -398,6 +429,13 @@ const CreateProject = () => {
       </main>
 
       <AppFooter />
+      
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        feature="إنشاء مشاريع جديدة"
+        description={`لقد استخدمت ${limits.projectsUsed} من ${limits.projectLimit} مشروع هذا الشهر. قم بالترقية لإنشاء المزيد من المشاريع.`}
+      />
     </div>
   );
 };

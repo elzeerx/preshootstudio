@@ -11,10 +11,16 @@ import { AppHeader } from "@/components/common/AppHeader";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { AppFooter } from "@/components/common/AppFooter";
 import { useProjects } from "@/hooks/useProjects";
+import { useSubscription } from "@/hooks/useSubscription";
 import { formatDate, getStatusLabel, getStatusVariant } from "@/lib/helpers/formatters";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
   const { projects, isLoading, stats, filterProjects, getCompletedFeatures } = useProjects();
+  const { limits } = useSubscription();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
@@ -43,6 +49,50 @@ const Projects = () => {
 
           {/* Stats Cards */}
           {!isLoading && projects.length > 0 && <ProjectStats stats={stats} />}
+
+          {/* Project Usage Alert */}
+          {!isLoading && projects.length > 0 && (
+            <div className="mb-6">
+              {limits.projectsUsed >= limits.projectLimit ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>
+                      وصلت إلى الحد الشهري ({limits.projectsUsed}/{limits.projectLimit} مشروع). 
+                      قم بالترقية لإنشاء المزيد من المشاريع.
+                    </span>
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={() => navigate('/pricing')}
+                      className="gap-2 shrink-0 mr-4"
+                    >
+                      <Zap className="w-4 h-4" />
+                      ترقية الخطة
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              ) : limits.projectsUsed >= limits.projectLimit * 0.8 ? (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>
+                      استخدمت {limits.projectsUsed} من {limits.projectLimit} مشروع هذا الشهر. 
+                      اقتربت من الحد الشهري!
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate('/pricing')}
+                      className="gap-2 shrink-0 mr-4"
+                    >
+                      عرض الخطط
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+            </div>
+          )}
 
           {/* Search and Filter */}
           {!isLoading && projects.length > 0 && (
