@@ -6,7 +6,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Check, Zap } from 'lucide-react';
+import { Check, Zap, X } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
 import { toast } from 'sonner';
@@ -133,7 +134,7 @@ export default function Pricing() {
               return (
                 <Card
                   key={plan.id}
-                  className={`p-6 relative backdrop-blur-md bg-background/40 border-border/50 transition-all duration-300 hover:bg-background/60 hover:scale-105 ${
+                  className={`p-6 relative overflow-visible backdrop-blur-md bg-background/40 border-border/50 transition-all duration-300 hover:bg-background/60 hover:scale-105 ${
                     isPopular ? 'border-primary shadow-lg shadow-primary/20 scale-105' : ''
                   }`}
                 >
@@ -175,6 +176,157 @@ export default function Pricing() {
             })}
           </div>
         )}
+
+        {/* Feature Comparison Table */}
+        <div className="mt-16 mb-12">
+          <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+            مقارنة الخطط
+          </h2>
+          
+          <div className="overflow-x-auto">
+            <Table className="backdrop-blur-md bg-background/40 border border-border/50 rounded-lg">
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-border/50">
+                  <TableHead className="text-right font-bold text-foreground w-1/4">الميزة</TableHead>
+                  {plans.map((plan) => (
+                    <TableHead 
+                      key={plan.id} 
+                      className={`text-center font-bold ${
+                        plan.slug === 'pro' ? 'bg-primary/10 text-primary' : 'text-foreground'
+                      }`}
+                    >
+                      {plan.name_ar}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {/* Monthly Price */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">السعر الشهري</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      ${plan.price_monthly_usd}
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* Yearly Price */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">السعر السنوي</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {plan.price_yearly_usd ? (
+                        <div className="flex flex-col items-center gap-1">
+                          <span>${plan.price_yearly_usd}</span>
+                          <span className="text-xs text-primary">(وفّر شهرين)</span>
+                        </div>
+                      ) : (
+                        '-'
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* Monthly Projects */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">المشاريع شهرياً</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {plan.project_limit_monthly || 'غير محدود'}
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* Monthly Tokens */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">الرموز شهرياً</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {(plan.token_limit_monthly / 1000).toLocaleString('en-US')}K
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* Redos per Tab */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">إعادة التوليد لكل تبويب</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {plan.redo_limit_per_tab === 99 ? 'غير محدود' : plan.redo_limit_per_tab}
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* Export Enabled */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">تصدير الملفات</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {plan.export_enabled ? (
+                        <Check className="w-5 h-5 text-primary mx-auto" />
+                      ) : (
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* Priority Support */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">دعم فني ذو أولوية</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {plan.priority_support ? (
+                        <Check className="w-5 h-5 text-primary mx-auto" />
+                      ) : (
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+
+                {/* API Access */}
+                <TableRow className="border-border/50">
+                  <TableCell className="font-medium text-right">وصول API</TableCell>
+                  {plans.map((plan) => (
+                    <TableCell 
+                      key={plan.id} 
+                      className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
+                    >
+                      {plan.api_access ? (
+                        <Check className="w-5 h-5 text-primary mx-auto" />
+                      ) : (
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
         {/* Payment Methods */}
         <div className="text-center py-8 mt-12 border-t border-border/50">
