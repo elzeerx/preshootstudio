@@ -131,10 +131,18 @@ serve(async (req) => {
             raw_payload: webhook,
           });
 
-        // Reset monthly usage counter
+        // Reset monthly usage counter and clear dunning state
         await supabase
           .from('subscriptions')
-          .update({ projects_used_this_period: 0 })
+          .update({
+            projects_used_this_period: 0,
+            status: 'active',
+            dunning_count: 0,
+            last_dunning_email: null,
+            grace_period_end: null,
+            payment_retry_count: 0,
+            last_payment_attempt: null,
+          })
           .eq('id', subscription.id);
 
         console.log('Payment processed for subscription:', paypalSubscriptionId);
@@ -158,27 +166,26 @@ serve(async (req) => {
           break;
         }
 
-        // Send payment failed email
-        const retryDate = new Date();
-        retryDate.setDate(retryDate.getDate() + 3); // Retry in 3 days
+        // Update subscription to past_due and start dunning process
+        const gracePeriodEnd = new Date();
+        gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 7); // 7-day grace period
 
-        supabase.functions.invoke('send-subscription-notification', {
-          body: {
-            userId: subscription.user_id,
-            eventType: 'payment_failed',
-            data: {
-              plan_name: subscription.plan.name,
-              amount: subscription.billing_period === 'yearly' 
-                ? subscription.plan.price_yearly_usd 
-                : subscription.plan.price_monthly_usd,
-              currency: 'USD',
-              retry_date: retryDate.toISOString(),
-              reason: failureData.reason || 'فشل الدفع',
-            },
-          },
-        }).catch(err => console.error('Failed to send payment failure email:', err));
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: 'past_due',
+            payment_retry_count: (subscription.payment_retry_count || 0) + 1,
+            last_payment_attempt: new Date().toISOString(),
+            grace_period_end: subscription.grace_period_end || gracePeriodEnd.toISOString(),
+          })
+          .eq('id', subscription.id);
 
-        console.log('Payment failed for subscription:', paypalSubscriptionId);
+        // Trigger immediate dunning process
+        supabase.functions.invoke('process-dunning').catch(err => 
+          console.error('Failed to trigger dunning process:', err)
+        );
+
+        console.log('Payment failed for subscription, started dunning:', paypalSubscriptionId);
         break;
       }
 

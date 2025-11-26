@@ -654,7 +654,12 @@ export type Database = {
           created_at: string | null
           current_period_end: string | null
           current_period_start: string | null
+          dunning_count: number | null
+          grace_period_end: string | null
           id: string
+          last_dunning_email: string | null
+          last_payment_attempt: string | null
+          payment_retry_count: number | null
           paypal_email: string | null
           paypal_payer_id: string | null
           paypal_subscription_id: string | null
@@ -671,7 +676,12 @@ export type Database = {
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
+          dunning_count?: number | null
+          grace_period_end?: string | null
           id?: string
+          last_dunning_email?: string | null
+          last_payment_attempt?: string | null
+          payment_retry_count?: number | null
           paypal_email?: string | null
           paypal_payer_id?: string | null
           paypal_subscription_id?: string | null
@@ -688,7 +698,12 @@ export type Database = {
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
+          dunning_count?: number | null
+          grace_period_end?: string | null
           id?: string
+          last_dunning_email?: string | null
+          last_payment_attempt?: string | null
+          payment_retry_count?: number | null
           paypal_email?: string | null
           paypal_payer_id?: string | null
           paypal_subscription_id?: string | null
