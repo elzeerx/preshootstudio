@@ -162,9 +162,9 @@ export default function RequestAccess() {
                   {/* Reason Field */}
                   <div className="space-y-2">
                     <Label htmlFor="reason" className="text-base">
-                      لماذا تريد الانضمام إلى PreShoot AI؟ <span className="text-destructive">*</span>
+                      لماذا تريد الانضمام إلى Preshoot Studio؟ <span className="text-destructive">*</span>
                     </Label>
-                    <Textarea id="reason" placeholder="أخبرنا عن نفسك وكيف تخطط لاستخدام PreShoot AI في عملك..." disabled={isSubmitting} {...register("reason")} className={`min-h-[120px] ${errors.reason ? "border-destructive" : ""}`} rows={5} />
+                    <Textarea id="reason" placeholder="أخبرنا عن نفسك وكيف تخطط لاستخدام Preshoot Studio في عملك..." disabled={isSubmitting} {...register("reason")} className={`min-h-[120px] ${errors.reason ? "border-destructive" : ""}`} rows={5} />
                     {errors.reason && <p className="text-sm text-destructive">{errors.reason.message}</p>}
                     <p className="text-xs text-muted-foreground">
                       يرجى تقديم معلومات مفصلة لمساعدتنا في فهم احتياجاتك (10-1000 حرف)
