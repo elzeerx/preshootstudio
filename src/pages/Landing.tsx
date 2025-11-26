@@ -494,7 +494,7 @@ export default function Landing() {
               <img
                 src="/src/assets/preshoot-logo-new.png"
                 alt="PreShoot Logo"
-                className="h-8 w-auto"
+                className="h-8 w-auto brightness-0 invert"
               />
             </div>
 
