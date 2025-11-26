@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Crown, Calendar, CreditCard } from 'lucide-react';
+import { Crown, Calendar, CreditCard, RefreshCw } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { ChangePlanDialog } from './ChangePlanDialog';
 
 export const CurrentPlanCard = () => {
   const { subscription, plan, isFreeTier, cancel } = useSubscription();
   const navigate = useNavigate();
+  const [showChangePlan, setShowChangePlan] = useState(false);
 
   if (!plan) return null;
 
@@ -60,14 +63,26 @@ export const CurrentPlanCard = () => {
             )}
 
             {subscription.status === 'active' && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleCancel}
-                className="w-full"
-              >
-                إلغاء الاشتراك
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => setShowChangePlan(true)}
+                  className="w-full gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  تغيير الخطة
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCancel}
+                  className="w-full"
+                >
+                  إلغاء الاشتراك
+                </Button>
+              </div>
             )}
           </>
         )}
@@ -81,6 +96,8 @@ export const CurrentPlanCard = () => {
           </Button>
         )}
       </CardContent>
+
+      <ChangePlanDialog open={showChangePlan} onOpenChange={setShowChangePlan} />
     </Card>
   );
 };
