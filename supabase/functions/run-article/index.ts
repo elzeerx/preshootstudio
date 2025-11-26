@@ -49,21 +49,52 @@ Deno.serve(async (req) => {
       })
       .eq("id", projectId);
 
+    // Detect content type
+    const contentType = project.content_type || 'factual';
+    const isCreativeType = ['creative', 'personal', 'opinion'].includes(contentType);
+
     // Build context for the AI model
-    let context = `الموضوع: ${project.topic}\n\n`;
+    let context = `الموضوع: ${project.topic}\n`;
+    context += `نوع المحتوى: ${contentType}\n\n`;
 
-    if (project.research_summary) {
-      context += `ملخص البحث (للاستفادة، لا للنسخ الحرفي):\n${project.research_summary}\n\n`;
-    }
-
-    if (project.research_data) {
-      const researchData = project.research_data as any;
-      if (researchData.keyPoints && Array.isArray(researchData.keyPoints)) {
-        context += `نقاط رئيسية من البحث:\n`;
-        researchData.keyPoints.slice(0, 5).forEach((point: string) => {
-          context += `- ${point}\n`;
+    if (isCreativeType && project.creative_data) {
+      // Use creative research data
+      const creativeData = project.creative_data as any;
+      
+      context += `زوايا المحتوى المقترحة:\n`;
+      if (creativeData.contentAngles && Array.isArray(creativeData.contentAngles)) {
+        creativeData.contentAngles.slice(0, 3).forEach((angle: string) => {
+          context += `- ${angle}\n`;
         });
         context += `\n`;
+      }
+      
+      if (creativeData.hooks && Array.isArray(creativeData.hooks)) {
+        context += `افتتاحيات مقترحة:\n`;
+        creativeData.hooks.slice(0, 3).forEach((hook: string) => {
+          context += `- ${hook}\n`;
+        });
+        context += `\n`;
+      }
+      
+      if (creativeData.uniqueValueProp) {
+        context += `القيمة الفريدة: ${creativeData.uniqueValueProp}\n\n`;
+      }
+    } else {
+      // Use factual research data
+      if (project.research_summary) {
+        context += `ملخص البحث (للاستفادة، لا للنسخ الحرفي):\n${project.research_summary}\n\n`;
+      }
+
+      if (project.research_data) {
+        const researchData = project.research_data as any;
+        if (researchData.keyPoints && Array.isArray(researchData.keyPoints)) {
+          context += `نقاط رئيسية من البحث:\n`;
+          researchData.keyPoints.slice(0, 5).forEach((point: string) => {
+            context += `- ${point}\n`;
+          });
+          context += `\n`;
+        }
       }
     }
 
@@ -77,15 +108,33 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Build content-type-aware prompt
+    let articleTypeGuidance = '';
+    if (isCreativeType) {
+      if (contentType === 'creative') {
+        articleTypeGuidance = `نوع المقال: مقال ترفيهي/إبداعي يناسب محتوى الترفيه والألعاب والمراجعات.
+أسلوب الكتابة: شخصي، جذاب، مشوّق، يستخدم السرد القصصي.`;
+      } else if (contentType === 'personal') {
+        articleTypeGuidance = `نوع المقال: مقال شخصي يعبر عن تجارب وقصص حياتية.
+أسلوب الكتابة: صادق، عاطفي، سردي، يربط بالقارئ على مستوى شخصي.`;
+      } else if (contentType === 'opinion') {
+        articleTypeGuidance = `نوع المقال: مقال رأي يقدم وجهة نظر شخصية.
+أسلوب الكتابة: مقنع، واضح، متوازن مع احترام الآراء المختلفة.`;
+      }
+    } else {
+      articleTypeGuidance = `نوع المقال: مقال تحليلي تقني مبسط.
+أسلوب الكتابة: موضوعي، معلوماتي، دقيق، مدعوم بالحقائق.`;
+    }
+
     const userPrompt = `${context}
 اكتب مقالاً احترافياً جاهزاً للنشر حول هذا الموضوع.
-الجمهور المستهدف: جمهور عربي مهتم بالتقنية والمحتوى، غير متخصص بالضرورة.
-نوع المقال: مقال تحليلي تقني مبسط.
+الجمهور المستهدف: جمهور عربي مهتم بهذا النوع من المحتوى.
+${articleTypeGuidance}
 
 التزم بصيغة JSON المحددة في التعليمات، وتأكد من:
-- عنوان جذاب ومقدمة مشوقة
+- عنوان جذاب ومقدمة مشوقة تناسب نوع المحتوى
 - تقسيم منطقي إلى 3-5 أقسام
-- خاتمة تلخص الفكرة الأساسية
+- خاتمة تلخص الفكرة الأساسية أو تترك القارئ مع فكرة قوية
 - معلومات SEO محسّنة`;
 
     console.log("Calling Lovable AI Gateway for article generation...");

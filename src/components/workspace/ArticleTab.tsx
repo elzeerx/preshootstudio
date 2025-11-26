@@ -9,15 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import { BookOpen, Copy, RefreshCw, Clock, Tag, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleData } from "@/lib/types/article";
-import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { hasValidResearchForContentType, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { CreativeResearchData } from "@/lib/types/creativeResearch";
 
 interface Project {
   id: string;
   topic: string;
+  content_type?: string;
   article_status?: string;
   article_data?: ArticleData;
   article_last_run_at?: string;
   research_data?: any;
+  creative_data?: CreativeResearchData;
 }
 
 interface ArticleTabProps {
@@ -29,14 +32,18 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const hasResearch = hasValidResearch(project.research_data);
+  const hasResearch = hasValidResearchForContentType(
+    project.research_data,
+    project.creative_data,
+    project.content_type || 'factual'
+  );
 
   const handleGenerateArticle = async () => {
     // Check for research before proceeding
     if (!hasResearch) {
       toast({
         title: "البحث مطلوب",
-        description: getMissingResearchMessage(),
+        description: getMissingResearchMessage(project.content_type || 'factual'),
         variant: "destructive",
       });
       return;
@@ -355,7 +362,7 @@ export const ArticleTab = ({ project, onProjectUpdate }: ArticleTabProps) => {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>البحث مطلوب</AlertTitle>
           <AlertDescription>
-            {getMissingResearchMessage()}
+            {getMissingResearchMessage(project.content_type || 'factual')}
           </AlertDescription>
         </Alert>
       )}

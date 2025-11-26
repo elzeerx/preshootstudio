@@ -7,14 +7,17 @@ import { FileText, Loader2, RefreshCw, Copy, CheckCircle2, AlertTriangle } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ScriptsData, getToneLabel } from "@/lib/types/scripts";
-import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { hasValidResearchForContentType, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { CreativeResearchData } from "@/lib/types/creativeResearch";
 
 interface Project {
   id: string;
   topic: string;
+  content_type?: string;
   scripts_status?: string;
   scripts_data?: ScriptsData;
   research_data?: any;
+  creative_data?: CreativeResearchData;
 }
 
 interface ScriptsTabProps {
@@ -74,14 +77,18 @@ export const ScriptsTab = ({ project, onProjectUpdate }: ScriptsTabProps) => {
     }
   };
 
-  const hasResearch = hasValidResearch(project.research_data);
+  const hasResearch = hasValidResearchForContentType(
+    project.research_data,
+    project.creative_data,
+    project.content_type || 'factual'
+  );
 
   const runScripts = async () => {
     // Check for research before proceeding
     if (!hasResearch) {
       toast({
         title: "البحث مطلوب",
-        description: getMissingResearchMessage(),
+        description: getMissingResearchMessage(project.content_type || 'factual'),
         variant: "destructive",
       });
       return;
@@ -144,7 +151,7 @@ export const ScriptsTab = ({ project, onProjectUpdate }: ScriptsTabProps) => {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>البحث مطلوب</AlertTitle>
             <AlertDescription>
-              {getMissingResearchMessage()}
+              {getMissingResearchMessage(project.content_type || 'factual')}
             </AlertDescription>
           </Alert>
         )}
