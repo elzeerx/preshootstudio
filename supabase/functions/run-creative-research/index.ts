@@ -356,7 +356,7 @@ Deno.serve(async (req) => {
       .from('projects')
       .update({
         creative_data: creativeData,
-        research_status: 'completed',
+        research_status: 'ready',
         research_last_run_at: new Date().toISOString(),
       })
       .eq('id', projectId);
