@@ -3,6 +3,9 @@ project_id = "uoydhwauppxnytzochqx"
 [functions.run-article]
 verify_jwt = true
 
+[functions.run-creative-research]
+verify_jwt = true
+
 [functions.run-broll]
 verify_jwt = true
 
