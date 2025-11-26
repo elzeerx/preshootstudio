@@ -7,6 +7,7 @@ export interface Project {
   status: string;
   created_at: string;
   updated_at: string;
+  content_type: string | null;
   research_status: string | null;
   scripts_status: string | null;
   broll_status: string | null;
