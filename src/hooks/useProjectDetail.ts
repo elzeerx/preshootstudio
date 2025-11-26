@@ -6,6 +6,7 @@ import { BRollData } from "@/lib/types/broll";
 import { PromptsData } from "@/lib/types/prompts";
 import { ArticleData } from "@/lib/types/article";
 import { SimplifyData } from "@/lib/types/simplify";
+import { CreativeResearchData } from "@/lib/types/creativeResearch";
 
 export interface QualityMetrics {
   sourceCount: number;
@@ -21,6 +22,8 @@ export interface ProjectDetail {
   notes?: string;
   created_at: string;
   updated_at: string;
+  content_type?: string;
+  creative_data?: CreativeResearchData;
   research_status: string | null;
   research_data?: ResearchData;
   research_summary?: string;
@@ -92,6 +95,8 @@ export const useProjectDetail = (projectId: string | undefined) => {
 
       setProject({
         ...data,
+        content_type: data.content_type,
+        creative_data: data.creative_data as unknown as CreativeResearchData | undefined,
         research_data: data.research_data as unknown as ResearchData | undefined,
         research_quality_metrics: data.research_quality_metrics as unknown as QualityMetrics | null | undefined,
         research_manual_edits: data.research_manual_edits as unknown as Record<string, boolean> | null | undefined,
