@@ -346,7 +346,9 @@ export type Database = {
           broll_data: Json | null
           broll_last_run_at: string | null
           broll_status: string | null
+          content_type: string | null
           created_at: string
+          creative_data: Json | null
           id: string
           metadata: Json | null
           notes: string | null
@@ -378,7 +380,9 @@ export type Database = {
           broll_data?: Json | null
           broll_last_run_at?: string | null
           broll_status?: string | null
+          content_type?: string | null
           created_at?: string
+          creative_data?: Json | null
           id?: string
           metadata?: Json | null
           notes?: string | null
@@ -410,7 +414,9 @@ export type Database = {
           broll_data?: Json | null
           broll_last_run_at?: string | null
           broll_status?: string | null
+          content_type?: string | null
           created_at?: string
+          creative_data?: Json | null
           id?: string
           metadata?: Json | null
           notes?: string | null

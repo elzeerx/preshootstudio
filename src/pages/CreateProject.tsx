@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw, GraduationCap, Briefcase, Heart, Tv } from "lucide-react";
+import { Sparkles, Zap, Lightbulb, Loader2, Wand2, RefreshCw, GraduationCap, Briefcase, Heart, Tv, BookOpen, User, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,12 +17,44 @@ const CreateProject = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [topic, setTopic] = useState("");
+  const [contentType, setContentType] = useState<"factual" | "creative" | "personal" | "opinion">("factual");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const contentTypes = [
+    { 
+      id: "factual" as const, 
+      label: "أبحاث ومعلومات", 
+      description: "محتوى علمي، تقني، أعمال",
+      icon: BookOpen,
+      color: "text-blue-500"
+    },
+    { 
+      id: "creative" as const, 
+      label: "ترفيه وإبداع", 
+      description: "فلوجات، ألعاب، مراجعات",
+      icon: Sparkles,
+      color: "text-purple-500"
+    },
+    { 
+      id: "personal" as const, 
+      label: "تجارب شخصية", 
+      description: "قصص، أسلوب حياة",
+      icon: Heart,
+      color: "text-pink-500"
+    },
+    { 
+      id: "opinion" as const, 
+      label: "رأي وتحليل", 
+      description: "تعليقات، آراء، نقاشات",
+      icon: MessageSquare,
+      color: "text-orange-500"
+    },
+  ];
 
   const categories = [
     { id: "all", label: "الكل", icon: Sparkles },
@@ -97,6 +129,7 @@ const CreateProject = () => {
         .from("projects")
         .insert({
           topic: topic.trim(),
+          content_type: contentType,
           status: "new",
           user_id: user.id,
         })
@@ -150,6 +183,50 @@ const CreateProject = () => {
             </CardHeader>
             <CardContent className="pt-2">
               <form onSubmit={handleCreateProject} className="space-y-6">
+                {/* Content Type Selection */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">
+                    نوع المحتوى
+                  </Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {contentTypes.map((type) => {
+                      const Icon = type.icon;
+                      const isSelected = contentType === type.id;
+                      return (
+                        <button
+                          key={type.id}
+                          type="button"
+                          onClick={() => setContentType(type.id)}
+                          disabled={isCreating}
+                          className={`
+                            relative p-4 rounded-lg border-2 text-right transition-all
+                            ${isSelected 
+                              ? 'border-primary bg-primary/5 shadow-sm' 
+                              : 'border-border hover:border-primary/50 hover:bg-accent/50'
+                            }
+                            ${isCreating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                          `}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary/10' : 'bg-muted'}`}>
+                              <Icon className={`w-5 h-5 ${isSelected ? 'text-primary' : type.color}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-sm mb-1">{type.label}</div>
+                              <div className="text-xs text-muted-foreground">{type.description}</div>
+                            </div>
+                            {isSelected && (
+                              <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                                <div className="w-2 h-2 rounded-full bg-primary-foreground" />
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="topic" className="text-base font-semibold">
