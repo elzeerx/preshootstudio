@@ -241,8 +241,8 @@ export const AdminUserManagement = () => {
                   <TableCell>{getStatusBadge(user.account_status || 'active')}</TableCell>
                   <TableCell>{getRoleBadge(user.role || 'user')}</TableCell>
                   <TableCell>{user.project_count || 0}</TableCell>
-                  <TableCell>{(user.token_usage || 0).toLocaleString()}</TableCell>
-                  <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>{(user.token_usage || 0).toLocaleString('en-US')}</TableCell>
+                  <TableCell>{new Date(user.created_at).toLocaleDateString('en-US')}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

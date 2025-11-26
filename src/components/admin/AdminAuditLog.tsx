@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Clock } from 'lucide-react';
+import { formatDateTime } from '@/lib/helpers/formatters';
 
 interface AuditLog {
   id: string;
@@ -159,7 +160,7 @@ export const AdminAuditLog = () => {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" />
-                      {new Date(log.created_at).toLocaleString()}
+                      {formatDateTime(log.created_at)}
                     </div>
                   </div>
                 </CardHeader>

@@ -325,7 +325,7 @@ export const TokenUsageAnalytics = ({ users }: TokenUsageAnalyticsProps) => {
                   dataKey="date" 
                   stroke="hsl(var(--foreground))"
                   style={{ fontSize: '10px' }}
-                  tickFormatter={(date) => new Date(date).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}
+                  tickFormatter={(date) => new Date(date).toLocaleDateString('ar-SA-u-nu-latn', { month: 'short', day: 'numeric' })}
                 />
                 <YAxis 
                   stroke="hsl(var(--foreground))"
@@ -338,7 +338,7 @@ export const TokenUsageAnalytics = ({ users }: TokenUsageAnalyticsProps) => {
                     border: '2px solid hsl(var(--border))',
                     borderRadius: '8px'
                   }}
-                  labelFormatter={(date) => new Date(date).toLocaleDateString('ar-SA')}
+                  labelFormatter={(date) => new Date(date).toLocaleDateString('ar-SA-u-nu-latn')}
                   formatter={(value: number) => [formatNumber(value), '']}
                 />
                 <Legend />

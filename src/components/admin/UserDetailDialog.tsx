@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { User, Calendar, Activity, FileText, Coins } from 'lucide-react';
+import { formatDateTime, formatDateShort } from '@/lib/helpers/formatters';
 
 interface UserDetailDialogProps {
   open: boolean;
@@ -104,7 +105,7 @@ export const UserDetailDialog = ({ open, onOpenChange, user, onRefresh }: UserDe
               <div className="text-right text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
+                  <span>Joined {formatDateShort(user.created_at)}</span>
                 </div>
               </div>
             </div>
@@ -131,9 +132,9 @@ export const UserDetailDialog = ({ open, onOpenChange, user, onRefresh }: UserDe
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{totalTokensUsed.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">{totalTokensUsed.toLocaleString('en-US')}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Limit: {user.monthly_token_limit?.toLocaleString() || 'N/A'}
+                    Limit: {user.monthly_token_limit?.toLocaleString('en-US') || 'N/A'}
                   </p>
                 </CardContent>
               </Card>
@@ -171,7 +172,7 @@ export const UserDetailDialog = ({ open, onOpenChange, user, onRefresh }: UserDe
                       <CardContent className="text-sm text-muted-foreground">
                         <div className="flex justify-between">
                           <span>Status: {project.status}</span>
-                          <span>{new Date(project.created_at).toLocaleDateString()}</span>
+                          <span>{formatDateShort(project.created_at)}</span>
                         </div>
                       </CardContent>
                     </Card>
@@ -191,13 +192,13 @@ export const UserDetailDialog = ({ open, onOpenChange, user, onRefresh }: UserDe
                       <CardContent className="text-sm">
                         <div className="grid grid-cols-2 gap-2">
                           <span className="text-muted-foreground">Tokens:</span>
-                          <span className="font-medium">{usage.total_tokens?.toLocaleString()}</span>
+                          <span className="font-medium">{usage.total_tokens?.toLocaleString('en-US')}</span>
                           <span className="text-muted-foreground">Cost:</span>
                           <span className="font-medium">${usage.estimated_cost_usd?.toFixed(4)}</span>
                           <span className="text-muted-foreground">Model:</span>
                           <span className="font-medium">{usage.model_used}</span>
                           <span className="text-muted-foreground">Date:</span>
-                          <span className="font-medium">{new Date(usage.created_at).toLocaleString()}</span>
+                          <span className="font-medium">{formatDateTime(usage.created_at)}</span>
                         </div>
                       </CardContent>
                     </Card>
@@ -214,7 +215,7 @@ export const UserDetailDialog = ({ open, onOpenChange, user, onRefresh }: UserDe
                       <CardHeader>
                         <CardTitle className="text-sm flex items-center justify-between">
                           <span>{log.action_type.replace(/_/g, ' ').toUpperCase()}</span>
-                          <Badge variant="outline">{new Date(log.created_at).toLocaleString()}</Badge>
+                          <Badge variant="outline">{formatDateTime(log.created_at)}</Badge>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
