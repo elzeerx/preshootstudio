@@ -74,6 +74,22 @@ serve(async (req) => {
           .update({ subscription_tier: plan.slug })
           .eq('id', userId);
 
+        // Send subscription activated email
+        const amount = billingPeriod === 'yearly' ? plan.price_yearly_usd : plan.price_monthly_usd;
+        supabase.functions.invoke('send-subscription-notification', {
+          body: {
+            userId,
+            eventType: 'subscription_activated',
+            data: {
+              plan_name: plan.name,
+              billing_period: billingPeriod === 'yearly' ? 'سنوي' : 'شهري',
+              amount,
+              currency: 'USD',
+              next_billing_date: nextBillingTime,
+            },
+          },
+        }).catch(err => console.error('Failed to send activation email:', err));
+
         console.log('Subscription activated for user:', userId);
         break;
       }
@@ -125,6 +141,47 @@ serve(async (req) => {
         break;
       }
 
+      case 'PAYMENT.SALE.DENIED':
+      case 'BILLING.SUBSCRIPTION.PAYMENT.FAILED': {
+        const failureData = webhook.resource;
+        const paypalSubscriptionId = failureData.billing_agreement_id || failureData.id;
+
+        // Find subscription
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*, plan:subscription_plans(*)')
+          .eq('paypal_subscription_id', paypalSubscriptionId)
+          .single();
+
+        if (!subscription) {
+          console.error('Subscription not found for PayPal ID:', paypalSubscriptionId);
+          break;
+        }
+
+        // Send payment failed email
+        const retryDate = new Date();
+        retryDate.setDate(retryDate.getDate() + 3); // Retry in 3 days
+
+        supabase.functions.invoke('send-subscription-notification', {
+          body: {
+            userId: subscription.user_id,
+            eventType: 'payment_failed',
+            data: {
+              plan_name: subscription.plan.name,
+              amount: subscription.billing_period === 'yearly' 
+                ? subscription.plan.price_yearly_usd 
+                : subscription.plan.price_monthly_usd,
+              currency: 'USD',
+              retry_date: retryDate.toISOString(),
+              reason: failureData.reason || 'فشل الدفع',
+            },
+          },
+        }).catch(err => console.error('Failed to send payment failure email:', err));
+
+        console.log('Payment failed for subscription:', paypalSubscriptionId);
+        break;
+      }
+
       case 'BILLING.SUBSCRIPTION.CANCELLED':
       case 'BILLING.SUBSCRIPTION.SUSPENDED':
       case 'BILLING.SUBSCRIPTION.EXPIRED': {
@@ -140,7 +197,7 @@ serve(async (req) => {
             canceled_at: new Date().toISOString(),
           })
           .eq('paypal_subscription_id', paypalSubscriptionId)
-          .select()
+          .select('*, plan:subscription_plans(*)')
           .single();
 
         if (subscription) {
@@ -149,6 +206,18 @@ serve(async (req) => {
             .from('profiles')
             .update({ subscription_tier: 'free' })
             .eq('id', subscription.user_id);
+
+          // Send cancellation email
+          supabase.functions.invoke('send-subscription-notification', {
+            body: {
+              userId: subscription.user_id,
+              eventType: 'subscription_cancelled',
+              data: {
+                plan_name: subscription.plan.name,
+                end_date: subscription.current_period_end || new Date().toISOString(),
+              },
+            },
+          }).catch(err => console.error('Failed to send cancellation email:', err));
 
           console.log('Subscription cancelled/suspended/expired:', paypalSubscriptionId);
         }
