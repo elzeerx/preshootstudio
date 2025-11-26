@@ -31,13 +31,13 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { new_plan_slug, billing_period = 'monthly' } = await req.json();
+    const { newPlanSlug, billingPeriod = 'monthly' } = await req.json();
 
-    if (!new_plan_slug || !['monthly', 'yearly'].includes(billing_period)) {
+    if (!newPlanSlug || !['monthly', 'yearly'].includes(billingPeriod)) {
       throw new Error('Invalid request parameters');
     }
 
-    console.log(`Processing plan change for user ${user.id} to ${new_plan_slug} (${billing_period})`);
+    console.log(`Processing plan change for user ${user.id} to ${newPlanSlug} (${billingPeriod})`);
 
     // Fetch current subscription
     const { data: currentSub, error: subError } = await supabaseAdmin
@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
     const { data: newPlan, error: planError } = await supabaseAdmin
       .from('subscription_plans')
       .select('*')
-      .eq('slug', new_plan_slug)
+      .eq('slug', newPlanSlug)
       .eq('is_active', true)
       .single();
 
@@ -67,12 +67,12 @@ Deno.serve(async (req) => {
     }
 
     // Check if trying to change to the same plan
-    if (currentSub.plan.slug === new_plan_slug && currentSub.billing_period === billing_period) {
+    if (currentSub.plan.slug === newPlanSlug && currentSub.billing_period === billingPeriod) {
       throw new Error('You are already on this plan with this billing period');
     }
 
     // Get PayPal plan ID for new plan
-    const newPayPalPlanId = billing_period === 'yearly' 
+    const newPayPalPlanId = billingPeriod === 'yearly' 
       ? newPlan.paypal_plan_id_yearly 
       : newPlan.paypal_plan_id_monthly;
 
@@ -87,9 +87,6 @@ Deno.serve(async (req) => {
     // Get PayPal access token
     const accessToken = await getPayPalAccessToken();
 
-    // Calculate effective date (immediate change)
-    const effectiveDate = new Date().toISOString();
-
     // Prepare revision request for PayPal
     const revisionPayload = {
       plan_id: newPayPalPlanId,
@@ -98,6 +95,8 @@ Deno.serve(async (req) => {
         locale: 'ar-SA',
         shipping_preference: 'NO_SHIPPING',
         user_action: 'CONTINUE',
+        return_url: `${Deno.env.get('VITE_APP_URL')}/subscription?success=true`,
+        cancel_url: `${Deno.env.get('VITE_APP_URL')}/pricing`,
       }
     };
 
@@ -124,12 +123,29 @@ Deno.serve(async (req) => {
     const revisionData = await reviseResponse.json();
     console.log('PayPal revision successful:', revisionData);
 
+    // Check if user needs to approve the change
+    if (revisionData.links) {
+      const approvalLink = revisionData.links.find((link: any) => link.rel === 'approve');
+      if (approvalLink) {
+        return new Response(
+          JSON.stringify({
+            requiresApproval: true,
+            approvalUrl: approvalLink.href,
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+          }
+        );
+      }
+    }
+
     // Update subscription in database
     const { error: updateError } = await supabaseAdmin
       .from('subscriptions')
       .update({
         plan_id: newPlan.id,
-        billing_period: billing_period,
+        billing_period: billingPeriod,
         updated_at: new Date().toISOString(),
       })
       .eq('id', currentSub.id);
@@ -147,10 +163,10 @@ Deno.serve(async (req) => {
         subscription_id: currentSub.id,
         paypal_subscription_id: currentSub.paypal_subscription_id,
         paypal_transaction_id: `plan_change_${Date.now()}`,
-        amount: billing_period === 'yearly' ? newPlan.price_yearly_usd : newPlan.price_monthly_usd,
+        amount: billingPeriod === 'yearly' ? newPlan.price_yearly_usd : newPlan.price_monthly_usd,
         currency: 'USD',
         status: 'completed',
-        billing_period: billing_period,
+        billing_period: billingPeriod,
         plan_name: newPlan.name,
         plan_slug: newPlan.slug,
         paypal_event_type: 'SUBSCRIPTION.PLAN_CHANGED',
@@ -165,8 +181,8 @@ Deno.serve(async (req) => {
         data: {
           old_plan_name: currentSub.plan.name_ar,
           new_plan_name: newPlan.name_ar,
-          billing_period: billing_period,
-          amount: billing_period === 'yearly' ? newPlan.price_yearly_usd : newPlan.price_monthly_usd,
+          billing_period: billingPeriod,
+          amount: billingPeriod === 'yearly' ? newPlan.price_yearly_usd : newPlan.price_monthly_usd,
           currency: 'USD',
         },
       },
@@ -178,7 +194,7 @@ Deno.serve(async (req) => {
         message: 'تم تغيير الخطة بنجاح',
         subscription: {
           plan: newPlan,
-          billing_period: billing_period,
+          billing_period: billingPeriod,
         },
       }),
       { 
