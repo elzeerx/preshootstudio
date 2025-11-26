@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
 import { toast } from 'sonner';
+import { formatTokens } from '@/lib/helpers/formatters';
 
 interface Plan {
   id: string;
@@ -75,7 +76,7 @@ export default function Pricing() {
   const getFeatures = (plan: Plan) => {
     const features = [
       `${plan.project_limit_monthly || 'غير محدود'} مشروع شهرياً`,
-      `${(plan.token_limit_monthly / 1000).toLocaleString('en-US')}K رمز شهرياً`,
+      `${formatTokens(plan.token_limit_monthly)} رمز شهرياً`,
       `إعادة توليد ${plan.redo_limit_per_tab === 99 ? 'غير محدودة' : plan.redo_limit_per_tab + ' مرات'} لكل تبويب`,
     ];
 
@@ -255,7 +256,7 @@ export default function Pricing() {
                       key={plan.id} 
                       className={`text-center ${plan.slug === 'pro' ? 'bg-primary/5' : ''}`}
                     >
-                      {(plan.token_limit_monthly / 1000).toLocaleString('en-US')}K
+                      {formatTokens(plan.token_limit_monthly)}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -328,11 +329,23 @@ export default function Pricing() {
           </div>
         </div>
 
-        {/* Payment Methods */}
-        <div className="text-center py-8 mt-12 border-t border-border/50">
-          <p className="text-sm text-muted-foreground mb-4">
-            مدفوعات آمنة بواسطة PayPal
-          </p>
+        {/* Trust Signals & Payment Methods */}
+        <div className="text-center py-12 mt-12 border-t border-border/50">
+          <div className="flex flex-wrap justify-center items-center gap-8 mb-8">
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-primary" />
+              <span className="text-sm text-muted-foreground">ألغِ في أي وقت</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-primary" />
+              <span className="text-sm text-muted-foreground">مدفوعات آمنة بواسطة PayPal</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-primary" />
+              <span className="text-sm text-muted-foreground">لا يتطلب بطاقة ائتمانية للخطة المجانية</span>
+            </div>
+          </div>
+          
           <div className="flex justify-center items-center gap-3 p-3 rounded-lg bg-background/40 backdrop-blur-sm border border-border/50 w-fit mx-auto">
             <Zap className="w-5 h-5 text-primary" />
             <span className="text-sm font-medium">PayPal</span>

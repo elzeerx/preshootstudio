@@ -1,11 +1,34 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, ArrowUpRight } from "lucide-react";
+import { Zap, Sparkles, Target, Search, Lightbulb, FileText, Video, Image, BookOpen, Film, Mail, Twitter, Linkedin, ArrowUpRight, Check } from "lucide-react";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { formatTokens } from "@/lib/helpers/formatters";
+import { APP_ROUTES } from "@/lib/constants";
+
+interface Plan {
+  id: string;
+  name: string;
+  name_ar: string;
+  slug: string;
+  price_monthly_usd: number;
+  price_yearly_usd: number | null;
+  project_limit_monthly: number | null;
+  token_limit_monthly: number;
+  redo_limit_per_tab: number;
+  export_enabled: boolean;
+  api_access: boolean;
+  priority_support: boolean;
+}
 
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +37,38 @@ const Landing = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    const { data } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order');
+    
+    if (data) setPlans(data as Plan[]);
+  };
+
+  const getPrice = (plan: Plan) => {
+    return billingPeriod === 'yearly' && plan.price_yearly_usd
+      ? plan.price_yearly_usd
+      : plan.price_monthly_usd;
+  };
+
+  const getTopFeatures = (plan: Plan) => {
+    const features = [
+      `${plan.project_limit_monthly || 'غير محدود'} مشروع/شهر`,
+      `${formatTokens(plan.token_limit_monthly)} رمز/شهر`,
+      `${plan.redo_limit_per_tab === 99 ? 'إعادة توليد غير محدودة' : plan.redo_limit_per_tab + ' إعادة توليد/تبويب'}`,
+    ];
+    
+    if (plan.export_enabled) features.push('تصدير الملفات');
+    
+    return features.slice(0, 4);
+  };
 
   return (
     <div className="text-white font-sans selection:bg-white/20">
@@ -24,6 +79,7 @@ const Landing = () => {
             <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto brightness-0 invert" />
           </div>
           <div className="flex items-center gap-6">
+            <Link to={APP_ROUTES.PRICING} className="hidden md:block text-sm font-medium hover:text-gray-300 transition-colors">الأسعار</Link>
             <Link to="/auth" className="hidden md:block text-sm font-medium hover:text-gray-300 transition-colors">تسجيل الدخول</Link>
             <Link to="/auth">
               <Button className="rounded-full bg-white text-black hover:bg-gray-200 px-6 font-bold neon-glow transition-all">
@@ -145,6 +201,115 @@ const Landing = () => {
                 <Target className="w-10 h-10 text-green-400" />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-32 px-6">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl md:text-7xl font-bold mb-6">خطط الأسعار</h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+              اختر الخطة المناسبة لاحتياجاتك. ابدأ مجاناً أو اشترك للحصول على المزيد من الميزات
+            </p>
+
+            {/* Billing Toggle */}
+            <div className="flex justify-center items-center gap-4 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 w-fit mx-auto">
+              <span className={billingPeriod === 'monthly' ? 'font-semibold text-white' : 'text-gray-400'}>
+                شهري
+              </span>
+              <Switch 
+                checked={billingPeriod === 'yearly'}
+                onCheckedChange={(checked) => setBillingPeriod(checked ? 'yearly' : 'monthly')}
+              />
+              <span className={billingPeriod === 'yearly' ? 'font-semibold text-white' : 'text-gray-400'}>
+                سنوي
+              </span>
+              {billingPeriod === 'yearly' && (
+                <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                  وفّر شهرين
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Pricing Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {plans.map((plan) => {
+              const isPopular = plan.slug === 'pro';
+              const price = getPrice(plan);
+              const features = getTopFeatures(plan);
+
+              return (
+                <Card
+                  key={plan.id}
+                  className={`p-6 relative overflow-visible backdrop-blur-md bg-white/5 border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105 ${
+                    isPopular ? 'border-purple-500 shadow-lg shadow-purple-500/20 scale-105' : ''
+                  }`}
+                >
+                  {isPopular && (
+                    <Badge className="absolute -top-3 right-1/2 translate-x-1/2 bg-purple-500 text-white border-0">
+                      الأكثر شعبية
+                    </Badge>
+                  )}
+                  
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold mb-2">{plan.name_ar}</h3>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-bold">${price}</span>
+                      <span className="text-gray-400">
+                        /{billingPeriod === 'yearly' ? 'سنة' : 'شهر'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 mb-6">
+                    {features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
+                        <span className="text-sm text-gray-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link to={plan.slug === 'free' ? '/request-access' : APP_ROUTES.PRICING}>
+                    <Button
+                      className={`w-full ${isPopular ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'}`}
+                    >
+                      {plan.slug === 'free' ? 'البدء مجاناً' : 'اشترك الآن'}
+                    </Button>
+                  </Link>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Trust Signals */}
+          <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-400">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-400" />
+              <span>ألغِ في أي وقت</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-400" />
+              <span>مدفوعات آمنة بواسطة PayPal</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-400" />
+              <span>لا يتطلب بطاقة ائتمانية للخطة المجانية</span>
+            </div>
+          </div>
+
+          {/* View Full Details Link */}
+          <div className="text-center mt-8">
+            <Link 
+              to={APP_ROUTES.PRICING}
+              className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              عرض التفاصيل الكاملة
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
