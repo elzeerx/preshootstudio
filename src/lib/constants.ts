@@ -8,6 +8,7 @@ export const APP_ROUTES = {
   CREATE_PROJECT: '/create',
   PROJECT_DETAIL: (id: string) => `/projects/${id}`,
   PROFILE: '/profile',
+  PAYMENT_HISTORY: '/payment-history',
   ADMIN: '/admin',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',

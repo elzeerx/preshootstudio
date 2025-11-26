@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import AcceptInvite from "./pages/AcceptInvite";
 import RequestAccess from "./pages/RequestAccess";
+import PaymentHistory from "./pages/PaymentHistory";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <ProjectDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/payment-history"
+                element={
+                  <ProtectedRoute>
+                    <PaymentHistory />
                   </ProtectedRoute>
                 }
               />
