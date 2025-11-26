@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FolderOpen, Plus, User, Shield, LogOut, Menu, X } from "lucide-react";
+import { FolderOpen, Plus, User, Shield, LogOut, Menu, X, Receipt } from "lucide-react";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 import { APP_ROUTES } from "@/lib/constants";
 import { useState } from "react";
@@ -125,6 +125,12 @@ export const AppHeader = () => {
                     الملف الشخصي
                   </DropdownMenuItem>
                 </Link>
+                <Link to={APP_ROUTES.PAYMENT_HISTORY}>
+                  <DropdownMenuItem className="flex-row-reverse cursor-pointer">
+                    <Receipt className="ml-2 h-4 w-4" />
+                    سجل المدفوعات
+                  </DropdownMenuItem>
+                </Link>
                 {isAdmin && (
                   <Link to={APP_ROUTES.ADMIN}>
                     <DropdownMenuItem className="flex-row-reverse cursor-pointer">
@@ -187,6 +193,20 @@ export const AppHeader = () => {
                     </Link>
                   );
                 })}
+                <Link
+                  to={APP_ROUTES.PAYMENT_HISTORY}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <DropdownMenuItem
+                    className={cn(
+                      "flex-row-reverse cursor-pointer",
+                      isActive(APP_ROUTES.PAYMENT_HISTORY) && "bg-primary/10"
+                    )}
+                  >
+                    <Receipt className="ml-2 h-4 w-4" />
+                    سجل المدفوعات
+                  </DropdownMenuItem>
+                </Link>
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />

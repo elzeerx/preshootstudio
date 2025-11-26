@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, User, Mail, Calendar } from 'lucide-react';
+import { Loader2, User, Mail, Calendar, Receipt, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
@@ -193,6 +193,28 @@ export default function Profile() {
           <CurrentPlanCard />
           <UsageMeter />
         </div>
+
+        {/* Quick Links */}
+        <Card className="border-border/50 backdrop-blur-sm bg-card/95">
+          <CardHeader>
+            <CardTitle>روابط سريعة</CardTitle>
+            <CardDescription>الوصول السريع إلى الميزات المهمة</CardDescription>
+          </CardHeader>
+          <CardContent className="grid md:grid-cols-2 gap-3">
+            <Button variant="outline" asChild className="justify-start gap-2">
+              <Link to="/payment-history">
+                <Receipt className="w-4 h-4" />
+                سجل المدفوعات
+              </Link>
+            </Button>
+            <Button variant="outline" asChild className="justify-start gap-2">
+              <Link to="/pricing">
+                <Zap className="w-4 h-4" />
+                عرض الخطط
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Token Limits Section */}
         <TokenLimitSettings />
