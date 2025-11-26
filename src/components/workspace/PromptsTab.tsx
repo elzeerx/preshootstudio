@@ -9,14 +9,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { PromptsData, ImagePrompt, VideoPrompt, ThumbnailPrompt } from "@/lib/types/prompts";
-import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { hasValidResearchForContentType, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { CreativeResearchData } from "@/lib/types/creativeResearch";
 
 interface Project {
   id: string;
   topic: string;
+  content_type?: string;
   prompts_status?: string | null;
   prompts_data?: PromptsData | null;
   research_data?: any;
+  creative_data?: CreativeResearchData;
   [key: string]: any;
 }
 
@@ -78,12 +81,16 @@ export const PromptsTab = ({ project, onProjectUpdate }: PromptsTabProps) => {
     }
   };
 
-  const hasResearch = hasValidResearch(project.research_data);
+  const hasResearch = hasValidResearchForContentType(
+    project.research_data,
+    project.creative_data,
+    project.content_type || 'factual'
+  );
 
   const handleGeneratePrompts = async () => {
     // Check for research before proceeding
     if (!hasResearch) {
-      toast.error(getMissingResearchMessage());
+      toast.error(getMissingResearchMessage(project.content_type || 'factual'));
       return;
     }
 

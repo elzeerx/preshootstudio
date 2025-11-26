@@ -9,15 +9,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import type { BRollData, BRollShot } from "@/lib/types/broll";
-import { hasValidResearch, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { hasValidResearchForContentType, getMissingResearchMessage } from "@/lib/helpers/researchValidation";
+import { CreativeResearchData } from "@/lib/types/creativeResearch";
 
 interface Project {
   id: string;
   topic: string;
+  content_type?: string;
   broll_status?: string | null;
   broll_data?: BRollData | null;
   broll_last_run_at?: string | null;
   research_data?: any;
+  creative_data?: CreativeResearchData;
 }
 
 interface BRollTabProps {
@@ -96,14 +99,18 @@ export const BRollTab = ({ project, onProjectUpdate }: BRollTabProps) => {
     }
   };
 
-  const hasResearch = hasValidResearch(project.research_data);
+  const hasResearch = hasValidResearchForContentType(
+    project.research_data,
+    project.creative_data,
+    project.content_type || 'factual'
+  );
   
   const handleGenerateBRoll = async () => {
     // Check for research before proceeding
     if (!hasResearch) {
       toast({
         title: "البحث مطلوب",
-        description: getMissingResearchMessage(),
+        description: getMissingResearchMessage(project.content_type || 'factual'),
         variant: "destructive",
       });
       return;
