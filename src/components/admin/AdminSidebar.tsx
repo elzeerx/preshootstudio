@@ -9,6 +9,7 @@ import {
   Database,
   Shield,
   Mail,
+  Settings,
   ChevronLeft,
 } from "lucide-react";
 import {
@@ -40,6 +41,7 @@ const menuItems = [
   { value: "training", label: "تصدير التدريب", icon: Database },
   { value: "audit", label: "سجل المراجعة", icon: Shield },
   { value: "email", label: "قوالب البريد", icon: Mail },
+  { value: "settings", label: "الإعدادات", icon: Settings },
 ];
 
 export function AdminSidebar({ activeTab, onTabChange, pendingSignupsCount }: AdminSidebarProps) {

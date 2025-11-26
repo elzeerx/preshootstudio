@@ -27,6 +27,7 @@ import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
 import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor';
+import { PayPalSetup } from '@/components/admin/PayPalSetup';
 import {
   Loader2, 
   Users, 
@@ -628,7 +629,7 @@ export default function Admin() {
               {/* Tabbed Content */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
                 {/* Desktop Tabs - Hidden on Mobile */}
-                <TabsList className="hidden md:flex flex-wrap w-full gap-1 md:grid md:grid-cols-8">
+                <TabsList className="hidden md:flex flex-wrap w-full gap-1 md:grid md:grid-cols-9">
                   <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
                   <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
                   <TabsTrigger value="signups" className="relative">
@@ -644,6 +645,7 @@ export default function Admin() {
                   <TabsTrigger value="training">تصدير التدريب</TabsTrigger>
                   <TabsTrigger value="audit">سجل المراجعة</TabsTrigger>
                   <TabsTrigger value="email">قوالب البريد</TabsTrigger>
+                  <TabsTrigger value="settings">الإعدادات</TabsTrigger>
                 </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-6">
@@ -898,6 +900,10 @@ export default function Admin() {
 
               <TabsContent value="email" className="mt-6">
                 <EmailTemplateEditor />
+              </TabsContent>
+
+              <TabsContent value="settings" className="mt-6">
+                <PayPalSetup />
               </TabsContent>
             </Tabs>
             </div>
