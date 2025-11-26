@@ -240,6 +240,75 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_history: {
+        Row: {
+          amount: number
+          billing_period: string | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          paypal_event_id: string | null
+          paypal_event_type: string | null
+          paypal_subscription_id: string | null
+          paypal_transaction_id: string
+          plan_name: string | null
+          plan_slug: string | null
+          raw_payload: Json | null
+          status: string
+          subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          billing_period?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          paypal_event_id?: string | null
+          paypal_event_type?: string | null
+          paypal_subscription_id?: string | null
+          paypal_transaction_id: string
+          plan_name?: string | null
+          plan_slug?: string | null
+          raw_payload?: Json | null
+          status: string
+          subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_period?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          paypal_event_id?: string | null
+          paypal_event_type?: string | null
+          paypal_subscription_id?: string | null
+          paypal_transaction_id?: string
+          plan_name?: string | null
+          plan_slug?: string | null
+          raw_payload?: Json | null
+          status?: string
+          subscription_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_status: string | null
@@ -250,6 +319,7 @@ export type Database = {
           id: string
           limit_notifications_enabled: boolean | null
           monthly_token_limit: number | null
+          subscription_tier: string | null
           suspended_at: string | null
           suspended_by: string | null
           suspension_reason: string | null
@@ -264,6 +334,7 @@ export type Database = {
           id: string
           limit_notifications_enabled?: boolean | null
           monthly_token_limit?: number | null
+          subscription_tier?: string | null
           suspended_at?: string | null
           suspended_by?: string | null
           suspension_reason?: string | null
@@ -278,6 +349,7 @@ export type Database = {
           id?: string
           limit_notifications_enabled?: boolean | null
           monthly_token_limit?: number | null
+          subscription_tier?: string | null
           suspended_at?: string | null
           suspended_by?: string | null
           suspension_reason?: string | null
@@ -342,9 +414,11 @@ export type Database = {
         Row: {
           article_data: Json | null
           article_last_run_at: string | null
+          article_run_count: number | null
           article_status: string | null
           broll_data: Json | null
           broll_last_run_at: string | null
+          broll_run_count: number | null
           broll_status: string | null
           content_type: string | null
           created_at: string
@@ -354,19 +428,23 @@ export type Database = {
           notes: string | null
           prompts_data: Json | null
           prompts_last_run_at: string | null
+          prompts_run_count: number | null
           prompts_status: string | null
           research_data: Json | null
           research_last_run_at: string | null
           research_manual_edits: Json | null
           research_quality_metrics: Json | null
           research_quality_score: number | null
+          research_run_count: number | null
           research_status: string | null
           research_summary: string | null
           scripts_data: Json | null
           scripts_last_run_at: string | null
+          scripts_run_count: number | null
           scripts_status: string | null
           simplify_data: Json | null
           simplify_last_run_at: string | null
+          simplify_run_count: number | null
           simplify_status: string | null
           status: string
           topic: string
@@ -376,9 +454,11 @@ export type Database = {
         Insert: {
           article_data?: Json | null
           article_last_run_at?: string | null
+          article_run_count?: number | null
           article_status?: string | null
           broll_data?: Json | null
           broll_last_run_at?: string | null
+          broll_run_count?: number | null
           broll_status?: string | null
           content_type?: string | null
           created_at?: string
@@ -388,19 +468,23 @@ export type Database = {
           notes?: string | null
           prompts_data?: Json | null
           prompts_last_run_at?: string | null
+          prompts_run_count?: number | null
           prompts_status?: string | null
           research_data?: Json | null
           research_last_run_at?: string | null
           research_manual_edits?: Json | null
           research_quality_metrics?: Json | null
           research_quality_score?: number | null
+          research_run_count?: number | null
           research_status?: string | null
           research_summary?: string | null
           scripts_data?: Json | null
           scripts_last_run_at?: string | null
+          scripts_run_count?: number | null
           scripts_status?: string | null
           simplify_data?: Json | null
           simplify_last_run_at?: string | null
+          simplify_run_count?: number | null
           simplify_status?: string | null
           status?: string
           topic: string
@@ -410,9 +494,11 @@ export type Database = {
         Update: {
           article_data?: Json | null
           article_last_run_at?: string | null
+          article_run_count?: number | null
           article_status?: string | null
           broll_data?: Json | null
           broll_last_run_at?: string | null
+          broll_run_count?: number | null
           broll_status?: string | null
           content_type?: string | null
           created_at?: string
@@ -422,19 +508,23 @@ export type Database = {
           notes?: string | null
           prompts_data?: Json | null
           prompts_last_run_at?: string | null
+          prompts_run_count?: number | null
           prompts_status?: string | null
           research_data?: Json | null
           research_last_run_at?: string | null
           research_manual_edits?: Json | null
           research_quality_metrics?: Json | null
           research_quality_score?: number | null
+          research_run_count?: number | null
           research_status?: string | null
           research_summary?: string | null
           scripts_data?: Json | null
           scripts_last_run_at?: string | null
+          scripts_run_count?: number | null
           scripts_status?: string | null
           simplify_data?: Json | null
           simplify_last_run_at?: string | null
+          simplify_run_count?: number | null
           simplify_status?: string | null
           status?: string
           topic?: string
@@ -483,6 +573,144 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_plans: {
+        Row: {
+          api_access: boolean | null
+          created_at: string | null
+          export_enabled: boolean | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_ar: string
+          paypal_plan_id_monthly: string | null
+          paypal_plan_id_yearly: string | null
+          paypal_product_id: string | null
+          price_monthly_usd: number
+          price_yearly_usd: number | null
+          priority_support: boolean | null
+          project_limit_monthly: number | null
+          redo_limit_per_tab: number
+          slug: string
+          sort_order: number | null
+          token_limit_monthly: number
+          updated_at: string | null
+        }
+        Insert: {
+          api_access?: boolean | null
+          created_at?: string | null
+          export_enabled?: boolean | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_ar: string
+          paypal_plan_id_monthly?: string | null
+          paypal_plan_id_yearly?: string | null
+          paypal_product_id?: string | null
+          price_monthly_usd?: number
+          price_yearly_usd?: number | null
+          priority_support?: boolean | null
+          project_limit_monthly?: number | null
+          redo_limit_per_tab?: number
+          slug: string
+          sort_order?: number | null
+          token_limit_monthly: number
+          updated_at?: string | null
+        }
+        Update: {
+          api_access?: boolean | null
+          created_at?: string | null
+          export_enabled?: boolean | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_ar?: string
+          paypal_plan_id_monthly?: string | null
+          paypal_plan_id_yearly?: string | null
+          paypal_product_id?: string | null
+          price_monthly_usd?: number
+          price_yearly_usd?: number | null
+          priority_support?: boolean | null
+          project_limit_monthly?: number | null
+          redo_limit_per_tab?: number
+          slug?: string
+          sort_order?: number | null
+          token_limit_monthly?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          billing_period: string | null
+          cancel_at_period_end: boolean | null
+          canceled_at: string | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          paypal_email: string | null
+          paypal_payer_id: string | null
+          paypal_subscription_id: string | null
+          plan_id: string
+          projects_used_this_period: number | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_period?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          paypal_email?: string | null
+          paypal_payer_id?: string | null
+          paypal_subscription_id?: string | null
+          plan_id: string
+          projects_used_this_period?: number | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_period?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          paypal_email?: string | null
+          paypal_payer_id?: string | null
+          paypal_subscription_id?: string | null
+          plan_id?: string
+          projects_used_this_period?: number | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

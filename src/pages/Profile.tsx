@@ -12,6 +12,8 @@ import { AppHeader } from '@/components/common/AppHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { AppFooter } from '@/components/common/AppFooter';
 import { TokenLimitSettings } from '@/components/profile/TokenLimitSettings';
+import { CurrentPlanCard } from '@/components/subscription/CurrentPlanCard';
+import { UsageMeter } from '@/components/subscription/UsageMeter';
 import { formatDate } from '@/lib/helpers/formatters';
 
 export default function Profile() {
@@ -185,6 +187,12 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Subscription Section */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <CurrentPlanCard />
+          <UsageMeter />
+        </div>
 
         {/* Token Limits Section */}
         <TokenLimitSettings />
