@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { APP_ROUTES } from "@/lib/constants";
+import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 
 export const AppFooter = () => {
   return (
@@ -9,26 +10,42 @@ export const AppFooter = () => {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <img 
-              src="/src/assets/preshoot-logo-new.png" 
+              src={preshootLogoNew}
               alt="Preshoot Studio" 
               className="h-8 w-auto brightness-0 invert" 
             />
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Link to={APP_ROUTES.PROJECTS} className="hover:text-foreground transition-colors">
-              مشاريعي
-            </Link>
-            <Link to={APP_ROUTES.CREATE_PROJECT} className="hover:text-foreground transition-colors">
-              إنشاء مشروع جديد
-            </Link>
-            <Link to={APP_ROUTES.PROFILE} className="hover:text-foreground transition-colors">
-              الملف الشخصي
-            </Link>
-            <Link to={APP_ROUTES.HOME} className="hover:text-foreground transition-colors">
-              الصفحة الرئيسية
-            </Link>
+          <div className="flex flex-col items-center gap-4">
+            {/* Navigation Links */}
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+              <Link to={APP_ROUTES.PROJECTS} className="hover:text-foreground transition-colors">
+                مشاريعي
+              </Link>
+              <Link to={APP_ROUTES.CREATE_PROJECT} className="hover:text-foreground transition-colors">
+                إنشاء مشروع جديد
+              </Link>
+              <Link to={APP_ROUTES.PROFILE} className="hover:text-foreground transition-colors">
+                الملف الشخصي
+              </Link>
+              <Link to={APP_ROUTES.HOME} className="hover:text-foreground transition-colors">
+                الصفحة الرئيسية
+              </Link>
+            </div>
+            
+            {/* Legal Links */}
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+              <Link to={APP_ROUTES.TERMS} className="hover:text-foreground transition-colors">
+                الشروط والأحكام
+              </Link>
+              <Link to={APP_ROUTES.PRIVACY} className="hover:text-foreground transition-colors">
+                سياسة الخصوصية
+              </Link>
+              <Link to={APP_ROUTES.HELP} className="hover:text-foreground transition-colors">
+                مركز المساعدة
+              </Link>
+            </div>
           </div>
 
           {/* Social Links */}

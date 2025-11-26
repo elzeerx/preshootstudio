@@ -11,6 +11,7 @@ import { FeatureCard } from "@/components/landing/FeatureCard";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { APP_ROUTES } from "@/lib/constants";
 import { formatTokens } from "@/lib/helpers/formatters";
+import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 import {
   Search,
   FileText,
@@ -492,23 +493,39 @@ export default function Landing() {
             {/* Logo */}
             <div className="flex items-center gap-2">
               <img
-                src="/src/assets/preshoot-logo-new.png"
+                src={preshootLogoNew}
                 alt="PreShoot Logo"
                 className="h-8 w-auto brightness-0 invert"
               />
             </div>
 
             {/* Links */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-              <Link to={APP_ROUTES.PRICING} className="hover:text-foreground transition-colors">
-                الأسعار
-              </Link>
-              <Link to={APP_ROUTES.AUTH} className="hover:text-foreground transition-colors">
-                تسجيل الدخول
-              </Link>
-              <Link to={APP_ROUTES.REQUEST_ACCESS} className="hover:text-foreground transition-colors">
-                طلب الوصول
-              </Link>
+            <div className="flex flex-col items-center gap-4">
+              {/* Navigation Links */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+                <Link to={APP_ROUTES.PRICING} className="hover:text-foreground transition-colors">
+                  الأسعار
+                </Link>
+                <Link to={APP_ROUTES.AUTH} className="hover:text-foreground transition-colors">
+                  تسجيل الدخول
+                </Link>
+                <Link to={APP_ROUTES.REQUEST_ACCESS} className="hover:text-foreground transition-colors">
+                  طلب الوصول
+                </Link>
+              </div>
+
+              {/* Legal Links */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+                <Link to={APP_ROUTES.TERMS} className="hover:text-foreground transition-colors">
+                  الشروط والأحكام
+                </Link>
+                <Link to={APP_ROUTES.PRIVACY} className="hover:text-foreground transition-colors">
+                  سياسة الخصوصية
+                </Link>
+                <Link to={APP_ROUTES.HELP} className="hover:text-foreground transition-colors">
+                  مركز المساعدة
+                </Link>
+              </div>
             </div>
 
             {/* Social Links */}

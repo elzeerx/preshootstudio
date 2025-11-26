@@ -29,6 +29,9 @@ import Pricing from "./pages/Pricing";
 import AcceptInvite from "./pages/AcceptInvite";
 import RequestAccess from "./pages/RequestAccess";
 import PaymentHistory from "./pages/PaymentHistory";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Help from "./pages/Help";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +96,9 @@ const App = () => (
                 }
               />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/help" element={<Help />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
