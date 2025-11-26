@@ -80,7 +80,7 @@ serve(async (req) => {
         locale: 'ar-SA',
         shipping_preference: 'NO_SHIPPING',
         user_action: 'SUBSCRIBE_NOW',
-        return_url: `${appUrl}/profile?subscription=success`,
+        return_url: `${appUrl}/subscription?success=true`,
         cancel_url: `${appUrl}/pricing?subscription=canceled`,
       },
       custom_id: user.id,

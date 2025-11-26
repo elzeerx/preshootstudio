@@ -5,9 +5,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface TokenUsageData {
   total_tokens: number;
@@ -20,10 +22,10 @@ interface TokenUsageData {
 
 export const TokenLimitSettings = () => {
   const { toast } = useToast();
+  const { plan } = useSubscription();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [usage, setUsage] = useState<TokenUsageData | null>(null);
-  const [monthlyLimit, setMonthlyLimit] = useState(1000000);
   const [alertThreshold, setAlertThreshold] = useState(80);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -44,7 +46,6 @@ export const TokenLimitSettings = () => {
       if (data && data.length > 0) {
         const usageData = data[0];
         setUsage(usageData);
-        setMonthlyLimit(usageData.limit_amount || 1000000);
         setAlertThreshold(usageData.alert_threshold || 80);
         setNotificationsEnabled(usageData.notifications_enabled !== false);
       }
@@ -69,7 +70,6 @@ export const TokenLimitSettings = () => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          monthly_token_limit: monthlyLimit,
           alert_threshold_percentage: alertThreshold,
           limit_notifications_enabled: notificationsEnabled,
         })
@@ -106,8 +106,9 @@ export const TokenLimitSettings = () => {
     );
   }
 
+  const tokenLimit = plan?.token_limit_monthly || usage?.limit_amount || 50000;
   const usagePercentage = usage 
-    ? (Number(usage.total_tokens) / usage.limit_amount) * 100 
+    ? (Number(usage.total_tokens) / tokenLimit) * 100 
     : 0;
 
   const getUsageColor = () => {
@@ -124,7 +125,7 @@ export const TokenLimitSettings = () => {
         <CardHeader>
           <CardTitle>الاستخدام الحالي هذا الشهر</CardTitle>
           <CardDescription>
-            {usage?.total_tokens.toLocaleString('ar-SA') || 0} / {monthlyLimit.toLocaleString('ar-SA')} tokens
+            {usage?.total_tokens.toLocaleString() || 0} / {tokenLimit.toLocaleString()} tokens
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -164,7 +165,7 @@ export const TokenLimitSettings = () => {
             <div>
               <p className="text-xs text-muted-foreground">عدد الطلبات</p>
               <p className="text-lg font-bold">
-                {usage?.request_count?.toLocaleString('ar-SA') || 0}
+                {usage?.request_count?.toLocaleString() || 0}
               </p>
             </div>
           </div>
@@ -182,15 +183,17 @@ export const TokenLimitSettings = () => {
             <Label htmlFor="monthly-limit">الحد الشهري للـ Tokens</Label>
             <Input
               id="monthly-limit"
-              type="number"
-              value={monthlyLimit}
-              onChange={(e) => setMonthlyLimit(Number(e.target.value))}
-              min={100000}
-              step={100000}
+              type="text"
+              value={tokenLimit.toLocaleString()}
+              disabled
+              className="bg-muted cursor-not-allowed"
             />
-            <p className="text-xs text-muted-foreground">
-              الحد الأقصى للـ tokens المسموح باستخدامها شهرياً
-            </p>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                يتم تحديد الحد الأقصى للـ tokens بواسطة خطة الاشتراك الخاصة بك: {plan?.name || 'مجاني'}
+              </AlertDescription>
+            </Alert>
           </div>
 
           <div className="space-y-2">
