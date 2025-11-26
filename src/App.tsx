@@ -29,6 +29,7 @@ import Pricing from "./pages/Pricing";
 import AcceptInvite from "./pages/AcceptInvite";
 import RequestAccess from "./pages/RequestAccess";
 import PaymentHistory from "./pages/PaymentHistory";
+import Subscription from "./pages/Subscription";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Help from "./pages/Help";
@@ -92,6 +93,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <PaymentHistory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/subscription"
+                element={
+                  <ProtectedRoute>
+                    <Subscription />
                   </ProtectedRoute>
                 }
               />

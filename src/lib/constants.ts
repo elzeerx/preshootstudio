@@ -10,6 +10,7 @@ export const APP_ROUTES = {
   PROFILE: '/profile',
   PAYMENT_HISTORY: '/payment-history',
   PRICING: '/pricing',
+  SUBSCRIPTION: '/subscription',
   ADMIN: '/admin',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',

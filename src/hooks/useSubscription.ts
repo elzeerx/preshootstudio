@@ -25,6 +25,7 @@ interface Subscription {
   billing_period: string;
   current_period_end: string | null;
   projects_used_this_period: number;
+  cancel_at_period_end: boolean | null;
   plan: SubscriptionPlan;
 }
 
