@@ -162,6 +162,38 @@ export default function Admin() {
     }
   }, [user, isAdmin, roleLoading, navigate]);
 
+  // Realtime listener for beta signups
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const channel = supabase
+      .channel('admin-signups-count')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'beta_signups' },
+        () => {
+          setStats(prev => ({
+            ...prev,
+            pendingSignups: prev.pendingSignups + 1,
+            totalBetaSignups: prev.totalBetaSignups + 1
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'beta_signups' },
+        () => {
+          // Recalculate pending count on status changes
+          fetchAllData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -562,7 +594,11 @@ export default function Admin() {
         <div className="flex flex-1 w-full">
           {/* Mobile Sidebar */}
           <div className="md:hidden">
-            <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+            <AdminSidebar 
+              activeTab={activeTab} 
+              onTabChange={setActiveTab} 
+              pendingSignupsCount={stats.pendingSignups}
+            />
           </div>
           
           <main className="flex-1 w-full">
@@ -595,7 +631,14 @@ export default function Admin() {
                 <TabsList className="hidden md:flex flex-wrap w-full gap-1 md:grid md:grid-cols-8">
                   <TabsTrigger value="overview">لمحة عامة</TabsTrigger>
                   <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
-                  <TabsTrigger value="signups">طلبات Beta</TabsTrigger>
+                  <TabsTrigger value="signups" className="relative">
+                    طلبات Beta
+                    {stats.pendingSignups > 0 && (
+                      <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-pulse">
+                        {stats.pendingSignups}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
                   <TabsTrigger value="tokens">استخدام الرموز</TabsTrigger>
                   <TabsTrigger value="projects">مراقبة المشاريع</TabsTrigger>
                   <TabsTrigger value="training">تصدير التدريب</TabsTrigger>
