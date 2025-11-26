@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSubscription } from '@/hooks/useSubscription';
 import { toast } from 'sonner';
 import { formatTokens } from '@/lib/helpers/formatters';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Plan {
   id: string;
@@ -36,6 +37,7 @@ export default function Pricing() {
   const [isLoading, setIsLoading] = useState(true);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const { checkout, plan: currentPlan } = useSubscription();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchPlans();
@@ -170,7 +172,13 @@ export default function Pricing() {
                     variant={isPopular ? 'default' : 'outline'}
                     disabled={isCurrent}
                   >
-                    {isCurrent ? 'الخطة الحالية' : plan.slug === 'free' ? 'البدء مجاناً' : 'اشترك الآن'}
+                    {isCurrent 
+                      ? 'الخطة الحالية' 
+                      : !user 
+                        ? 'سجل دخول للاشتراك'
+                        : plan.slug === 'free' 
+                          ? 'البدء مجاناً' 
+                          : 'اشترك الآن'}
                   </Button>
                 </Card>
               );

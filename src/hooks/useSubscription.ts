@@ -123,6 +123,7 @@ export const useSubscription = () => {
   const checkout = async (planSlug: string, period: 'monthly' | 'yearly') => {
     if (!user) {
       toast.error('يجب تسجيل الدخول أولاً');
+      window.location.href = '/auth?redirect=/pricing';
       return;
     }
 

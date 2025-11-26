@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,8 @@ import { FeatureCard } from "@/components/landing/FeatureCard";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { APP_ROUTES } from "@/lib/constants";
 import { formatTokens } from "@/lib/helpers/formatters";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import preshootLogoNew from "@/assets/preshoot-logo-new.png";
 import {
   Search,
@@ -46,6 +48,9 @@ export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+  const { user } = useAuth();
+  const { checkout } = useSubscription();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +87,19 @@ export default function Landing() {
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
       setMobileMenuOpen(false);
+    }
+  };
+
+  const handlePlanClick = (plan: Plan) => {
+    if (!user) {
+      navigate(APP_ROUTES.REQUEST_ACCESS);
+      return;
+    }
+
+    if (plan.slug === 'free') {
+      navigate(APP_ROUTES.PROJECTS);
+    } else {
+      checkout(plan.slug, billingPeriod);
     }
   };
 
@@ -407,16 +425,15 @@ export default function Landing() {
                       </div>
                     </div>
 
-                    <Link to={APP_ROUTES.REQUEST_ACCESS}>
-                      <Button
-                        className={`w-full ${
-                          plan.slug === "pro" ? "bg-primary hover:bg-primary/90" : ""
-                        }`}
-                        variant={plan.slug === "pro" ? "default" : "outline"}
-                      >
-                        {plan.slug === "free" ? "ابدأ مجاناً" : "اشترك الآن"}
-                      </Button>
-                    </Link>
+                    <Button
+                      onClick={() => handlePlanClick(plan)}
+                      className={`w-full ${
+                        plan.slug === "pro" ? "bg-primary hover:bg-primary/90" : ""
+                      }`}
+                      variant={plan.slug === "pro" ? "default" : "outline"}
+                    >
+                      {plan.slug === "free" ? "ابدأ مجاناً" : "اشترك الآن"}
+                    </Button>
                   </div>
                 </Card>
               </ScrollReveal>
