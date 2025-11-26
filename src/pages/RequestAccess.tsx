@@ -96,7 +96,7 @@ export default function RequestAccess() {
       <header className="border-b border-border">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto" />
+            <img src={preshootLogoNew} alt="PreShoot Studio" className="h-8 w-auto brightness-0 invert" />
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
