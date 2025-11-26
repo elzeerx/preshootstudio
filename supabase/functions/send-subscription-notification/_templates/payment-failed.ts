@@ -9,6 +9,7 @@ interface PaymentFailedData {
 
 export function getPaymentFailedTemplate(data: PaymentFailedData): string {
   const retryDate = new Date(data.retry_date).toLocaleDateString('ar-SA', {
+    calendar: 'gregory',
     year: 'numeric',
     month: 'long',
     day: 'numeric',

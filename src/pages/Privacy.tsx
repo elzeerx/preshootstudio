@@ -10,7 +10,7 @@ const Privacy = () => {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-8 text-center">سياسة الخصوصية</h1>
           <p className="text-muted-foreground text-center mb-8">
-            آخر تحديث: {new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}
+            آخر تحديث: {new Date().toLocaleDateString('ar-SA', { calendar: 'gregory', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
 
           <div className="space-y-6">
