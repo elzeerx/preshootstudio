@@ -860,3 +860,19 @@ All colors MUST be HSL.
 .icon-pulse {
   animation: icon-pulse 2s ease-in-out infinite;
 }
+
+/* Badge pulse animation */
+@keyframes badge-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.1); 
+    opacity: 0.8; 
+  }
+}
+
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}

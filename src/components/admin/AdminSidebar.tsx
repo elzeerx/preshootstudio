@@ -23,10 +23,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface AdminSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  pendingSignupsCount?: number;
 }
 
 const menuItems = [
@@ -40,7 +42,7 @@ const menuItems = [
   { value: "email", label: "قوالب البريد", icon: Mail },
 ];
 
-export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab, onTabChange, pendingSignupsCount }: AdminSidebarProps) {
   const { open, setOpen, isMobile } = useSidebar();
   const currentItem = menuItems.find((item) => item.value === activeTab);
 
@@ -100,6 +102,11 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
                     >
                       <Icon className="h-5 w-5 ml-3" />
                       <span>{item.label}</span>
+                      {item.value === 'signups' && pendingSignupsCount && pendingSignupsCount > 0 && (
+                        <Badge className="mr-auto bg-red-500 text-white animate-pulse">
+                          {pendingSignupsCount}
+                        </Badge>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
