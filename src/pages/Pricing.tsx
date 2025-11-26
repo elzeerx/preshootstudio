@@ -72,8 +72,8 @@ export default function Pricing() {
   const getFeatures = (plan: Plan) => {
     const features = [
       `${plan.project_limit_monthly || 'غير محدود'} مشروع شهرياً`,
-      `${(plan.token_limit_monthly / 1000).toLocaleString('ar-SA')}K رمز شهرياً`,
-      `إعادة توليد ${plan.redo_limit_per_tab === 99 ? 'غير محدودة' : plan.redo_limit_per_tab + ' مرات'} لكل تبويب`,
+      `${(plan.token_limit_monthly / 1000).toLocaleString('en-US')}K رمز شهرياً`,
+      `إعادة توليد ${plan.redo_limit_per_tab === 99 ? 'غير محدودة' : plan.redo_limit_per_tab.toLocaleString('en-US') + ' مرات'} لكل تبويب`,
     ];
 
     if (plan.export_enabled) features.push('تصدير الملفات');
@@ -100,22 +100,25 @@ export default function Pricing() {
 
         {/* Billing Toggle */}
         <div className="flex justify-center items-center gap-4 mb-12">
-          <span className={billingPeriod === 'monthly' ? 'font-semibold' : 'text-muted-foreground'}>
+          <span className={billingPeriod === 'monthly' ? 'font-semibold text-foreground' : 'text-muted-foreground transition-colors'}>
             شهري
           </span>
           <button
             onClick={() => setBillingPeriod(prev => prev === 'monthly' ? 'yearly' : 'monthly')}
-            className="relative w-14 h-8 bg-muted rounded-full transition-colors hover:bg-muted/80"
+            className="relative w-16 h-9 bg-card border-2 border-border rounded-full transition-all hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+            aria-label="Toggle billing period"
           >
-            <div className={`absolute top-1 w-6 h-6 bg-primary rounded-full transition-transform ${
-              billingPeriod === 'yearly' ? 'translate-x-1' : 'translate-x-7'
-            }`} />
+            <div 
+              className={`absolute top-0.5 w-7 h-7 bg-gradient-to-br from-primary via-accent to-secondary rounded-full transition-all duration-300 shadow-md ${
+                billingPeriod === 'yearly' ? 'translate-x-1' : 'translate-x-8'
+              }`} 
+            />
           </button>
-          <span className={billingPeriod === 'yearly' ? 'font-semibold' : 'text-muted-foreground'}>
+          <span className={billingPeriod === 'yearly' ? 'font-semibold text-foreground' : 'text-muted-foreground transition-colors'}>
             سنوي
           </span>
           {billingPeriod === 'yearly' && (
-            <Badge variant="secondary" className="mr-2">
+            <Badge variant="secondary" className="mr-2 bg-accent text-accent-foreground">
               وفّر شهرين
             </Badge>
           )}
@@ -135,10 +138,14 @@ export default function Pricing() {
               return (
                 <Card
                   key={plan.id}
-                  className={`p-6 relative ${isPopular ? 'border-primary shadow-lg scale-105' : ''}`}
+                  className={`p-6 relative transition-all ${
+                    isPopular 
+                      ? 'border-2 border-accent shadow-lg scale-[1.02] bg-card' 
+                      : 'border border-border bg-card hover:border-border/60'
+                  }`}
                 >
                   {isPopular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground border-none">
                       الأكثر شعبية
                     </Badge>
                   )}
@@ -146,7 +153,7 @@ export default function Pricing() {
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold mb-2">{plan.name_ar}</h3>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold">${price}</span>
+                      <span className="text-4xl font-bold" style={{ fontVariantNumeric: 'lining-nums' }}>${price.toLocaleString('en-US')}</span>
                       <span className="text-muted-foreground">
                         /{billingPeriod === 'yearly' ? 'سنة' : 'شهر'}
                       </span>
@@ -156,8 +163,8 @@ export default function Pricing() {
                   <ul className="space-y-3 mb-6">
                     {features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
+                        <Check className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                        <span className="text-sm text-card-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
