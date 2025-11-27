@@ -159,7 +159,7 @@ export default function Landing() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <img
-                src="/src/assets/preshoot-logo-new.png"
+                src={preshootLogoNew}
                 alt="PreShoot Logo"
                 className="h-8 w-auto brightness-0 invert group-hover:scale-110 transition-transform duration-300"
               />
