@@ -46,15 +46,12 @@ export default function RequestAccess() {
   });
   const onSubmit = async (data: RequestAccessForm) => {
     try {
-      const {
-        data: signupData,
-        error
-      } = await supabase.from("beta_signups").insert([{
+      const { error } = await supabase.from("beta_signups").insert([{
         name: data.name.trim(),
         email: data.email.trim().toLowerCase(),
         notes: data.reason.trim(),
         status: 'pending'
-      }]).select().single();
+      }]);
       if (error) {
         if (error.code === "23505") {
           toast.error("هذا البريد الإلكتروني مسجل مسبقاً");
@@ -68,7 +65,6 @@ export default function RequestAccess() {
       // Notify admins via edge function (fire and forget)
       supabase.functions.invoke("notify-admins-new-signup", {
         body: {
-          signupId: signupData.id,
           signupName: data.name.trim(),
           signupEmail: data.email.trim().toLowerCase(),
           signupReason: data.reason.trim()
