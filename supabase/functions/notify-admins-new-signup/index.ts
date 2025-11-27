@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 interface NotifyRequest {
-  signupId: string;
+  signupId?: string;
   signupName: string;
   signupEmail: string;
   signupReason?: string;
