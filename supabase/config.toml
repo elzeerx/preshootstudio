@@ -3,6 +3,9 @@ project_id = "uoydhwauppxnytzochqx"
 [functions.paypal-webhook]
 verify_jwt = false
 
+[functions.submit-beta-signup]
+verify_jwt = false
+
 [functions.run-article]
 verify_jwt = true
 

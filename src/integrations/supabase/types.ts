@@ -159,6 +159,33 @@ export type Database = {
           },
         ]
       }
+      beta_signup_rate_limits: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          id: string
+          ip_address: string
+          last_attempt: string
+          window_start: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          ip_address: string
+          last_attempt?: string
+          window_start?: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          ip_address?: string
+          last_attempt?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       beta_signups: {
         Row: {
           account_created_at: string | null

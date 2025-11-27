@@ -46,45 +46,36 @@ export default function RequestAccess() {
   });
   const onSubmit = async (data: RequestAccessForm) => {
     try {
-      const { error } = await supabase.from("beta_signups").insert([{
-        name: data.name.trim(),
-        email: data.email.trim().toLowerCase(),
-        notes: data.reason.trim(),
-        status: 'pending'
-      }]);
+      // Submit through rate-limited edge function
+      const { data: responseData, error } = await supabase.functions.invoke(
+        "submit-beta-signup",
+        {
+          body: {
+            name: data.name,
+            email: data.email,
+            notes: data.reason,
+            preferred_language: "ar",
+          },
+        }
+      );
+
       if (error) {
-        if (error.code === "23505") {
-          toast.error("هذا البريد الإلكتروني مسجل مسبقاً");
+        if (error.message?.includes('429')) {
+          toast.error("لقد تجاوزت الحد المسموح من المحاولات. يرجى المحاولة لاحقاً.");
+        } else if (error.message?.includes('409')) {
+          toast.error("هذا البريد الإلكتروني مسجل مسبقاً.");
         } else {
-          console.error("Signup error:", error);
-          toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
+          toast.error("حدث خطأ أثناء إرسال طلبك. يرجى المحاولة مرة أخرى.");
         }
         return;
       }
 
-      // Notify admins via edge function (fire and forget)
-      supabase.functions.invoke("notify-admins-new-signup", {
-        body: {
-          signupName: data.name.trim(),
-          signupEmail: data.email.trim().toLowerCase(),
-          signupReason: data.reason.trim()
-        }
-      }).then(({
-        error: notifyError
-      }) => {
-        if (notifyError) {
-          console.error("Error notifying admins:", notifyError);
-          // Don't show error to user - notification failure shouldn't block signup
-        } else {
-          console.log("Admins notified successfully");
-        }
-      });
       setIsSuccess(true);
       toast.success("تم إرسال طلبك بنجاح!");
       reset();
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      toast.error("حدث خطأ أثناء إرسال طلبك. يرجى المحاولة مرة أخرى.");
     }
   };
   return <div className="min-h-screen flex flex-col bg-background">

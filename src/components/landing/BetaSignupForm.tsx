@@ -33,25 +33,34 @@ export const BetaSignupForm = () => {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      const {
-        error
-      } = await supabase.from("beta_signups").insert([{
-        name: data.name,
-        email: data.email
-      }]);
+      const { data: responseData, error } = await supabase.functions.invoke(
+        "submit-beta-signup",
+        {
+          body: {
+            name: data.name,
+            email: data.email,
+            preferred_language: "ar",
+          },
+        }
+      );
+
       if (error) {
-        if (error.code === "23505") {
-          toast.error("هذا البريد الإلكتروني مسجل مسبقاً");
+        if (error.message?.includes('429')) {
+          toast.error("لقد تجاوزت الحد المسموح من المحاولات. يرجى المحاولة لاحقاً.");
+        } else if (error.message?.includes('409')) {
+          toast.error("هذا البريد الإلكتروني مسجل مسبقاً.");
         } else {
-          toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
+          toast.error("حدث خطأ. يرجى المحاولة مرة أخرى.");
         }
         return;
       }
+
       setIsSuccess(true);
       toast.success("تم التسجيل بنجاح! سنتواصل معك قريباً");
       reset();
-    } catch (err) {
-      toast.error("حدث خطأ، يرجى المحاولة مرة أخرى");
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      toast.error("حدث خطأ. يرجى المحاولة مرة أخرى.");
     } finally {
       setIsSubmitting(false);
     }
