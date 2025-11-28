@@ -67,6 +67,7 @@ interface BetaSignup {
   email: string;
   status: string;
   created_at: string;
+  preferred_language?: string;
 }
 
 interface Profile {
@@ -423,6 +424,128 @@ export default function Admin() {
       console.error('Error deleting signup:', error);
       toast.error('حدث خطأ في حذف الطلب');
     }
+  };
+
+  const handleInvitationSent = (signupId: string) => {
+    setSignups(signups.map(signup => 
+      signup.id === signupId ? { ...signup, status: 'notified' } : signup
+    ));
+    
+    // Update stats
+    const pendingCount = signups.filter(s => 
+      s.id === signupId ? false : s.status === 'pending'
+    ).length;
+    const approvedCount = signups.filter(s => 
+      s.id === signupId ? false : s.status === 'approved'
+    ).length;
+    
+    setStats(prev => ({
+      ...prev,
+      pendingSignups: pendingCount,
+      approvedSignups: approvedCount
+    }));
+  };
+
+  const bulkUpdateStatus = async (ids: string[], newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('beta_signups')
+        .update({ status: newStatus })
+        .in('id', ids);
+
+      if (error) throw error;
+
+      setSignups(signups.map(signup => 
+        ids.includes(signup.id) ? { ...signup, status: newStatus } : signup
+      ));
+      
+      // Recalculate stats
+      const updatedSignups = signups.map(signup => 
+        ids.includes(signup.id) ? { ...signup, status: newStatus } : signup
+      );
+      const pendingCount = updatedSignups.filter(s => s.status === 'pending').length;
+      const approvedCount = updatedSignups.filter(s => s.status === 'approved').length;
+      
+      setStats(prev => ({
+        ...prev,
+        pendingSignups: pendingCount,
+        approvedSignups: approvedCount
+      }));
+
+      toast.success(`تم تحديث ${ids.length} طلب بنجاح`);
+    } catch (error) {
+      console.error('Error bulk updating status:', error);
+      toast.error('حدث خطأ في تحديث الحالة');
+    }
+  };
+
+  const bulkDeleteSignups = async (ids: string[]) => {
+    try {
+      const { error } = await supabase
+        .from('beta_signups')
+        .delete()
+        .in('id', ids);
+
+      if (error) throw error;
+
+      setSignups(signups.filter(signup => !ids.includes(signup.id)));
+      setStats(prev => ({
+        ...prev,
+        totalBetaSignups: prev.totalBetaSignups - ids.length
+      }));
+      toast.success(`تم حذف ${ids.length} طلب بنجاح`);
+    } catch (error) {
+      console.error('Error bulk deleting signups:', error);
+      toast.error('حدث خطأ في حذف الطلبات');
+    }
+  };
+
+  const bulkSendInvitations = async (signupsToInvite: BetaSignup[]) => {
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const signup of signupsToInvite) {
+      try {
+        const { error } = await supabase.functions.invoke('send-invitation-email', {
+          body: {
+            signupId: signup.id,
+            name: signup.name,
+            email: signup.email,
+            language: signup.preferred_language || 'en',
+          },
+        });
+
+        if (error) throw error;
+        successCount++;
+        
+        // Update local status
+        setSignups(prev => prev.map(s => 
+          s.id === signup.id ? { ...s, status: 'notified' } : s
+        ));
+      } catch (error) {
+        console.error(`Error sending invitation to ${signup.email}:`, error);
+        failCount++;
+      }
+    }
+
+    if (successCount > 0) {
+      toast.success(`تم إرسال ${successCount} دعوة بنجاح`);
+    }
+    if (failCount > 0) {
+      toast.error(`فشل إرسال ${failCount} دعوة`);
+    }
+
+    // Recalculate stats
+    const pendingCount = signups.filter(s => s.status === 'pending').length;
+    const approvedCount = signups.filter(s => 
+      s.status === 'approved' && !signupsToInvite.find(inv => inv.id === s.id)
+    ).length;
+    
+    setStats(prev => ({
+      ...prev,
+      pendingSignups: pendingCount,
+      approvedSignups: approvedCount
+    }));
   };
 
 
@@ -871,6 +994,10 @@ export default function Admin() {
               signups={signups}
               onUpdateStatus={updateStatus}
               onDelete={deleteSignup}
+              onInvitationSent={handleInvitationSent}
+              onBulkUpdateStatus={bulkUpdateStatus}
+              onBulkDelete={bulkDeleteSignups}
+              onBulkSendInvitations={bulkSendInvitations}
             />
           </TabsContent>
 
