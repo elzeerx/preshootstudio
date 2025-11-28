@@ -129,10 +129,9 @@ serve(async (req) => {
     // Notify admins asynchronously (don't await)
     supabase.functions.invoke('notify-admins-new-signup', {
       body: {
-        name: signupData.name,
-        email: signupData.email,
-        notes: signupData.notes,
-        preferred_language: signupData.preferred_language
+        signupName: signupData.name,
+        signupEmail: signupData.email,
+        signupReason: signupData.notes
       }
     }).catch(err => console.error('Admin notification error:', err));
 
