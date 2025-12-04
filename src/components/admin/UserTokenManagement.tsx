@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Edit, AlertCircle, CheckCircle } from 'lucide-react';
+import { Edit, AlertCircle, CheckCircle, Gift, Sparkles } from 'lucide-react';
 import { EditUserTokenLimitDialog } from './EditUserTokenLimitDialog';
 import {
   Table,
@@ -24,6 +24,9 @@ interface UserTokenData {
   total_tokens: number;
   total_cost: number;
   request_count: number;
+  bonus_tokens: number;
+  plan_name: string;
+  plan_token_limit: number;
 }
 
 interface UserTokenManagementProps {
@@ -34,6 +37,10 @@ interface UserTokenManagementProps {
 export const UserTokenManagement = ({ users, onUpdate }: UserTokenManagementProps) => {
   const [selectedUser, setSelectedUser] = useState<UserTokenData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const getEffectiveLimit = (user: UserTokenData) => {
+    return user.plan_token_limit + (user.bonus_tokens || 0);
+  };
 
   const getUsagePercentage = (used: number, limit: number) => {
     if (limit === 0) return 0;
@@ -81,13 +88,16 @@ export const UserTokenManagement = ({ users, onUpdate }: UserTokenManagementProp
           </div>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="text-right">المستخدم</TableHead>
-                <TableHead className="text-right">الحد الشهري</TableHead>
-                <TableHead className="text-right">الاستخدام الحالي</TableHead>
+                <TableHead className="text-right">الخطة</TableHead>
+                <TableHead className="text-right">حد الخطة</TableHead>
+                <TableHead className="text-right">إضافي</TableHead>
+                <TableHead className="text-right">الحد الفعلي</TableHead>
+                <TableHead className="text-right">الاستخدام</TableHead>
                 <TableHead className="text-right">النسبة</TableHead>
                 <TableHead className="text-right">التنبيهات</TableHead>
                 <TableHead className="text-right">الإجراءات</TableHead>
@@ -96,14 +106,16 @@ export const UserTokenManagement = ({ users, onUpdate }: UserTokenManagementProp
             <TableBody>
               {users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center text-muted-foreground">
                     لا يوجد مستخدمين
                   </TableCell>
                 </TableRow>
               ) : (
                 users.map((user) => {
-                  const usagePercentage = getUsagePercentage(user.total_tokens, user.monthly_token_limit);
+                  const effectiveLimit = getEffectiveLimit(user);
+                  const usagePercentage = getUsagePercentage(user.total_tokens, effectiveLimit);
                   const usageColor = getUsageColor(usagePercentage);
+                  const hasBonus = (user.bonus_tokens || 0) > 0;
 
                   return (
                     <TableRow key={user.user_id}>
@@ -114,7 +126,32 @@ export const UserTokenManagement = ({ users, onUpdate }: UserTokenManagementProp
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge variant="outline">{formatNumber(user.monthly_token_limit)}</Badge>
+                        <Badge variant="outline">{user.plan_name}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <span className="text-muted-foreground">
+                          {formatNumber(user.plan_token_limit)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {hasBonus ? (
+                          <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                            <Gift className="h-3 w-3 ml-1" />
+                            +{formatNumber(user.bonus_tokens)}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center gap-1 justify-end">
+                          <Badge variant="secondary">
+                            {formatNumber(effectiveLimit)}
+                          </Badge>
+                          {hasBonus && (
+                            <Sparkles className="h-3 w-3 text-yellow-500" />
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col gap-2">

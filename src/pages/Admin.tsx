@@ -123,6 +123,9 @@ interface UserTokenData {
   total_tokens: number;
   total_cost: number;
   request_count: number;
+  bonus_tokens: number;
+  plan_name: string;
+  plan_token_limit: number;
 }
 
 export default function Admin() {

@@ -897,10 +897,13 @@ export type Database = {
         Args: never
         Returns: {
           alert_threshold_percentage: number
+          bonus_tokens: number
           email: string
           full_name: string
           limit_notifications_enabled: boolean
           monthly_token_limit: number
+          plan_name: string
+          plan_token_limit: number
           request_count: number
           total_cost: number
           total_tokens: number
