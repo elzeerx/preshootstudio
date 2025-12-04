@@ -12,14 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Gift, Sparkles, Package } from 'lucide-react';
 
 interface EditUserTokenLimitDialogProps {
   open: boolean;
@@ -31,16 +27,19 @@ interface EditUserTokenLimitDialogProps {
     monthly_token_limit: number;
     alert_threshold_percentage: number;
     limit_notifications_enabled: boolean;
+    total_tokens: number;
+    bonus_tokens: number;
+    plan_name: string;
+    plan_token_limit: number;
   };
   onSave: () => void;
 }
 
-const PRESET_LIMITS = [
-  { value: '50000', label: 'محدود جداً (50K)', description: 'للاختبار الأساسي' },
-  { value: '100000', label: 'قياسي (100K)', description: 'الافتراضي للبيتا' },
-  { value: '250000', label: 'نشط (250K)', description: 'للمستخدمين النشطين' },
-  { value: '500000', label: 'متقدم (500K)', description: 'للاستخدام المكثف' },
-  { value: 'custom', label: 'مخصص', description: 'قيمة مخصصة' },
+const BONUS_PRESETS = [
+  { value: 50000, label: '+50K' },
+  { value: 100000, label: '+100K' },
+  { value: 250000, label: '+250K' },
+  { value: 500000, label: '+500K' },
 ];
 
 export const EditUserTokenLimitDialog = ({
@@ -49,36 +48,32 @@ export const EditUserTokenLimitDialog = ({
   user,
   onSave,
 }: EditUserTokenLimitDialogProps) => {
-  const [selectedPreset, setSelectedPreset] = useState<string>(() => {
-    const preset = PRESET_LIMITS.find(p => p.value === user.monthly_token_limit.toString());
-    return preset ? preset.value : 'custom';
-  });
-  const [customLimit, setCustomLimit] = useState(user.monthly_token_limit.toString());
+  const [bonusTokens, setBonusTokens] = useState(user.bonus_tokens || 0);
   const [alertThreshold, setAlertThreshold] = useState(user.alert_threshold_percentage);
   const [notificationsEnabled, setNotificationsEnabled] = useState(user.limit_notifications_enabled);
   const [saving, setSaving] = useState(false);
 
-  const getCurrentLimit = () => {
-    if (selectedPreset === 'custom') {
-      return parseInt(customLimit) || 0;
-    }
-    return parseInt(selectedPreset);
+  const effectiveLimit = user.plan_token_limit + bonusTokens;
+  const usagePercentage = effectiveLimit > 0 ? Math.min((user.total_tokens / effectiveLimit) * 100, 100) : 0;
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${Math.round(num / 1000)}K`;
+    return num.toLocaleString('en-US');
+  };
+
+  const handlePresetClick = (value: number) => {
+    setBonusTokens(value);
   };
 
   const handleSave = async () => {
-    const limit = getCurrentLimit();
-    
-    if (limit <= 0) {
-      toast.error('الحد الشهري يجب أن يكون أكبر من صفر');
-      return;
-    }
-
     setSaving(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
-          monthly_token_limit: limit,
+          bonus_tokens: bonusTokens,
+          monthly_token_limit: effectiveLimit,
           alert_threshold_percentage: alertThreshold,
           limit_notifications_enabled: notificationsEnabled,
         })
@@ -98,57 +93,105 @@ export const EditUserTokenLimitDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>تعديل حدود الاستخدام</DialogTitle>
           <DialogDescription>
-            تعديل حدود استخدام الـ Tokens الشهرية للمستخدم
+            إدارة حدود استخدام الـ Tokens الشهرية للمستخدم
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* User Info */}
-          <div className="space-y-1">
-            <p className="text-sm font-medium">{user.full_name || 'غير محدد'}</p>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
+          <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+            <div className="flex-1">
+              <p className="font-medium">{user.full_name || 'غير محدد'}</p>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
+            </div>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Package className="h-3 w-3" />
+              {user.plan_name}
+            </Badge>
           </div>
 
-          {/* Token Limit Preset */}
+          {/* Plan Base Limit */}
           <div className="space-y-2">
-            <Label>الحد الشهري للـ Tokens</Label>
-            <Select value={selectedPreset} onValueChange={setSelectedPreset}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PRESET_LIMITS.map((preset) => (
-                  <SelectItem key={preset.value} value={preset.value}>
-                    <div className="flex flex-col items-start">
-                      <span>{preset.label}</span>
-                      <span className="text-xs text-muted-foreground">{preset.description}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between">
+              <Label className="text-muted-foreground">حد الخطة الأساسي</Label>
+              <span className="font-medium">{formatNumber(user.plan_token_limit)} token</span>
+            </div>
           </div>
 
-          {/* Custom Limit Input */}
-          {selectedPreset === 'custom' && (
+          {/* Bonus Tokens Section */}
+          <div className="space-y-4 p-4 border rounded-lg bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-950/20">
+            <div className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-green-600" />
+              <Label className="font-medium">التوكنز الإضافية (Bonus)</Label>
+            </div>
+            
+            {/* Preset Buttons */}
+            <div className="flex flex-wrap gap-2">
+              {BONUS_PRESETS.map((preset) => (
+                <Button
+                  key={preset.value}
+                  variant={bonusTokens === preset.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePresetClick(preset.value)}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+              <Button
+                variant={!BONUS_PRESETS.find(p => p.value === bonusTokens) && bonusTokens !== 0 ? "default" : "outline"}
+                size="sm"
+                onClick={() => setBonusTokens(0)}
+              >
+                بدون إضافة
+              </Button>
+            </div>
+
+            {/* Custom Input */}
             <div className="space-y-2">
-              <Label>قيمة مخصصة</Label>
+              <Label className="text-sm text-muted-foreground">أو أدخل قيمة مخصصة</Label>
               <Input
                 type="number"
-                value={customLimit}
-                onChange={(e) => setCustomLimit(e.target.value)}
-                placeholder="أدخل الحد المخصص"
-                min="1"
+                value={bonusTokens}
+                onChange={(e) => setBonusTokens(parseInt(e.target.value) || 0)}
+                placeholder="0"
+                min="0"
               />
-              <p className="text-xs text-muted-foreground">
-                الحد الحالي: {parseInt(customLimit).toLocaleString('en-US') || 0} token
-              </p>
             </div>
-          )}
+          </div>
+
+          {/* Effective Limit Display */}
+          <div className="p-4 border rounded-lg bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-yellow-500" />
+                <Label className="font-medium">الحد الفعلي</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">{formatNumber(effectiveLimit)}</span>
+                <span className="text-muted-foreground">token</span>
+              </div>
+            </div>
+            {bonusTokens > 0 && (
+              <p className="text-sm text-green-600">
+                +{formatNumber(bonusTokens)} tokens إضافية من الأدمن
+              </p>
+            )}
+          </div>
+
+          {/* Current Usage */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span>الاستخدام الحالي</span>
+              <span className={usagePercentage >= 80 ? 'text-destructive' : ''}>
+                {formatNumber(user.total_tokens)} / {formatNumber(effectiveLimit)} ({usagePercentage.toFixed(1)}%)
+              </span>
+            </div>
+            <Progress value={usagePercentage} className="h-2" />
+          </div>
 
           {/* Alert Threshold */}
           <div className="space-y-3">
